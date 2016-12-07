@@ -1,0 +1,128 @@
+Version 1.54
+- Provide a commandline BrainNet_GenSurface.m for generating nv surface file from nifti mask
+- Fix a bug in label setting of option panel
+- Add a colormap for volume mapping
+- Fix a bug when the angle between two nodes in z direction is 180 degree
+- Using gaussian kenrnel in smoothing the ROI culster instead of the default box kernel
+
+Version 1.53 Released 20150807
+- Improve the outlay of 6 views
+- Show colorbar when using node colormapping
+- Fix a bug in drawing directed networks
+
+Version 1.52 Released 20150414
+- Provide a commandline BrainNet_GenCoord.m for generating node file from voxel-based template
+- Fix a bug in coloring edges according to nodal modules
+- Fix a compatible bug of label display in matlab 2014b
+- Fix a bug in loading volume file in commandline mode
+
+Version 1.51 Released 20150206
+- Fix a bug in identifying Matlab version
+- Fix a bug of loading files in commandline mode
+
+Version 1.5 Released 20150123
+- Fix a bug when volume data including NaN
+- Fix a bug when module number is bigger than option files in command line mode
+- Fix a bug when use absolute value in edge color
+- Remove ROI identifying when initializing the option panel to speed up volume file loading
+- Fix a bug that the ROI selection menu disappear when change from ROI draw all
+- Add surface area in data cursor
+- Fix a bug that the demo and stop buttons are not matching
+- Fix a bug that the apply button doesn't change when smooth checked
+- Add support for SPM or REST statistical files
+- Add function for drawing cluster from SPM or REST statistical files
+- Add function for auto selecting surface opacity between volume mapping and ROI cluster drawing
+- Add support for comments starting with '#' in '.nv', '.node', and '.edge' files
+- Fix a compatible issue with higher version matlab when saving as matlab figures
+- Show colorbar when using edge colormapping
+- support show edge with different opacity
+- Add function for set edge color by custom matrix
+- Add function that only draw nodes with connections 
+
+Version 1.43 Released 20131227
+- Fix a bug that when double surface mode is selected, the ventral view is still active
+- Fix a bug that when double surface mode is enabled, the labels only appear for the first brain
+- Fix a bug in drawing edge with raw size
+- Add a smoothed brain surface of Ch2
+- Add support for '*.obj' file as brain surface
+- Fix a bug that the label isn't appear when including '-' in the string
+- Add support for txt file for volume mapping in command line mode
+
+Version 1.42 Released 20130709
+- Add support for BYU '*.g' file
+- Add support for '*.nv' file in MergeMesh tool
+- Add a function to draw graph in commandline way
+- Fix a bug in short colorbar arrangement for Positive and Negative volume mapping mode
+- Add a volume to surface mapping algorithm 
+- Add support for saving as matlab figure
+- Add view for medium with ventral
+- Add a function to show figure of matrix
+- Arrange the order of colormaps in volume panel as name order
+- Fix a warning bug in volume panel
+- Citation paper was published
+
+Version 1.41 Released 20120918
+- Fix a bug that surface deformed when drawing surface and node in single view
+- Fix a bug that the brain surface out of bound when using single view with axis direction
+- Fix a bug of camlight in ROI drawing mode
+- Adopt new version to read configuration file in older version
+- Manual updated
+
+Version 1.4 Released 20120809
+- Add several volume to surface mapping algorithms
+- Change WindowsStyle of option panel from modal to normal
+- Adjust volume mapping colorbar axis ticks
+- Eliminate the overlap of colorbar and surface in single view
+- Enable resizing main window 
+- Add spectral colorbar for volume mapping
+- Add custom view for single brain mode
+- Add a manner of edge color depending on nodal module
+- Adjust camlight for interaction in multi-surface view
+- Add separated hemispheres of smoothed ICBM152 surface
+
+Version 1.3 Released 20120724
+- Fix an error when the volume is smaller than surface template
+- Update the BrainMesh_Ch2withCerebellum.nv template made by BrainVISA
+- Add a BrainMesh_Ch2_Inflated.nv template made by BrainVISA
+- Add Brodmann Area parcellation information for data cursor
+- Add ROI draw manner
+- Add support for .nii.gz files
+- Add support for directed network
+- Fix an error that edges with value zero are drawed in matrix with negative value while draw all is selected
+- Add a function to save current colormap
+- Add a function to draw two brains networks in one figure
+- Fix a bug in colorbar arrangement in only positive or only negative situation
+
+
+Version 1.21 Released 20120414
+- Add default path for Brain Template load
+- Fix a spelling mistake in option panel
+- Add AAL parcellation information for data cursor
+- Add render methods selection to fix problem of text upside down
+- Add a function for graph detail adjusting
+- Fix a bug on edge colormap
+- Fix a compatibility bug of calling from REST
+
+Version 1.2 Released 20120412
+- Add custum colorbar for volume mapping
+- Fix a bug that an error occurs when entering in the edge thershold edit box
+- Add volume & node display manner
+- Add a colormap editor
+- Fix panel display under linux
+- Add a option for draw inter hemispheres edges
+- Add volume, node & edge display manner
+- Add function for object material, lighting, shading adjusting
+- Add a smoothed surface of ICBM152 in Talairach space
+- Add a function for auto set colorbar range for volume mapping
+- Fix a bug in calculating the distance between two node
+
+
+Version 1.1 Released 20111028
+- Add a Interface to REST (http://restfmri.net/forum/), can be called from the Slice Viewer function in REST to draw a vloume-surface mapping graph. (function BrainNet_MapVolumet to draw volume-surface mapping graph by script). 
+- Add a new graph layout called 'Medium view', which would show the lateral and medium side of hemispheres.
+- Integrat SPM NIFTI file lodaing functions, SPM NIFTI or Analyzed files can be supported.
+- Add several new colormap for volume-surface mapping function, and algorithm of colormap is adjusted
+- Adjust the position of nodal label.
+- Add a smoothed ICBM152 surface.
+- Adjust the Tab order in Option panel.
+- Change function name with uniformed prefix 'BrainNet_' to avoid confusion
