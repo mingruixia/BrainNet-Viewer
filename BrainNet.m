@@ -1,7 +1,7 @@
 function varargout = BrainNet(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %-----------------------------------------------------------
-%	Copyright(c) 2013
+%	Copyright(c) 2016
 %	Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
