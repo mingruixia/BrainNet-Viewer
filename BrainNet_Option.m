@@ -2,13 +2,13 @@ function varargout = BrainNet_Option(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %Function for control panel
 %-----------------------------------------------------------
-%	Copyright(c) 2013
+%	Copyright(c) 2017
 %	State Key Laboratory of Cognitive Neuroscience and Learning, Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
-%   Version 1.52;
+%   Version 1.6;
 %   Date 20110531;
-%   Last edited 20150414
+%   Last edited 20170303
 %-----------------------------------------------------------
 %
 % BrainNet_Option MATLAB code for BrainNet_Option.fig
@@ -34,7 +34,7 @@ function varargout = BrainNet_Option(varargin)
 
 % Edit the above text to modify the response to help BrainNet_Option
 
-% Last Modified by GUIDE v2.5 20-Jan-2015 10:08:21
+% Last Modified by GUIDE v2.5 17-Mar-2017 22:04:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -85,49 +85,61 @@ global surf
 global FLAG
 
 % Edited  by Mingrui Xia, 20120806, add custom view for single brain.
-set(handles.LotSingleCustomAz_edit,'String',num2str(EC.lot.view_az,'%d'));
+set(handles.LotSCusAz_edit,'String',num2str(EC.lot.view_az,'%d'));
 set(handles.LotSingleCustomEl_edit,'String',num2str(EC.lot.view_el,'%d'));
 switch EC.lot.view
     case 1
-        set(handles.LotP_radiobutton,'Value',1);
-        set(handles.LotPS_radiobutton,'Enable','on');
-        set(handles.LotPA_radiobutton,'Enable','on');
-        set(handles.LotPC_radiobutton,'Enable','on');
-        set(handles.LotSingleCustom_radiobutton,'Enable','on');
+        set(handles.LotS_radiobutton,'Value',1);
+        set(handles.LotSS_radiobutton,'Enable','on');
+        set(handles.LotSA_radiobutton,'Enable','on');
+        set(handles.LotSC_radiobutton,'Enable','on');
+        set(handles.LotSCus_radiobutton,'Enable','on');
         if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
             set(handles.LotF_radiobutton,'Enable','off');
-            set(handles.LotM_radiobutton,'Enable','off');
-            set(handles.LotV_radiobutton,'Enable','off'); % Added by Mingrui Xia, 20130221, add view for medium with ventral
+            set(handles.LotLM_radiobutton,'Enable','off');
+            set(handles.LotLMV_radiobutton,'Enable','off'); % Added by Mingrui Xia, 20130221, add view for medium with ventral
         end
     case 2
         set(handles.LotF_radiobutton,'Value',1);
-        set(handles.LotPS_radiobutton,'Enable','off');
-        set(handles.LotPA_radiobutton,'Enable','off');
-        set(handles.LotPC_radiobutton,'Enable','off');
-        set(handles.LotSingleCustom_radiobutton,'Enable','off');
-        set(handles.LotSingleCustomAz_text,'Enable','off');
-        set(handles.LotSingleCustomAz_edit,'Enable','off');
-        set(handles.LotSingleCustomEl_text,'Enable','off');
+        set(handles.LotSS_radiobutton,'Enable','off');
+        set(handles.LotSA_radiobutton,'Enable','off');
+        set(handles.LotSC_radiobutton,'Enable','off');
+        set(handles.LotSCus_radiobutton,'Enable','off');
+        set(handles.LotSCusAz_text,'Enable','off');
+        set(handles.LotSCusAz_edit,'Enable','off');
+        set(handles.LotSCusEl_text,'Enable','off');
         set(handles.LotSingleCustomEl_edit,'Enable','off');
     case 3 %%% Added by Mingrui Xia, 20111027, add for medium views(4 views).
-        set(handles.LotM_radiobutton, 'Value', 1);
-        set(handles.LotPS_radiobutton,'Enable','off');
-        set(handles.LotPA_radiobutton,'Enable','off');
-        set(handles.LotPC_radiobutton,'Enable','off');
-        set(handles.LotSingleCustom_radiobutton,'Enable','off');
-        set(handles.LotSingleCustomAz_text,'Enable','off');
-        set(handles.LotSingleCustomAz_edit,'Enable','off');
-        set(handles.LotSingleCustomEl_text,'Enable','off');
+        set(handles.LotLM_radiobutton, 'Value', 1);
+        set(handles.LotSS_radiobutton,'Enable','off');
+        set(handles.LotSA_radiobutton,'Enable','off');
+        set(handles.LotSC_radiobutton,'Enable','off');
+        set(handles.LotSCus_radiobutton,'Enable','off');
+        set(handles.LotSCusAz_text,'Enable','off');
+        set(handles.LotSCusAz_edit,'Enable','off');
+        set(handles.LotSCusEl_text,'Enable','off');
         set(handles.LotSingleCustomEl_edit,'Enable','off');
     case 4 % Added by Mingrui Xia, 20130221, add view for medium with ventral
-        set(handles.LotV_radiobutton,'Value',1);
-        set(handles.LotPS_radiobutton,'Enable','off');
-        set(handles.LotPA_radiobutton,'Enable','off');
-        set(handles.LotPC_radiobutton,'Enable','off');
-        set(handles.LotSingleCustom_radiobutton,'Enable','off');
-        set(handles.LotSingleCustomAz_text,'Enable','off');
-        set(handles.LotSingleCustomAz_edit,'Enable','off');
-        set(handles.LotSingleCustomEl_text,'Enable','off');
+        set(handles.LotLMV_radiobutton,'Value',1);
+        set(handles.LotSS_radiobutton,'Enable','off');
+        set(handles.LotSA_radiobutton,'Enable','off');
+        set(handles.LotSC_radiobutton,'Enable','off');
+        set(handles.LotSCus_radiobutton,'Enable','off');
+        set(handles.LotSCusAz_text,'Enable','off');
+        set(handles.LotSCusAz_edit,'Enable','off');
+        set(handles.LotSCusEl_text,'Enable','off');
+        set(handles.LotSingleCustomEl_edit,'Enable','off');
+        
+        % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+    case 5
+        set(handles.LotLMD_radiobutton,'Value',1);
+        set(handles.LotSS_radiobutton,'Enable','off');
+        set(handles.LotSA_radiobutton,'Enable','off');
+        set(handles.LotSC_radiobutton,'Enable','off');
+        set(handles.LotSCus_radiobutton,'Enable','off');
+        set(handles.LotSCusAz_text,'Enable','off');
+        set(handles.LotSCusAz_edit,'Enable','off');
+        set(handles.LotSCusEl_text,'Enable','off');
         set(handles.LotSingleCustomEl_edit,'Enable','off');
 end
 
@@ -136,66 +148,68 @@ switch FLAG.Loadfile
     case {1,3,7,9,11,15} %%% Edited by Mingrui Xia, 20120210, add 15 for volume, node and edge mode.
         [t,tl,tr,vl,vr,h1,w1,cut,cuv]=BrainNet('CutMesh', surf);
         if t<=cut
-            set(handles.LotM_radiobutton, 'Enable', 'off');
-            set(handles.LotV_radiobutton, 'Enable', 'off');
+            set(handles.LotLM_radiobutton, 'Enable', 'off');
+            set(handles.LotLMV_radiobutton, 'Enable', 'off');
+            set(handles.LotLMD_radiobutton, 'Enable', 'off');
             if EC.lot.view==3 && EC.lot.view == 4 % Edited by Mingrui Xia, 20130221, 4 for view of medium with ventral
                 EC.lot.view = 2;
                 set(handles.LotF_radiobutton,'Value',1);
-                set(handles.LotPS_radiobutton,'Enable','off');
-                set(handles.LotPA_radiobutton,'Enable','off');
-                set(handles.LotPC_radiobutton,'Enable','off');
-                set(handles.LotSingleCustom_radiobutton,'Enable','off');
-                set(handles.LotSingleCustomAz_text,'Enable','off');
-                set(handles.LotSingleCustomAz_edit,'Enable','off');
-                set(handles.LotSingleCustomEl_text,'Enable','off');
+                set(handles.LotSS_radiobutton,'Enable','off');
+                set(handles.LotSA_radiobutton,'Enable','off');
+                set(handles.LotSC_radiobutton,'Enable','off');
+                set(handles.LotSCus_radiobutton,'Enable','off');
+                set(handles.LotSCusAz_text,'Enable','off');
+                set(handles.LotSCusAz_edit,'Enable','off');
+                set(handles.LotSCusEl_text,'Enable','off');
                 set(handles.LotSingleCustomEl_edit,'Enable','off');
             end
         end
     case {2,6}
-        set(handles.LotM_radiobutton, 'Enable', 'off');
-        set(handles.LotV_radiobutton, 'Enable', 'off');
+        set(handles.LotLM_radiobutton, 'Enable', 'off');
+        set(handles.LotLMV_radiobutton, 'Enable', 'off');
+        set(handles.LotLMD_radiobutton, 'Enable', 'off');
         if EC.lot.view==3 && EC.lot.view == 4
             EC.lot.view = 2;
             set(handles.LotF_radiobutton,'Value',1);
-            set(handles.LotPS_radiobutton,'Enable','off');
-            set(handles.LotPA_radiobutton,'Enable','off');
-            set(handles.LotPC_radiobutton,'Enable','off');
-            set(handles.LotSingleCustom_radiobutton,'Enable','off');
-            set(handles.LotSingleCustomAz_text,'Enable','off');
-            set(handles.LotSingleCustomAz_edit,'Enable','off');
-            set(handles.LotSingleCustomEl_text,'Enable','off');
+            set(handles.LotSS_radiobutton,'Enable','off');
+            set(handles.LotSA_radiobutton,'Enable','off');
+            set(handles.LotSC_radiobutton,'Enable','off');
+            set(handles.LotSCus_radiobutton,'Enable','off');
+            set(handles.LotSCusAz_text,'Enable','off');
+            set(handles.LotSCusAz_edit,'Enable','off');
+            set(handles.LotSCusEl_text,'Enable','off');
             set(handles.LotSingleCustomEl_edit,'Enable','off');
         end
 end
 %%% Added END, 20111027
 switch EC.lot.view_direction
     case 1
-        set(handles.LotPS_radiobutton,'Value',1);
-        set(handles.LotSingleCustomAz_text,'Enable','off');
-        set(handles.LotSingleCustomAz_edit,'Enable','off');
-        set(handles.LotSingleCustomEl_text,'Enable','off');
+        set(handles.LotSS_radiobutton,'Value',1);
+        set(handles.LotSCusAz_text,'Enable','off');
+        set(handles.LotSCusAz_edit,'Enable','off');
+        set(handles.LotSCusEl_text,'Enable','off');
         set(handles.LotSingleCustomEl_edit,'Enable','off');
     case 2
-        set(handles.LotPA_radiobutton,'Value',1);
-        set(handles.LotSingleCustomAz_text,'Enable','off');
-        set(handles.LotSingleCustomAz_edit,'Enable','off');
-        set(handles.LotSingleCustomEl_text,'Enable','off');
+        set(handles.LotSA_radiobutton,'Value',1);
+        set(handles.LotSCusAz_text,'Enable','off');
+        set(handles.LotSCusAz_edit,'Enable','off');
+        set(handles.LotSCusEl_text,'Enable','off');
         set(handles.LotSingleCustomEl_edit,'Enable','off');
     case 3
-        set(handles.LotPC_radiobutton,'Value',1);
-        set(handles.LotSingleCustomAz_text,'Enable','off');
-        set(handles.LotSingleCustomAz_edit,'Enable','off');
-        set(handles.LotSingleCustomEl_text,'Enable','off');
+        set(handles.LotSC_radiobutton,'Value',1);
+        set(handles.LotSCusAz_text,'Enable','off');
+        set(handles.LotSCusAz_edit,'Enable','off');
+        set(handles.LotSCusEl_text,'Enable','off');
         set(handles.LotSingleCustomEl_edit,'Enable','off');
     case 4
-        set(handles.LotSingleCustom_radiobutton,'Value',1);
-        set(handles.LotSingleCustomAz_text,'Enable','on');
-        set(handles.LotSingleCustomAz_edit,'Enable','on');
-        set(handles.LotSingleCustomEl_text,'Enable','on');
+        set(handles.LotSCus_radiobutton,'Value',1);
+        set(handles.LotSCusAz_text,'Enable','on');
+        set(handles.LotSCusAz_edit,'Enable','on');
+        set(handles.LotSCusEl_text,'Enable','on');
         set(handles.LotSingleCustomEl_edit,'Enable','on');
         
 end
-set(handles.BakC_text,'BackgroundColor',EC.bak.color);
+set(handles.BakC_pushbutton,'BackgroundColor',EC.bak.color);
 
 switch EC.glb.material % Add by Mingrui Xia, 20120316, modify object material, shading, light.
     case 'shiny'
@@ -274,10 +288,13 @@ end
 
 set(handles.GlbGD_popupmenu,'Value',EC.glb.detail); % Add by Mingrui Xia, 20120413, adjust graph detail
 
+% Add by Mingrui, 20170309, display LR
+set(handles.GlbLR_checkbox,'Value',EC.glb.lr);
+
 % if FLAG.Loadfile==1||FLAG.Loadfile==3||FLAG.Loadfile==7 %%% Edited by
 % Mingrui Xia, add 11 for volume & node mode.
 if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==1||FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15
-    set(handles.MshC_text,'BackgroundColor',EC.msh.color);
+    set(handles.MshC_pushbutton,'BackgroundColor',EC.msh.color);
     set(handles.MshA_slider, 'Value',EC.msh.alpha);
     set(handles.MshA_edit, 'String',num2str(EC.msh.alpha,'%6.2f'));
     
@@ -287,11 +304,11 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
         set(handles.MshDoubleBrain_checkbox,'Enable','off');
     end
     % elseif %% Edited by Mingrui Xia, 20120210, add 15 for volume, node and edge mode.
-    %     set(handles.MshC_text,'Enable','off');
+    %     set(handles.MshC_pushbutton,'Enable','off');
     %     set(handles.MshA_slider, 'Value',EC.msh.alpha);
     %     set(handles.MshA_edit, 'String',num2str(EC.msh.alpha,'%6.2f'));
 else
-    set(handles.MshC_text,'Enable','off');
+    set(handles.MshC_pushbutton,'Enable','off');
     set(handles.MshA_slider,'Enable','off');
     set(handles.MshA_edit,'Enable','off');
     
@@ -417,34 +434,52 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
     set(handles.NodST_edit,'String',num2str(EC.nod.size_threshold,'%6.2f'));
     set(handles.NodSVR_slider,'Value',EC.nod.size_ratio);
     set(handles.NodSVR_edit,'String',num2str(EC.nod.size_ratio,'%6.2f'));
-    switch EC.nod.color
+    
+    switch EC.nod.color % Modified by Mingrui, 20170303, fixed range of color mapping
         case 1
             set(handles.NodCS_radiobutton,'Value',1);
             set(handles.NodCC_popupmenu,'Enable','off');
             set(handles.NodCM_pushbutton,'Enable','off');
             set(handles.NodCT_slider,'Enable','off');
             set(handles.NodCT_edit,'Enable','off');
-            set(handles.NodCS_text,'BackgroundColor',EC.nod.CM(1,:));
+            set(handles.NodCS_pushbutton,'BackgroundColor',EC.nod.CM(1,:));
+            set(handles.NodCC_Range_popupmenu,'Enable','off');
+            set(handles.NodCC_low_edit,'Enable','off');
+            set(handles.NodCC_high_edit,'Enable','off');
         case 2
             set(handles.NodCC_radiobutton,'Value',1);
             set(handles.NodCC_popupmenu,'Enable','on');
             set(handles.NodCM_pushbutton,'Enable','off');
             set(handles.NodCT_slider,'Enable','off');
             set(handles.NodCT_edit,'Enable','off');
+            set(handles.NodCC_Range_popupmenu,'Enable','on');
+            if EC.nod.color_map_type == 1
+                set(handles.NodCC_low_edit,'Enable','off');
+                set(handles.NodCC_high_edit,'Enable','off');
+            else
+                set(handles.NodCC_low_edit,'Enable','on');
+                set(handles.NodCC_high_edit,'Enable','on');
+            end
         case 3
             set(handles.NodCM_radiobutton,'Value',1);
             set(handles.NodCC_popupmenu,'Enable','off');
             set(handles.NodCM_pushbutton,'Enable','on');
             set(handles.NodCT_slider,'Enable','off');
             set(handles.NodCT_edit,'Enable','off');
+            set(handles.NodCC_Range_popupmenu,'Enable','off');
+            set(handles.NodCC_low_edit,'Enable','off');
+            set(handles.NodCC_high_edit,'Enable','off');
         case 4
             set(handles.NodCT_radiobutton,'Value',1);
             set(handles.NodCC_popupmenu,'Enable','off');
             set(handles.NodCM_pushbutton,'Enable','off');
             set(handles.NodCT_slider,'Enable','on');
             set(handles.NodCT_edit,'Enable','on');
-            set(handles.NodCTH_text,'BackgroundColor',EC.nod.CM(1,:));
-            set(handles.NodCTL_text,'BackgroundColor',EC.nod.CM(64,:));
+            set(handles.NodCTH_pushbutton,'BackgroundColor',EC.nod.CM(1,:));
+            set(handles.NodCTL_pushbutton,'BackgroundColor',EC.nod.CM(64,:));
+            set(handles.NodCC_Range_popupmenu,'Enable','off');
+            set(handles.NodCC_low_edit,'Enable','off');
+            set(handles.NodCC_high_edit,'Enable','off');
     end
     set(handles.NodCC_popupmenu,'Value',EC.nod.color_map);
     if EC.nod.color_threshold>max(surf.sphere(:,4))||EC.nod.color_threshold<min(surf.sphere(:,4))
@@ -454,6 +489,9 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
     set(handles.NodCT_slider,'Min',min(surf.sphere(:,4))-0.001);
     set(handles.NodCT_slider,'Value',EC.nod.color_threshold);
     set(handles.NodCT_edit,'String',num2str(EC.nod.color_threshold,'%6.2f'));
+    set(handles.NodCC_Range_popupmenu,'Value',EC.nod.color_map_type);
+    set(handles.NodCC_low_edit,'String',num2str(EC.nod.color_map_low,'%6.2f'));
+    set(handles.NodCC_high_edit,'String',num2str(EC.nod.color_map_high,'%6.2f'));
 else
     set(handles.NodDA_radiobutton,'Enable','off');
     set(handles.NodDT_radiobutton,'Enable','off');
@@ -485,6 +523,9 @@ else
     set(handles.LblT_edit,'Enable','off');
     set(handles.LblT_popupmenu,'Enable','off');
     set(handles.LblF_button,'Enable','off');
+    set(handles.NodCC_Range_popupmenu,'Enable','off');
+    set(handles.NodCC_low_edit,'Enable','off');
+    set(handles.NodCC_high_edit,'Enable','off');
 end
 
 
@@ -576,16 +617,19 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
     end
     set(handles.EdgSRR_slider,'Value',EC.edg.size_ratio);
     set(handles.EdgSRR_edit,'String',num2str(EC.edg.size_ratio,'%6.2f'));
-    switch EC.edg.color
+    switch EC.edg.color % Modified by Mingrui, 20170303, fixed range of color mapping
         case 1
             set(handles.EdgCS_radiobutton,'Value',1);
-            set(handles.EdgCS_text,'BackgroundColor',EC.edg.CM(1,:));
+            set(handles.EdgCS_pushbutton,'BackgroundColor',EC.edg.CM(1,:));
             set(handles.EdgCC_popupmenu,'Enable','off');
             set(handles.EdgCT_slider,'Enable','off');
             set(handles.EdgCT_edit,'Enable','off');
             set(handles.EdgCD_slider,'Enable','off');
             set(handles.EdgCD_edit,'Enable','off');
             set(handles.EdgColorCostum_pushbutton,'Enable','off');
+            set(handles.EdgCC_Range_popupmenu,'Enable','off');
+            set(handles.EdgCC_low_edit,'Enable','off');
+            set(handles.EdgCC_high_edit,'Enable','off');
         case 2
             set(handles.EdgCC_radiobutton,'Value',1);
             set(handles.EdgCC_popupmenu,'Enable','on');
@@ -594,6 +638,14 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCD_slider,'Enable','off');
             set(handles.EdgCD_edit,'Enable','off');
             set(handles.EdgColorCostum_pushbutton,'Enable','off');
+            set(handles.EdgCC_Range_popupmenu,'Enable','on');
+            if EC.edg.color_map_type == 1
+                set(handles.EdgCC_low_edit,'Enable','off');
+                set(handles.EdgCC_high_edit,'Enable','off');
+            else
+                set(handles.NodCC_low_edit,'Enable','on');
+                set(handles.NodCC_high_edit,'Enable','on');
+            end
         case 3
             set(handles.EdgCT_radiobutton,'Value',1);
             set(handles.EdgCC_popupmenu,'Enable','off');
@@ -601,11 +653,14 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCT_edit,'Enable','on');
             set(handles.EdgCT_slider,'Value',EC.edg.color_threshold);
             set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%6.2f'));
-            set(handles.EdgCTH_text,'BackgroundColor',EC.edg.CM(1,:));
-            set(handles.EdgCTL_text,'BackgroundColor',EC.edg.CM(64,:));
+            set(handles.EdgCTH_pushbutton,'BackgroundColor',EC.edg.CM(1,:));
+            set(handles.EdgCTL_pushbutton,'BackgroundColor',EC.edg.CM(64,:));
             set(handles.EdgCD_slider,'Enable','off');
             set(handles.EdgCD_edit,'Enable','off');
             set(handles.EdgColorCostum_pushbutton,'Enable','off');
+            set(handles.EdgCC_Range_popupmenu,'Enable','off');
+            set(handles.EdgCC_low_edit,'Enable','off');
+            set(handles.EdgCC_high_edit,'Enable','off');
         case 4
             set(handles.EdgCD_radiobutton,'Value',1);
             set(handles.EdgCC_popupmenu,'Enable','off');
@@ -613,11 +668,14 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCT_edit,'Enable','off');
             set(handles.EdgCD_slider,'Enable','on');
             set(handles.EdgCD_edit,'Enable','on');
-            set(handles.EdgCDH_text,'BackgroundColor',EC.edg.CM(1,:));
-            set(handles.EdgCDL_text,'BackgroundColor',EC.edg.CM(64,:));
+            set(handles.EdgCDH_pushbutton,'BackgroundColor',EC.edg.CM(1,:));
+            set(handles.EdgCDL_pushbutton,'BackgroundColor',EC.edg.CM(64,:));
             set(handles.EdgCD_slider,'Value',EC.edg.color_distance);
             set(handles.EdgCD_edit,'String',num2str(EC.edg.color_distance,'%6.2f'));
             set(handles.EdgColorCostum_pushbutton,'Enable','off');
+            set(handles.EdgCC_Range_popupmenu,'Enable','off');
+            set(handles.EdgCC_low_edit,'Enable','off');
+            set(handles.EdgCC_high_edit,'Enable','off');
         case 5 % Added by Mingrui Xia, 20120809 add edge color according to nodal module
             set(handles.EdgColorModule_radiobutton,'Value',1);
             set(handles.EdgCC_popupmenu,'Enable','off');
@@ -626,6 +684,9 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCD_slider,'Enable','off');
             set(handles.EdgCD_edit,'Enable','off');
             set(handles.EdgColorCostum_pushbutton,'Enable','off');
+            set(handles.EdgCC_Range_popupmenu,'Enable','off');
+            set(handles.EdgCC_low_edit,'Enable','off');
+            set(handles.EdgCC_high_edit,'Enable','off');
             
             % Addde by Mingrui, 20150120, using custom matrix to define edge color.
         case 6
@@ -636,10 +697,17 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCD_slider,'Enable','off');
             set(handles.EdgCD_edit,'Enable','off');
             set(handles.EdgColorCostum_pushbutton,'Enable','on');
+            set(handles.EdgCC_Range_popupmenu,'Enable','off');
+            set(handles.EdgCC_low_edit,'Enable','off');
+            set(handles.EdgCC_high_edit,'Enable','off');
             
     end
     set(handles.EdgCC_popupmenu,'Value',EC.edg.color_map);
     set(handles.EdgC_checkbox,'Value',EC.edg.color_abs);
+    set(handles.EdgCC_Range_popupmenu,'Value',EC.edg.color_map_type);
+    set(handles.EdgCC_low_edit,'String',num2str(EC.edg.color_map_low,'%6.2f'));
+    set(handles.EdgCC_high_edit,'String',num2str(EC.edg.color_map_high,'%6.2f'));
+    
     switch EC.edg.color_abs
         case 0
             if EC.edg.color_threshold>max(surf.net(:))||EC.edg.color_threshold<min(surf.net(:))
@@ -715,6 +783,7 @@ else
     set(handles.EdgSizeScaleDiscreption_text,'Enable','off');
     
     set(handles.EdgOpaSam_radiobutton,'Enable','off');
+    set(handles.EdgOpaVal_radiobutton,'Enable','off');
     set(handles.EdgOpaSam_edit,'Enable','off');
     set(handles.EdgOpaValMin_edit,'Enable','off');
     set(handles.EdgOpaValMax_edit,'Enable','off');
@@ -724,6 +793,9 @@ else
     set(handles.EdgColorCostum_pushbutton,'Enable','off');
     
     set(handles.NodDrawConnection_radiobutton,'Enable','off');
+    set(handles.EdgCC_Range_popupmenu,'Enable','off');
+    set(handles.EdgCC_low_edit,'Enable','off');
+    set(handles.EdgCC_high_edit,'Enable','off');
 end
 % if FLAG.Loadfile==9 %%% Edited by Mingrui Xia 20111116, add 11 for volume
 % and node mode
@@ -779,14 +851,15 @@ if FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui X
         
         %     set(handles.VolROIColor_text,'Enable','on');
         %     set(handles.VolROIColor_popupmenu,'Enable','on');
-        %     set(handles.VolROIColorSQ_text,'Enable','on');
+        %     set(handles.VolROIColorSQ_pushbutton,'Enable','on');
         %     set(handles.VolROISmooth_checkbox,'Enable','on');
         set(handles.VolROIColor_popupmenu,'Value',1);
-        set(handles.VolROIColorSQ_text,'BackgroundColor',EC.vol.roi.colort(1,:));
+        set(handles.VolROIColorSQ_pushbutton,'BackgroundColor',EC.vol.roi.colort(1,:));
         
         if EC.vol.roi.smooth == 1
             set(handles.VolROISmooth_checkbox,'Value',1);
         end
+        set(handles.VolROISmooth_popupmenu,'Value',EC.vol.roi.smooth_kernal);
         
     else % load a text
         DataLow = min(surf.T);
@@ -801,8 +874,9 @@ if FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui X
         set(handles.VolROICus_edit,'Enable','off');
         set(handles.VolROIColor_text,'Enable','off');
         set(handles.VolROIColor_popupmenu,'Enable','off');
-        set(handles.VolROIColorSQ_text,'Enable','off');
+        set(handles.VolROIColorSQ_pushbutton,'Enable','off');
         set(handles.VolROISmooth_checkbox,'Enable','off');
+        set(handles.VolROISmooth_popupmenu,'Enable','off');
         
         % Added by Mingrui, 20140923, statistic for SPM or REST nifti files
         set(handles.VolStaThr_edit,'Enable','off');
@@ -829,8 +903,9 @@ if FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui X
             set(handles.VolROICus_edit,'Enable','off');
             set(handles.VolROIColor_text,'Enable','off');
             set(handles.VolROIColor_popupmenu,'Enable','off');
-            set(handles.VolROIColorSQ_text,'Enable','off');
+            set(handles.VolROIColorSQ_pushbutton,'Enable','off');
             set(handles.VolROISmooth_checkbox,'Enable','off');
+            set(handles.VolROISmooth_popupmenu,'Enable','off');
         case 2
             set(handles.VolRD_radiobutton,'Value',1);
             set(handles.VolDR_text,'Enable','off');
@@ -897,7 +972,7 @@ if FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui X
             set(handles.VolNRx_edit,'String',num2str(DataLow,'%6.2f'));
         end
     end
-    set(handles.VolNCS_text,'BackgroundColor',EC.vol.null);
+    set(handles.VolNCS_pushbutton,'BackgroundColor',EC.vol.null);
     set(handles.VolC_popupmenu,'Value',EC.vol.color_map);
     set(handles.Vol_AdjustCM_checkbox,'Value',EC.vol.adjustCM);
     set(handles.VolMapAlgorithm_popupmenu,'Value',EC.vol.mapalgorithm);
@@ -935,8 +1010,9 @@ else
     set(handles.VolROICus_edit,'Enable','off');
     set(handles.VolROIColor_text,'Enable','off');
     set(handles.VolROIColor_popupmenu,'Enable','off');
-    set(handles.VolROIColorSQ_text,'Enable','off');
+    set(handles.VolROIColorSQ_pushbutton,'Enable','off');
     set(handles.VolROISmooth_checkbox,'Enable','off');
+    set(handles.VolROISmooth_popupmenu,'Enable','off');
     set(handles.Vol_AdjustCM_checkbox,'Enable','off');
     set(handles.VolMapAlgorithm_popupmenu,'Enable','off');
     set(handles.VolMapAlgorithm_text,'Enable','off');
@@ -1088,33 +1164,37 @@ global FLAG
 FLAG.IsCalledByREST = 0;
 
 
-if get(handles.LotP_radiobutton,'Value')==1
+if get(handles.LotS_radiobutton,'Value')==1
     EC.lot.view = 1;
 elseif get(handles.LotF_radiobutton, 'Value')==1
     EC.lot.view = 2;
-elseif get(handles.LotM_radiobutton,'Value') == 1 %%% Added by Mingrui Xia, 20111026, add for medium views (4 views).
+elseif get(handles.LotLM_radiobutton,'Value') == 1 %%% Added by Mingrui Xia, 20111026, add for medium views (4 views).
     EC.lot.view = 3;
-else % Added by Mingrui Xia, 20130221, add for medium views with ventral.
+elseif get(handles.LotLMV_radiobutton,'Value') == 1 % Added by Mingrui Xia, 20130221, add for medium views with ventral.
     EC.lot.view = 4;
+    
+    % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+else
+    EC.lot.view = 5;
 end
 
 % Edited by Mingrui Xia, 20120806, add custom view for single brain.
-if get(handles.LotPS_radiobutton,'Value')==1
+if get(handles.LotSS_radiobutton,'Value')==1
     EC.lot.view_direction=1;
     FLAG.sagittal=1;
-elseif get(handles.LotPA_radiobutton,'Value')==1
+elseif get(handles.LotSA_radiobutton,'Value')==1
     EC.lot.view_direction=2;
     FLAG.axis=1;
-elseif get(handles.LotPC_radiobutton,'Value') == 1
+elseif get(handles.LotSC_radiobutton,'Value') == 1
     EC.lot.view_direction=3;
     FLAG.coronal=1;
 else
     EC.lot.view_direction = 4;
 end
-EC.lot.view_az = str2double(get(handles.LotSingleCustomAz_edit,'String'));
+EC.lot.view_az = str2double(get(handles.LotSCusAz_edit,'String'));
 EC.lot.view_el = str2double(get(handles.LotSingleCustomEl_edit,'String'));
 
-EC.bak.color=get(handles.BakC_text,'BackgroundColor');
+EC.bak.color=get(handles.BakC_pushbutton,'BackgroundColor');
 switch get(handles.GlbM_popupmenu,'Value') % Add by Mingrui Xia, 20120316, modify object material.
     case 1
         EC.glb.material = 'shiny';
@@ -1167,8 +1247,10 @@ end
 
 EC.glb.detail = get(handles.GlbGD_popupmenu,'Value'); % Add by Mingrui Xia, 20120413, adjust graph detail
 
+% Add by Mingrui, 20170309, display LR
+EC.glb.lr = get(handles.GlbLR_checkbox,'Value');
 
-EC.msh.color=get(handles.MshC_text,'BackgroundColor');
+EC.msh.color=get(handles.MshC_pushbutton,'BackgroundColor');
 EC.msh.alpha=str2double(get(handles.MshA_edit,'String'));
 EC.msh.doublebrain = get(handles.MshDoubleBrain_checkbox,'Value'); % Added by Mingrui Xia, 20120717, show two brains in one figure
 
@@ -1196,9 +1278,10 @@ elseif get(handles.NodSV_radiobutton,'Value')==1
 end
 
 EC.nod.size_ratio=str2double(get(handles.NodSVR_edit,'String'));
+
 if get(handles.NodCS_radiobutton,'Value')==1
     EC.nod.color=1;
-    EC.nod.CM(1,:)=get(handles.NodCS_text,'BackgroundColor');
+    EC.nod.CM(1,:)=get(handles.NodCS_pushbutton,'BackgroundColor');
 elseif get(handles.NodCC_radiobutton,'Value')==1
     EC.nod.color=2;
     EC.nod.color_map=get(handles.NodCC_popupmenu,'Value');
@@ -1229,7 +1312,12 @@ elseif get(handles.NodCC_radiobutton,'Value')==1
             EC.nod.CM=pink;
         case 13
             EC.nod.CM=lines;
+        case 14
+            EC.nod.CM = EC.nod.CMt;
     end
+    EC.nod.color_map_type = get(handles.NodCC_Range_popupmenu,'Value'); % Added by Mingrui, 20170303, fixed range of color mapping
+    EC.nod.color_map_low = str2double(get(handles.NodCC_low_edit,'String'));
+    EC.nod.color_map_high = str2double(get(handles.NodCC_high_edit,'String'));
 elseif get(handles.NodCM_radiobutton,'Value')==1
     EC.nod.color=3;
     %     EC.nod.CM(1:21,:)=EC.nod.CMm;
@@ -1238,8 +1326,8 @@ elseif get(handles.NodCM_radiobutton,'Value')==1
 else
     EC.nod.color=4;
     EC.nod.color_threshold=str2double(get(handles.NodCT_edit,'String'));
-    EC.nod.CM(1,:)=get(handles.NodCTH_text,'BackgroundColor');
-    EC.nod.CM(64,:)=get(handles.NodCTL_text,'BackgroundColor');
+    EC.nod.CM(1,:)=get(handles.NodCTH_pushbutton,'BackgroundColor');
+    EC.nod.CM(64,:)=get(handles.NodCTL_pushbutton,'BackgroundColor');
 end
 if get(handles.LblA_radiobutton,'Value')==1
     EC.lbl=1;
@@ -1277,7 +1365,7 @@ EC.edg.size_abs=get(handles.EdgS_checkbox,'Value');
 EC.edg.color_abs=get(handles.EdgC_checkbox,'Value');
 if get(handles.EdgCS_radiobutton,'Value')==1
     EC.edg.color=1;
-    EC.edg.CM(1,:)=get(handles.EdgCS_text,'BackgroundColor');
+    EC.edg.CM(1,:)=get(handles.EdgCS_pushbutton,'BackgroundColor');
 elseif get(handles.EdgCC_radiobutton,'Value')==1
     EC.edg.color=2;
     EC.edg.color_map=get(handles.EdgCC_popupmenu,'Value');
@@ -1285,8 +1373,8 @@ elseif get(handles.EdgCC_radiobutton,'Value')==1
         case 1
             EC.edg.CM=jet;
             % EC.edg.CM = [repmat([51,181,229],21,1);repmat([255,187,51],21,1);repmat([255,68,68],22,1)]/255;
-%                         EC.edg.CM = [linspace(255,255,64);...
-%                             linspace(255,0,64);linspace(255,0,64)]'/255;
+            %                         EC.edg.CM = [linspace(255,255,64);...
+            %                             linspace(255,0,64);linspace(255,0,64)]'/255;
         case 2
             EC.edg.CM=hsv;
         case 3
@@ -1311,17 +1399,22 @@ elseif get(handles.EdgCC_radiobutton,'Value')==1
             EC.edg.CM=pink;
         case 13
             EC.edg.CM=lines;
+        case 14
+            EC.edg.CM = EC.edg.CMt;
     end
+    EC.edg.color_map_type = get(handles.EdgCC_Range_popupmenu,'Value'); % Added by Mingrui, 20170303, fixed range of color mapping
+    EC.edg.color_map_low = str2double(get(handles.EdgCC_low_edit,'String'));
+    EC.edg.color_map_high = str2double(get(handles.EdgCC_high_edit,'String'));
 elseif get(handles.EdgCT_radiobutton,'Value')==1
     EC.edg.color=3;
     EC.edg.color_threshold=str2double(get(handles.EdgCT_edit,'String'));
-    EC.edg.CM(1,:)=get(handles.EdgCTH_text,'BackgroundColor');
-    EC.edg.CM(64,:)=get(handles.EdgCTL_text,'BackgroundColor');
+    EC.edg.CM(1,:)=get(handles.EdgCTH_pushbutton,'BackgroundColor');
+    EC.edg.CM(64,:)=get(handles.EdgCTL_pushbutton,'BackgroundColor');
 elseif get(handles.EdgCD_radiobutton,'Value') == 1
     EC.edg.color=4;
     EC.edg.color_distance=str2double(get(handles.EdgCD_edit,'String'));
-    EC.edg.CM(1,:)=get(handles.EdgCDH_text,'BackgroundColor');
-    EC.edg.CM(64,:)=get(handles.EdgCDL_text,'BackgroundColor');
+    EC.edg.CM(1,:)=get(handles.EdgCDH_pushbutton,'BackgroundColor');
+    EC.edg.CM(64,:)=get(handles.EdgCDL_pushbutton,'BackgroundColor');
 elseif get(handles.EdgColorModule_radiobutton,'Value') == 1 % Added by Mingrui Xia, 20120809 add edge color according to nodal module
     EC.edg.color = 5;
     EC.edg.CM = EC.nod.CM;
@@ -1329,7 +1422,7 @@ elseif get(handles.EdgColorModule_radiobutton,'Value') == 1 % Added by Mingrui X
 else
     EC.edg.color = 6;
     EC.edg.CM = EC.edg.CM_custom;
-%             EC.edg.CM = jet;
+    %             EC.edg.CM = jet;
 end
 
 % Added by Mingrui, 20150114, support edge opacity
@@ -1348,7 +1441,7 @@ EC.vol.pn=str2double(get(handles.VolPRn_edit,'String'));
 EC.vol.px=str2double(get(handles.VolPRx_edit,'String'));
 EC.vol.nn=str2double(get(handles.VolNRn_edit,'String'));
 EC.vol.nx=str2double(get(handles.VolNRx_edit,'String'));
-EC.vol.null=get(handles.VolNCS_text,'BackgroundColor');
+EC.vol.null=get(handles.VolNCS_pushbutton,'BackgroundColor');
 EC.vol.color_map=get(handles.VolC_popupmenu,'Value');
 EC.vol.adjustCM = get(handles.Vol_AdjustCM_checkbox,'Value');
 
@@ -1365,6 +1458,7 @@ EC.vol.roi.drawall = get(handles.VolROIDrawAll_checkbox,'Value');
 EC.vol.roi.draw = EC.vol.roi.drawt;
 EC.vol.roi.color = EC.vol.roi.colort;
 EC.vol.roi.smooth = get(handles.VolROISmooth_checkbox,'Value');
+EC.vol.roi.smooth_kernal = get(handles.VolROISmooth_popupmenu,'Value');
 
 % Added by Mingrui, 20140923, statistic for SPM or REST nifti files
 EC.vol.threshold = str2double(get(handles.VolStaThr_edit,'String'));
@@ -1451,6 +1545,25 @@ function NodCC_popupmenu_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns NodCC_popupmenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from NodCC_popupmenu
 ChangeFlag(handles);
+global EC
+if get(hObject, 'Value') == 14
+    prompt = {'Node mapping colorbar: Please input a n*3 matrix.'};
+    def = {EC.nod.cmstring};
+    answer = inputdlg(prompt,'Custome colorbar defination',1,def);
+    if ~isempty(answer)
+        EC.nod.cmstring = answer{1};
+    end
+    tmp = eval([EC.nod.cmstring,';']);
+    if size(tmp,2)~=3
+        msgbox({'The colorbar inputed has wrong dimension.'},'Error','error');
+        tmp = EC.nod.CMt;
+    elseif max(tmp(:))>1 || min(tmp(:))<0
+        msgbox({['The colorbar inputed exceed range (0-1).','The colorbar is auto arranged']},'Error','error');
+        tmp = tmp/255;
+        tmp(tmp<0) = 0;
+    end
+    EC.nod.CMt = tmp;
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1923,6 +2036,25 @@ function EdgCC_popupmenu_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns EdgCC_popupmenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from EdgCC_popupmenu
 ChangeFlag(handles);
+global EC
+if get(hObject, 'Value') == 14
+    prompt = {'Edge mapping colorbar: Please input a n*3 matrix.'};
+    def = {EC.edg.cmstring};
+    answer = inputdlg(prompt,'Custome colorbar defination',1,def);
+    if ~isempty(answer)
+        EC.edg.cmstring = answer{1};
+    end
+    tmp = eval([EC.edg.cmstring,';']);
+    if size(tmp,2)~=3
+        msgbox({'The colorbar inputed has wrong dimension.'},'Error','error');
+        tmp = EC.edg.CMt;
+    elseif max(tmp(:))>1 || min(tmp(:))<0
+        msgbox({['The colorbar inputed exceed range (0-1).','The colorbar is auto arranged']},'Error','error');
+        tmp = tmp/255;
+        tmp(tmp<0) = 0;
+    end
+    EC.edg.CMt = tmp;
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -2192,8 +2324,14 @@ global surf
 global EC %%% Added by Mingrui Xia, 20111130, fix a bug that an error occurs when enter in the edge thershold edit box
 val=str2double(get(handles.EdgDT_edit,'String'));
 set(handles.EdgDT_slider,'Value',val);
-set(handles.EdgDS_slider,'Value',length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)));
-set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+switch get(handles.EdgDT_checkbox,'Value')
+    case 0
+        set(handles.EdgDS_slider,'Value',length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)));
+        set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+    case 1
+        set(handles.EdgDS_slider,'Value',length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)));
+        set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+end
 ChangeFlag(handles);
 
 
@@ -2335,27 +2473,27 @@ end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over BakC_text.
-function BakC_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to BakC_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over BakC_pushbutton.
+function BakC_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to BakC_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.BakC_text,'BackgroundColor',c);
+    set(handles.BakC_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over MshC_text.
-function MshC_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to MshC_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over MshC_pushbutton.
+function MshC_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to MshC_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.MshC_text,'BackgroundColor',c);
+    set(handles.MshC_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
@@ -2410,14 +2548,14 @@ ChangeFlag(handles);
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over NodCS_text.
-function NodCS_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to NodCS_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over NodCS_pushbutton.
+function NodCS_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to NodCS_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.NodCS_text,'BackgroundColor',c);
+    set(handles.NodCS_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
@@ -2435,47 +2573,66 @@ if get(handles.NodCS_radiobutton,'Value')==1
     set(handles.NodCM_pushbutton,'Enable','off');
     set(handles.NodCT_slider,'Enable','off');
     set(handles.NodCT_edit,'Enable','off');
+    set(handles.NodCC_Range_popupmenu,'Enable','off');
+    set(handles.NodCC_low_edit,'Enable','off');
+    set(handles.NodCC_high_edit,'Enable','off');
 elseif get(handles.NodCC_radiobutton,'Value')==1
     set(handles.NodCC_popupmenu,'Enable','on');
     set(handles.NodCM_pushbutton,'Enable','off');
     set(handles.NodCT_slider,'Enable','off');
     set(handles.NodCT_edit,'Enable','off');
+    set(handles.NodCC_Range_popupmenu,'Enable','on');
+    if get(handles.NodCC_Range_popupmenu,'Value')==1
+        set(handles.NodCC_low_edit,'Enable','off');
+        set(handles.NodCC_high_edit,'Enable','off');
+    else
+        set(handles.NodCC_low_edit,'Enable','on');
+        set(handles.NodCC_high_edit,'Enable','on');
+    end
+    
+    
 elseif get(handles.NodCM_radiobutton,'Value')==1
     set(handles.NodCC_popupmenu,'Enable','off');
     set(handles.NodCM_pushbutton,'Enable','on');
     set(handles.NodCT_slider,'Enable','off');
     set(handles.NodCT_edit,'Enable','off');
+    set(handles.NodCC_Range_popupmenu,'Enable','off');
+    set(handles.NodCC_low_edit,'Enable','off');
+    set(handles.NodCC_high_edit,'Enable','off');
 else
     set(handles.NodCC_popupmenu,'Enable','off');
     set(handles.NodCM_pushbutton,'Enable','off');
     set(handles.NodCT_slider,'Enable','on');
     set(handles.NodCT_edit,'Enable','on');
+    set(handles.NodCC_Range_popupmenu,'Enable','off');
+    set(handles.NodCC_low_edit,'Enable','off');
+    set(handles.NodCC_high_edit,'Enable','off');
 end
 ChangeFlag(handles);
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over NodCTH_text.
-function NodCTH_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to NodCTH_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over NodCTH_pushbutton.
+function NodCTH_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to NodCTH_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.NodCTH_text,'BackgroundColor',c);
+    set(handles.NodCTH_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over NodCTL_text.
-function NodCTL_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to NodCTL_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over NodCTL_pushbutton.
+function NodCTL_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to NodCTL_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.NodCTL_text,'BackgroundColor',c);
+    set(handles.NodCTL_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
@@ -2572,6 +2729,9 @@ if get(handles.EdgCS_radiobutton,'Value')==1
     set(handles.EdgCD_slider,'Enable','off');
     set(handles.EdgCD_edit,'Enable','off');
     set(handles.EdgColorCostum_pushbutton,'Enable','off');
+    set(handles.EdgCC_Range_popupmenu,'Enable','off');
+    set(handles.EdgCC_low_edit,'Enable','off');
+    set(handles.EdgCC_high_edit,'Enable','off');
 elseif get(handles.EdgCC_radiobutton,'Value')==1
     set(handles.EdgCC_popupmenu,'Enable','on');
     set(handles.EdgCT_slider,'Enable','off');
@@ -2579,6 +2739,14 @@ elseif get(handles.EdgCC_radiobutton,'Value')==1
     set(handles.EdgCD_slider,'Enable','off');
     set(handles.EdgCD_edit,'Enable','off');
     set(handles.EdgColorCostum_pushbutton,'Enable','off');
+    set(handles.EdgCC_Range_popupmenu,'Enable','on');
+    if get(handles.EdgCC_Range_popupmenu,'Value')==1
+        set(handles.EdgCC_low_edit,'Enable','off');
+        set(handles.EdgCC_high_edit,'Enable','off');
+    else
+        set(handles.EdgCC_low_edit,'Enable','on');
+        set(handles.EdgCC_high_edit,'Enable','on');
+    end
 elseif get(handles.EdgCT_radiobutton,'Value')==1
     set(handles.EdgCC_popupmenu,'Enable','off');
     set(handles.EdgCT_slider,'Enable','on');
@@ -2586,6 +2754,9 @@ elseif get(handles.EdgCT_radiobutton,'Value')==1
     set(handles.EdgCD_slider,'Enable','off');
     set(handles.EdgCD_edit,'Enable','off');
     set(handles.EdgColorCostum_pushbutton,'Enable','off');
+    set(handles.EdgCC_Range_popupmenu,'Enable','off');
+    set(handles.EdgCC_low_edit,'Enable','off');
+    set(handles.EdgCC_high_edit,'Enable','off');
 elseif get(handles.EdgCD_radiobutton,'Value') == 1
     set(handles.EdgCC_popupmenu,'Enable','off');
     set(handles.EdgCT_slider,'Enable','off');
@@ -2593,6 +2764,9 @@ elseif get(handles.EdgCD_radiobutton,'Value') == 1
     set(handles.EdgCD_slider,'Enable','on');
     set(handles.EdgCD_edit,'Enable','on');
     set(handles.EdgColorCostum_pushbutton,'Enable','off');
+    set(handles.EdgCC_Range_popupmenu,'Enable','off');
+    set(handles.EdgCC_low_edit,'Enable','off');
+    set(handles.EdgCC_high_edit,'Enable','off');
 elseif get(handles.EdgColorModule_radiobutton,'Value') == 1
     set(handles.EdgCC_popupmenu,'Enable','off');
     set(handles.EdgCT_slider,'Enable','off');
@@ -2600,6 +2774,9 @@ elseif get(handles.EdgColorModule_radiobutton,'Value') == 1
     set(handles.EdgCD_slider,'Enable','off');
     set(handles.EdgCD_edit,'Enable','off');
     set(handles.EdgColorCostum_pushbutton,'Enable','off');
+    set(handles.EdgCC_Range_popupmenu,'Enable','off');
+    set(handles.EdgCC_low_edit,'Enable','off');
+    set(handles.EdgCC_high_edit,'Enable','off');
 else
     set(handles.EdgCC_popupmenu,'Enable','off');
     set(handles.EdgCT_slider,'Enable','off');
@@ -2607,45 +2784,48 @@ else
     set(handles.EdgCD_slider,'Enable','off');
     set(handles.EdgCD_edit,'Enable','off');
     set(handles.EdgColorCostum_pushbutton,'Enable','on');
+    set(handles.EdgCC_Range_popupmenu,'Enable','off');
+    set(handles.EdgCC_low_edit,'Enable','off');
+    set(handles.EdgCC_high_edit,'Enable','off');
 end
 ChangeFlag(handles);
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCS_text.
-function EdgCS_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to EdgCS_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCS_pushbutton.
+function EdgCS_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCS_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.EdgCS_text,'BackgroundColor',c);
+    set(handles.EdgCS_pushbutton,'BackgroundColor',c);
 end
 ChangeFlag(handles);
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCTH_text.
-function EdgCTH_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to EdgCTH_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCTH_pushbutton.
+function EdgCTH_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCTH_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.EdgCTH_text,'BackgroundColor',c);
+    set(handles.EdgCTH_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCTL_text.
-function EdgCTL_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to EdgCTL_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCTL_pushbutton.
+function EdgCTL_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCTL_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.EdgCTL_text,'BackgroundColor',c);
+    set(handles.EdgCTL_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
@@ -2713,6 +2893,14 @@ end
 if isfield(tmp.EC.nod,'CM')
     EC.nod.CM = tmp.EC.nod.CM;
 end
+
+if isfield(tmp.EC.nod,'CMt')
+    EC.nod.CMt = tmp.EC.nod.CMt;
+end
+if isfield(tmp.EC.nod,'cmstring')
+    EC.nod.cmstring = tmp.EC.nod.cmstring;
+end
+
 if isfield(tmp.EC.nod,'color_map')
     EC.nod.color_map = tmp.EC.nod.color_map;
 end
@@ -2722,10 +2910,21 @@ end
 if isfield(tmp.EC.nod,'CMm')
     EC.nod.CMm = tmp.EC.nod.CMm;
 end
-
 if isfield(tmp.EC.nod,'ModularNumber')
     EC.nod.ModularNumberm = tmp.EC.nod.ModularNumber;
 end
+
+% Added by Mingrui, 20170303, fixed range of color mapping
+if isfield(tmp.EC.nod,'color_map_type')
+    EC.nod.color_map_type = tmp.EC.nod.color_map_type;
+end
+if isfield(tmp.EC.nod,'color_map_low')
+    EC.nod.color_map_low = tmp.EC.nod.color_map_low;
+end
+if isfield(tmp.EC.nod,'color_map_high')
+    EC.nod.color_map_high = tmp.EC.nod.color_map_high;
+end
+
 
 if isfield(tmp.EC,'lbl')
     EC.lbl = tmp.EC.lbl;
@@ -2769,6 +2968,14 @@ end
 if isfield(tmp.EC.edg,'CM')
     EC.edg.CM = tmp.EC.edg.CM;
 end
+
+if isfield(tmp.EC.edg,'CMt')
+    EC.edg.CMt = tmp.EC.edg.CMt;
+end
+if isfield(tmp.EC.edg,'cmstring')
+    EC.edg.cmstring = tmp.EC.edg.cmstring;
+end
+
 if isfield(tmp.EC.edg,'color_map')
     EC.edg.color_map = tmp.EC.edg.color_map;
 end
@@ -2787,6 +2994,18 @@ end
 if isfield(tmp.EC.edg,'directed')
     EC.edg.directed = tmp.EC.edg.directed;
 end
+
+% Added by Mingrui, 20170303, fixed range of color mapping
+if isfield(tmp.EC.edg,'color_map_type')
+    EC.edg.color_map_type = tmp.EC.edg.color_map_type;
+end
+if isfield(tmp.EC.edg,'color_map_low')
+    EC.edg.color_map_low = tmp.EC.edg.color_map_low;
+end
+if isfield(tmp.EC.edg,'color_map_high')
+    EC.edg.color_map_high = tmp.EC.edg.color_map_high;
+end
+
 if isfield(tmp.EC.img,'width')
     EC.img.width = tmp.EC.img.width;
 end
@@ -2883,6 +3102,12 @@ end
 if isfield(tmp.EC.glb,'detail')
     EC.glb.detail = tmp.EC.glb.detail;
 end
+
+% Add by Mingrui, 20170309, display LR
+if isfield(tmp.EC.glb,'lr')
+    EC.glb.lr = tmp.EC.glb.lr;
+end
+
 if isfield(tmp.EC.vol,'type')
     EC.vol.type = tmp.EC.vol.type;
 end
@@ -2901,6 +3126,11 @@ end
 if isfield(tmp.EC.vol.roi,'smooth')
     EC.vol.roi.smooth = tmp.EC.vol.roi.smooth;
 end
+
+if isfield(tmp.EC.vol.roi,'smooth_kernal')
+    EC.vol.roi.smooth_kernal = tmp.EC.vol.roi.smooth_kernal;
+end
+
 if isfield(tmp.EC.vol.roi,'drawcus')
     EC.vol.roi.drawcus = tmp.EC.vol.roi.drawcus;
 end
@@ -3040,27 +3270,27 @@ end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCDH_text.
-function EdgCDH_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to EdgCDH_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCDH_pushbutton.
+function EdgCDH_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCDH_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.EdgCDH_text,'BackgroundColor',c);
+    set(handles.EdgCDH_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCDL_text.
-function EdgCDL_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to EdgCDL_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over EdgCDL_pushbutton.
+function EdgCDL_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCDL_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
 if length(c)==3
-    set(handles.EdgCDL_text,'BackgroundColor',c);
+    set(handles.EdgCDL_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
 end
 
@@ -3260,27 +3490,25 @@ function Lot_panel_SelectionChangeFcn(hObject, eventdata, handles)
 %	OldValue: handle of the previously selected object or empty if none was selected
 %	NewValue: handle of the currently selected object
 % handles    structure with handles and user data (see GUIDATA)
-if get(handles.LotP_radiobutton,'Value')==1
-    set(handles.LotPS_radiobutton,'Enable','on');
-    set(handles.LotPA_radiobutton,'Enable','on');
-    set(handles.LotPC_radiobutton,'Enable','on');
-    if get(handles.LotSingleCustom_radiobutton,'Value') == 1
-        set(handles.LotSingleCustomAz_text,'Enable','on');
-        set(handles.LotSingleCustomAz_edit,'Enable','on');
-        set(handles.LotSingleCustomEl_text,'Enable','on');
+if get(handles.LotS_radiobutton,'Value')==1
+    set(handles.LotSS_radiobutton,'Enable','on');
+    set(handles.LotSA_radiobutton,'Enable','on');
+    set(handles.LotSC_radiobutton,'Enable','on');
+    set(handles.LotSCus_radiobutton,'Enable','on');
+    if get(handles.LotSCus_radiobutton,'Value') == 1
+        set(handles.LotSCusAz_text,'Enable','on');
+        set(handles.LotSCusAz_edit,'Enable','on');
+        set(handles.LotSCusEl_text,'Enable','on');
         set(handles.LotSingleCustomEl_edit,'Enable','on');
-        set(handles.LotSingleCustom_radiobutton,'Enable','off');
-    else
-        set(handles.LotSingleCustom_radiobutton,'Enable','on');
     end
 else
-    set(handles.LotPS_radiobutton,'Enable','off');
-    set(handles.LotPA_radiobutton,'Enable','off');
-    set(handles.LotPC_radiobutton,'Enable','off');
-    set(handles.LotSingleCustom_radiobutton,'Enable','off');
-    set(handles.LotSingleCustomAz_text,'Enable','off');
-    set(handles.LotSingleCustomAz_edit,'Enable','off');
-    set(handles.LotSingleCustomEl_text,'Enable','off');
+    set(handles.LotSS_radiobutton,'Enable','off');
+    set(handles.LotSA_radiobutton,'Enable','off');
+    set(handles.LotSC_radiobutton,'Enable','off');
+    set(handles.LotSCus_radiobutton,'Enable','off');
+    set(handles.LotSCusAz_text,'Enable','off');
+    set(handles.LotSCusAz_edit,'Enable','off');
+    set(handles.LotSCusEl_text,'Enable','off');
     set(handles.LotSingleCustomEl_edit,'Enable','off');
 end
 ChangeFlag(handles);
@@ -3316,15 +3544,15 @@ function LotP_panel_SelectionChangeFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 ChangeFlag(handles);
 % Added by Mingrui Xia, 20120806, add custom view for single brain.
-if get(handles.LotSingleCustom_radiobutton,'Value') == 1
-    set(handles.LotSingleCustomAz_text,'Enable','on');
-    set(handles.LotSingleCustomAz_edit,'Enable','on');
-    set(handles.LotSingleCustomEl_text,'Enable','on');
+if get(handles.LotSCus_radiobutton,'Value') == 1
+    set(handles.LotSCusAz_text,'Enable','on');
+    set(handles.LotSCusAz_edit,'Enable','on');
+    set(handles.LotSCusEl_text,'Enable','on');
     set(handles.LotSingleCustomEl_edit,'Enable','on');
 else
-    set(handles.LotSingleCustomAz_text,'Enable','off');
-    set(handles.LotSingleCustomAz_edit,'Enable','off');
-    set(handles.LotSingleCustomEl_text,'Enable','off');
+    set(handles.LotSCusAz_text,'Enable','off');
+    set(handles.LotSCusAz_edit,'Enable','off');
+    set(handles.LotSCusEl_text,'Enable','off');
     set(handles.LotSingleCustomEl_edit,'Enable','off');
 end
 
@@ -3516,23 +3744,25 @@ function VolC_popupmenu_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns VolC_popupmenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from VolC_popupmenu
-global EC
 ChangeFlag(handles);
-if get(hObject, 'Value')==24
-    prompt = {'Volume mapping colorbar.\n\nPlease input a n*3 matrix.'};
+global EC
+if get(hObject, 'Value') == 24
+    prompt = {'Volume mapping colorbar: Please input a n*3 matrix.'};
     def = {EC.vol.cmstring};
     answer = inputdlg(prompt,'Custome colorbar defination',1,def);
     if ~isempty(answer)
         EC.vol.cmstring = answer{1};
     end
-    EC.vol.CMt = eval([EC.vol.cmstring,';']);
-    if size(EC.vol.CMt,2)~=3
-        msgbox({['The colorbar inputed has wrong dimension.','The colorbar is set to jet(1000)']},'Error','error');
-        EC.vol.CMt = jet(1000);
-    elseif max(EC.vol.CMt(:))>1 || min(EC.vol.CMt(:))<0 %% Added by Mingrui Xia, 20120105 to adjust custom colorbar in proper range.
+    tmp = eval([EC.vol.cmstring,';']);
+    if size(tmp,2)~=3
+        msgbox({'The colorbar inputed has wrong dimension.'},'Error','error');
+        tmp = EC.vol.CMt;
+    elseif max(tmp(:))>1 || min(tmp(:))<0
         msgbox({['The colorbar inputed exceed range (0-1).','The colorbar is auto arranged']},'Error','error');
-        EC.vol.CMt = (EC.vol.CMt-min(EC.vol.CMt(:)))./(max(EC.vol.CMt(:))-min(EC.vol.CMt(:)));
+        tmp = tmp/255;
+        tmp(tmp<0) = 0;
     end
+    EC.vol.CMt = tmp;
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3703,9 +3933,9 @@ end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over VolNCS_text.
-function VolNCS_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to VolNCS_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over VolNCS_pushbutton.
+function VolNCS_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to VolNCS_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 c=uisetcolor('Select Color');
@@ -4078,7 +4308,7 @@ function VolROIColor_popupmenu_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns VolROIColor_popupmenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from VolROIColor_popupmenu
 global EC
-set(handles.VolROIColorSQ_text,'BackgroundColor',EC.vol.roi.colort(get(hObject,'Value'),:));
+set(handles.VolROIColorSQ_pushbutton,'BackgroundColor',EC.vol.roi.colort(get(hObject,'Value'),:));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -4103,6 +4333,11 @@ function VolROISmooth_checkbox_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of VolROISmooth_checkbox
+if get(hObject,'value') == 1
+    set(handles.VolROISmooth_popupmenu,'Enable','on');
+else
+    set(handles.VolROISmooth_popupmenu,'Enable','off');
+end
 ChangeFlag(handles); %% Add by Mingrui Xia, 20140729, fix the bug that apply button doesn't change when smooth checked
 
 % --- Executes when selected object is changed in VolTS_uipanel.
@@ -4155,8 +4390,9 @@ if get(handles.VolVS_radiobutton,'Value') == 1
     set(handles.VolROICus_edit,'Enable','off');
     set(handles.VolROIColor_text,'Enable','off');
     set(handles.VolROIColor_popupmenu,'Enable','off');
-    set(handles.VolROIColorSQ_text,'Enable','off');
+    set(handles.VolROIColorSQ_pushbutton,'Enable','off');
     set(handles.VolROISmooth_checkbox,'Enable','off');
+    set(handles.VolROISmooth_popupmenu,'Enable','off');
     set(handles.VolMapAlgorithm_text,'Enable','on');
     if FLAG.MAP == 2
         set(handles.VolMapAlgorithm_popupmenu,'Enable','on');
@@ -4191,8 +4427,13 @@ else
     end
     set(handles.VolROIColor_text,'Enable','on');
     set(handles.VolROIColor_popupmenu,'Enable','on');
-    set(handles.VolROIColorSQ_text,'Enable','on');
+    set(handles.VolROIColorSQ_pushbutton,'Enable','on');
     set(handles.VolROISmooth_checkbox,'Enable','on');
+    if get(handles.VolROISmooth_checkbox,'Value') == 1
+        set(handles.VolROISmooth_popupmenu,'Enable','on');
+    else
+        set(handles.VolROISmooth_popupmenu,'Enable','off');
+    end
     set(handles.VolMapAlgorithm_text,'Enable','off');
     set(handles.VolMapAlgorithm_popupmenu,'Enable','off');
     set(handles.Vol_AdjustCM_checkbox,'Enable','off');
@@ -4237,8 +4478,8 @@ else
     % Added by Mingrui, 20140926, auto set surface opacity when selecting
     % between volume mapping and ROI cluster
     if get(handles.MshA_slider,'Value') == 1
-        set(handles.MshA_slider,'Value',0.4);
-        set(handles.MshA_edit,'String','0.4');
+        set(handles.MshA_slider,'Value',0.3);
+        set(handles.MshA_edit,'String','0.3');
     end
     
 end
@@ -4260,9 +4501,9 @@ function NodD_panel_CreateFcn(hObject, eventdata, handles)
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over VolROIColorSQ_text.
-function VolROIColorSQ_text_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to VolROIColorSQ_text (see GCBO)
+% --- Otherwise, executes on mouse press in 5 pixel border or over VolROIColorSQ_pushbutton.
+function VolROIColorSQ_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to VolROIColorSQ_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
@@ -4310,17 +4551,17 @@ function MshDoubleBrain_checkbox_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of MshDoubleBrain_checkbox
 ChangeFlag(handles);
 if get(hObject,'Value') == 1
-    set(handles.LotP_radiobutton,'Value',1);
-    set(handles.LotPS_radiobutton,'Enable','on');
-    set(handles.LotPA_radiobutton,'Enable','on');
-    set(handles.LotPC_radiobutton,'Enable','on');
+    set(handles.LotS_radiobutton,'Value',1);
+    set(handles.LotSS_radiobutton,'Enable','on');
+    set(handles.LotSA_radiobutton,'Enable','on');
+    set(handles.LotSC_radiobutton,'Enable','on');
     set(handles.LotF_radiobutton,'Enable','off');
-    set(handles.LotM_radiobutton,'Enable','off');
-    set(handles.LotV_radiobutton,'Enable','off'); % Fix the bug that when double surface mode is selected, the vetral view is still active. By Mingrui, 20130208
+    set(handles.LotLM_radiobutton,'Enable','off');
+    set(handles.LotLMV_radiobutton,'Enable','off'); % Fix the bug that when double surface mode is selected, the vetral view is still active. By Mingrui, 20130208
 else
     set(handles.LotF_radiobutton,'Enable','on');
-    set(handles.LotM_radiobutton,'Enable','on');
-    set(handles.LotV_radiobutton,'Enable','on');
+    set(handles.LotLM_radiobutton,'Enable','on');
+    set(handles.LotLMV_radiobutton,'Enable','on');
 end
 
 
@@ -4348,19 +4589,19 @@ end
 
 
 
-function LotSingleCustomAz_edit_Callback(hObject, eventdata, handles)
-% hObject    handle to LotSingleCustomAz_edit (see GCBO)
+function LotSCusAz_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to LotSCusAz_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of LotSingleCustomAz_edit as text
-%        str2double(get(hObject,'String')) returns contents of LotSingleCustomAz_edit as a double
+% Hints: get(hObject,'String') returns contents of LotSCusAz_edit as text
+%        str2double(get(hObject,'String')) returns contents of LotSCusAz_edit as a double
 ChangeFlag(handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function LotSingleCustomAz_edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to LotSingleCustomAz_edit (see GCBO)
+function LotSCusAz_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LotSCusAz_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -4848,4 +5089,369 @@ else
     else
         msgbox('The size of the color matrix does not match the edge file','Warning','warn');
     end
+end
+
+
+% --- Executes on button press in VolNCS_pushbutton.
+function VolNCS_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to VolNCS_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(hObject,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in VolROIColorSQ_pushbutton.
+function VolROIColorSQ_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to VolROIColorSQ_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global EC
+c=uisetcolor('Select Color');
+if length(c)==3
+    EC.vol.roi.colort(get(handles.VolROIColor_popupmenu,'Value'),:) = c;
+    set(hObject,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in EdgCS_pushbutton.
+function EdgCS_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCS_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.EdgCS_pushbutton,'BackgroundColor',c);
+end
+ChangeFlag(handles);
+
+
+% --- Executes on button press in EdgCTL_pushbutton.
+function EdgCTL_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCTL_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.EdgCTL_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in EdgCTH_pushbutton.
+function EdgCTH_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCTH_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.EdgCTH_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in EdgCDL_pushbutton.
+function EdgCDL_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCDL_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.EdgCDL_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in EdgCDH_pushbutton.
+function EdgCDH_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCDH_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.EdgCDH_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in NodCS_pushbutton.
+function NodCS_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to NodCS_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.NodCS_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in NodCTL_pushbutton.
+function NodCTL_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to NodCTL_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.NodCTL_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in NodCTH_pushbutton.
+function NodCTH_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to NodCTH_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.NodCTH_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in MshC_pushbutton.
+function MshC_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to MshC_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.MshC_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on button press in BakC_pushbutton.
+function BakC_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to BakC_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c=uisetcolor('Select Color');
+if length(c)==3
+    set(handles.BakC_pushbutton,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+
+function NodCC_low_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to NodCC_low_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of NodCC_low_edit as text
+%        str2double(get(hObject,'String')) returns contents of NodCC_low_edit as a double
+if isnan(str2double(get(hObject,'String'))) == 1
+    set(hObject,'String',num2str(0));
+    msgbox('Please input a number.','Warning','warn');
+    % elseif str2double(get(hObject,'String'))>str2double(get(handles.NodCC_high_edit,'String'))
+    %     set(hObject,'String',str2double(get(handles.NodCC_high_edit,'String'))-1);
+    %     msgbox('Please input a smaller number .','Warning','warn');
+end
+ChangeFlag(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function NodCC_low_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to NodCC_low_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function NodCC_high_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to NodCC_high_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of NodCC_high_edit as text
+%        str2double(get(hObject,'String')) returns contents of NodCC_high_edit as a double
+if isnan(str2double(get(hObject,'String'))) == 1 || str2double(get(hObject,'String'))<str2double(get(handles.NodCC_low_edit,'String'))
+    set(hObject,'String',str2double(get(handles.NodCC_low_edit,'String'))+1);
+    msgbox('Please input a number that is larger than the low end.','Warning','warn');
+end
+ChangeFlag(handles);
+
+% --- Executes during object creation, after setting all properties.
+function NodCC_high_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to NodCC_high_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in NodCC_Range_popupmenu.
+function NodCC_Range_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to NodCC_Range_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns NodCC_Range_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from NodCC_Range_popupmenu
+if get(hObject,'Value')==1
+    set(handles.NodCC_low_edit,'Enable','off');
+    set(handles.NodCC_high_edit,'Enable','off');
+else
+    set(handles.NodCC_low_edit,'Enable','on');
+    set(handles.NodCC_high_edit,'Enable','on');
+end
+ChangeFlag(handles);
+
+
+% --- Executes on selection change in EdgCC_Range_popupmenu.
+function EdgCC_Range_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCC_Range_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns EdgCC_Range_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from EdgCC_Range_popupmenu
+if get(hObject,'Value')==1
+    set(handles.EdgCC_low_edit,'Enable','off');
+    set(handles.EdgCC_high_edit,'Enable','off');
+else
+    set(handles.EdgCC_low_edit,'Enable','on');
+    set(handles.EdgCC_high_edit,'Enable','on');
+end
+ChangeFlag(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function EdgCC_Range_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCC_Range_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function EdgCC_low_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCC_low_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of EdgCC_low_edit as text
+%        str2double(get(hObject,'String')) returns contents of EdgCC_low_edit as a double
+if isnan(str2double(get(hObject,'String'))) == 1
+    set(hObject,'String',num2str(0));
+    msgbox('Please input a number.','Warning','warn');
+end
+ChangeFlag(handles);
+
+% --- Executes during object creation, after setting all properties.
+function EdgCC_low_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCC_low_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function EdgCC_high_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to EdgCC_high_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of EdgCC_high_edit as text
+%        str2double(get(hObject,'String')) returns contents of EdgCC_high_edit as a double
+if isnan(str2double(get(hObject,'String'))) == 1 || str2double(get(hObject,'String'))<str2double(get(handles.EdgCC_low_edit,'String'))
+    set(hObject,'String',str2double(get(handles.EdgCC_low_edit,'String'))+1);
+    msgbox('Please input a number that is larger than the low end.','Warning','warn');
+end
+ChangeFlag(handles);
+
+% --- Executes during object creation, after setting all properties.
+function EdgCC_high_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EdgCC_high_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in VolROIColor_load_pushbutton.
+function VolROIColor_load_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to VolROIColor_load_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global EC
+[filename,pathname]=uigetfile({'*.txt','Text files (*.txt)';'*.*','All Files (*.*)'});
+if isequal(filename,0)||isequal(pathname,0)
+    return;
+else
+    fpath=fullfile(pathname,filename);
+    fid = fopen(fpath);
+    data = textscan(fid,'%f','CommentStyle','#');
+    fclose(fid);
+    tmp = reshape(data{1},[3,length(data{1})/3])';
+    if max(tmp(:))>1
+        tmp = tmp./255;
+    end
+    EC.vol.roi.colort(1:length(data{1})/3,:) = tmp;
+    set(handles.VolROIColorSQ_pushbutton,'BackgroundColor',EC.vol.roi.colort(get(handles.VolROIColor_popupmenu,'Value'),:));
+end
+ChangeFlag(handles);
+
+
+% --- Executes on button press in GlbLR_checkbox.
+function GlbLR_checkbox_Callback(hObject, eventdata, handles)
+% hObject    handle to GlbLR_checkbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of GlbLR_checkbox
+ChangeFlag(handles);
+
+
+% --- Executes on selection change in VolROISmooth_popupmenu.
+function VolROISmooth_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to VolROISmooth_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns VolROISmooth_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from VolROISmooth_popupmenu
+ChangeFlag(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function VolROISmooth_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to VolROISmooth_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end

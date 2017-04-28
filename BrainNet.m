@@ -1,13 +1,13 @@
 function varargout = BrainNet(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %-----------------------------------------------------------
-%	Copyright(c) 2016
+%	Copyright(c) 2017
 %	Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
-%   Version 1.53;
+%   Version 1.6;
 %   Date 20110906;
-%   Last edited 20150616
+%   Last edited 20170303
 %-----------------------------------------------------------
 %
 % BrainNet MATLAB code for BrainNet.fig
@@ -96,7 +96,7 @@ EC=[];
 EC.bak.color=[1,1,1];
 
 EC.msh.color=[0.95,0.95,0.95];
-EC.msh.alpha=0.4;
+EC.msh.alpha=0.3;
 EC.msh.doublebrain = 0; %%% Added by Mingrui Xia, 20120717, show two brains in one figure, 0 for one brain, 1 for two brains.
 
 EC.nod.draw=1;
@@ -108,9 +108,19 @@ EC.nod.size_value=1;
 EC.nod.size_threshold=0;
 EC.nod.size_ratio=1;
 EC.nod.color=1;
-EC.nod.CM=zeros(64,3);
-EC.nod.CM(:,1)=1;
+EC.nod.CM = [[37,89,152]/255;zeros(63,3)];
+
+% Add by Mingrui, 20170317, custom colormap for node
+EC.nod.CMt = EC.nod.CM;
+EC.nod.cmstring = 'jet(64);';
+
 EC.nod.color_map=1;
+
+% Add by Mingrui, 20170303, fixed range of color mapping
+EC.nod.color_map_type = 1; % 1 for auto, 2 for fix
+EC.nod.color_map_low = 0;
+EC.nod.color_map_high = 1;
+
 EC.nod.color_threshold=0;
 EC.nod.CMm=[0.956862745098039,1,0.545098039215686,0,0.247058823529412,0.913725490196078,1,0.803921568627451,0,0.129411764705882,0.611764705882353,1,1,0.298039215686275,0.0117647058823529,0.403921568627451,0.474509803921569,0.376470588235294,0.619607843137255,0,1;
     0.262745098039216,0.756862745098039,0.764705882352941,0.737254901960784,0.317647058823529,0.117647058823529,0.596078431372549,0.862745098039216,0.588235294117647,0.588235294117647,0.152941176470588,0.341176470588235,0.921568627450980,0.686274509803922,0.662745098039216,0.227450980392157,0.333333333333333,0.490196078431373,0.619607843137255,0,1;
@@ -147,7 +157,17 @@ EC.edg.color=1;
 % 5 for nodal module
 % 6 for custom definition
 
-EC.edg.CM=ones(64,3)*0.38;
+% Add by Mingrui, 20170303, fixed range of color mapping
+EC.edg.color_map_type = 1; % 1 for auto, 2 for fix
+EC.edg.color_map_low = 0;
+EC.edg.color_map_high = 1;
+
+EC.edg.CM = [[1,0.9,0.73];ones(63,3)*0.38];
+
+% Add by Mingrui 20170317, custom colormap for edge
+EC.edg.CMt = EC.edg.CM;
+EC.edg.cmstring = 'jet(64);';
+
 EC.edg.color_map=1;
 EC.edg.color_threshold=0;
 EC.edg.color_distance=0;
@@ -184,6 +204,12 @@ EC.lbl_font.FontUnits='points';
 
 
 EC.lot.view=1;
+% 1 for single view
+% 2 for full view
+% 3 for lateral and medial view
+% 4 for lateral, medial and ventral view
+% 5 for lateral, medial and dorsal view
+
 EC.lot.view_direction=1;
 % Added by Mingrui Xia, 20120806, add custom view for single brain.
 EC.lot.view_az = -90;
@@ -232,6 +258,9 @@ EC.glb.lightdirection = 'right';
 EC.glb.render = 'OpenGL'; % Added by Mingrui Xia, 20120413, selection for rendering methods
 EC.glb.detail = 3; % Add by Mingrui Xia, 20120413, adjust graph detail
 
+% Add by Mingrui, 20170309, display LR
+EC.glb.lr = 1; % 1 for display, 0 for not display
+
 % Added by Mingrui, 20120528, for ROI draw
 EC.vol.type = 1; % 1 for volume to surface, 2 for ROI
 EC.vol.roi.drawall = 1;
@@ -240,9 +269,17 @@ EC.vol.roi.color = hsv(100);
 EC.vol.roi.color = [EC.vol.roi.color(1:10:91,:)',EC.vol.roi.color(2:10:92,:)',EC.vol.roi.color(3:10:93,:)',EC.vol.roi.color(4:10:94,:)',EC.vol.roi.color(5:10:95,:)',EC.vol.roi.color(6:10:96,:)',EC.vol.roi.color(7:10:97,:)',EC.vol.roi.color(8:10:98,:)',EC.vol.roi.color(9:10:99,:)',EC.vol.roi.color(10:10:100,:)']';
 EC.vol.roi.color = repmat(EC.vol.roi.color,11,1);
 EC.vol.roi.colort = EC.vol.roi.color;
+% EC.vol.roi.color = ones(2000,3)*0.7;
+% EC.vol.roi.colort = EC.vol.roi.color;
 EC.vol.roi.smooth = 1;
 EC.vol.roi.drawcus = '';
 EC.vol.roi.drawt = [];
+
+% Added by Mingrui, 20170317, choice for smooth kernal
+EC.vol.roi.smooth_kernal = 1;
+% 1 for box
+% 2 for Gaussian
+
 
 global a
 if ~isempty(a) && mean(ishandle(a))==1
@@ -351,12 +388,12 @@ global surf
 global EC
 switch EC.edg.draw
     case 1
-        [surf.ncyl,surf.cylinder]=Nettrans(surf.net,min(surf.net(:)));
-        % cylinder(:,1:3): coordinate
+        [surf.ncyl,surf.cylinder]=Nettrans(surf.net);
+        % cylinder(:,1:3): node index and value
         % cylinder(:,4): size
         % cylinder(:,5): color
         % cylinder(:,6): opacity
-        % cylinder(:,7): direction
+        
     case 2
         [surf.ncyl,surf.cylinder]=Nettrans(surf.net,EC.edg.draw_threshold);
 end
@@ -417,13 +454,22 @@ switch EC.edg.color
         surf.cylinder(:,5) = 1;
     case 2
         tmp = surf.cylinder(:,5);
-        if max(tmp) ~=min(tmp)
-            k = 63 /(max(tmp)-min(tmp));
-            b = 64 - k*max(tmp);
+        if EC.edg.color_map_type == 1
+            lowend = min(tmp);
+            highend = max(tmp);
+        else
+            lowend = EC.edg.color_map_low;
+            highend = EC.edg.color_map_high;
+        end
+        
+        if highend~=lowend
+            k = 63 / (highend - lowend);
+            b = 64 - k*highend;
         else
             k = 0;
             b = 64;
         end
+        
         tmp = round(tmp * k + b);
         tmp(tmp < 1) = 1;
         tmp(tmp > 64) = 64;
@@ -550,21 +596,32 @@ global surf
 global EC
 if EC.nod.color==2
     surf.sphere(:,6)=surf.sphere(:,4);
-    if min(surf.sphere(:,6))<0
-        surf.sphere(:,6)=surf.sphere(:,6)-min(surf.sphere(:,6));
+    % Modified by Mingrui, 20170303, use only linear mapping, add fixed
+    % colormap range
+    
+    %     if min(surf.sphere(:,6))<0
+    %         surf.sphere(:,6)=surf.sphere(:,6)-min(surf.sphere(:,6));
+    %     end
+    %     if min(surf.sphere(:,6))<1
+    %         surf.sphere(:,6)=surf.sphere(:,6)+1;
+    %     end
+    %     while max(surf.sphere(:,6))/min(surf.sphere(:,6))>10
+    %         surf.sphere(:,6)=log(surf.sphere(:,6));
+    %         if min(surf.sphere(:,6))<1
+    %             surf.sphere(:,6)=surf.sphere(:,6)+1;
+    %         end
+    %     end
+    if EC.nod.color_map_type == 1
+        lowend = min(surf.sphere(:,6));
+        highend = max(surf.sphere(:,6));
+    else
+        lowend = EC.nod.color_map_low;
+        highend = EC.nod.color_map_high;
     end
-    if min(surf.sphere(:,6))<1
-        surf.sphere(:,6)=surf.sphere(:,6)+1;
-    end
-    while max(surf.sphere(:,6))/min(surf.sphere(:,6))>10
-        surf.sphere(:,6)=log(surf.sphere(:,6));
-        if min(surf.sphere(:,6))<1
-            surf.sphere(:,6)=surf.sphere(:,6)+1;
-        end
-    end
-    if max(surf.sphere(:,6))~=min(surf.sphere(:,6))
-        EC.nod.k=63/(max(surf.sphere(:,6))-min(surf.sphere(:,6)));
-        EC.nod.b=64-EC.nod.k*max(surf.sphere(:,6));
+    
+    if highend~=lowend
+        EC.nod.k=63/(highend-lowend);
+        EC.nod.b=64-EC.nod.k*highend;
     else
         EC.nod.k=0;
         EC.nod.b=1;
@@ -637,13 +694,21 @@ for i = 1:length(fv)
     vol(vol ~= EC.vol.roi.draw(i)) = 0;
     vol(vol == EC.vol.roi.draw(i)) = 1;
     if EC.vol.roi.smooth == 1
-        vol = smooth3(vol,'gaussian');
-        %         vol = smooth3(vol);
-        %         vol = smooth3(vol);
+        %         vol = smooth3(vol,'gaussian');
+        if EC.vol.roi.smooth_kernal == 1
+        vol = smooth3(vol);
+        else
+            vol = smooth3(vol,'gaussian');
+        end
+%         vol = smooth3(vol);
     end
     fv{i,1} = isosurface(vol);
     while size(fv{i,1}.vertices,1) == 0 %% Added by Mingrui Xia, expand ROI while it is too small
-        vol = smooth3(vol,'gaussian'); % Modified by Mingrui Xia 20160921, using Gaussian kernel instead of the 'box' kernel
+         if EC.vol.roi.smooth_kernal == 1
+        vol = smooth3(vol);
+        else
+            vol = smooth3(vol,'gaussian');
+        end% Modified by Mingrui Xia 20160921, using Gaussian kernel instead of the 'box' kernel
         vol(vol>0) = 1;
         fv{i,1} = isosurface(vol);
     end
@@ -668,6 +733,7 @@ end
 
 
 function [ncyl,cylinder]=Nettrans(net,t)
+% Modified by Mingrui, 20170309, draw two edges for bidirected edges
 global EC
 global surf
 switch EC.edg.draw_abs
@@ -677,38 +743,43 @@ switch EC.edg.draw_abs
         temp=abs(net);
 end
 temp = temp - diag(diag(temp));
-temp(temp==0)=t-1;
-if EC.edg.directed == 0
-    index=find(triu(temp)>=t&triu(temp)~=0); % Eddited by Mingrui Xia, 20120702, fix a drawall bug.
-    ncyl=length(index);
-    cylinder=zeros(ncyl,7);
-    [cylinder(:,1),cylinder(:,2)]=ind2sub(size(net),index);
-    cylinder(:,3)=net(index);
-    cylinder(:,7) = 1;
-else % Add by Mingrui Xia, 20120621, draw directed network.
+if nargin == 2
     temp(temp < t) = 0;
-    net_up = triu(temp);
-    net_low = tril(temp);
-    net_conj = net_low';
-    net_conj(net_up == 0) = 0;
-    net_conj(net_conj ~= 0) = (net_up(net_conj ~= 0) + net_conj(net_conj ~= 0)) / 2;
-    ind = find(net_conj ~= 0);
-    cylinder1 = zeros(length(ind),4);
-    [cylinder1(:,1),cylinder1(:,2)]=ind2sub(size(net),ind);
-    cylinder1(:,3) = net(ind);
-    cylinder1(:,7) = 2;
-    
-    net_conj = net_conj + net_conj';
-    temp(net_conj ~= 0) = 0;
-    ind = find(temp ~= 0);
-    cylinder2 = zeros(length(ind),4);
-    [cylinder2(:,2),cylinder2(:,1)]=ind2sub(size(net),ind);
-    cylinder2(:,3) = net(ind);
-    cylinder2(:,7) = 1;
-    
-    cylinder = [cylinder1',cylinder2']';
-    ncyl = size(cylinder,1);
 end
+if EC.edg.directed == 0
+    index = find(triu(temp) ~= 0); % Eddited by Mingrui Xia, 20120702, fix a drawall bug.
+    
+    %     cylinder(:,7) = 1;
+else % Add by Mingrui Xia, 20120621, draw directed network.
+    index = find(temp ~= 0);
+    %
+    %     temp(temp < t) = 0;
+    %     net_up = triu(temp);
+    %     net_low = tril(temp);
+    %     net_conj = net_low';
+    %     net_conj(net_up == 0) = 0;
+    %     net_conj(net_conj ~= 0) = (net_up(net_conj ~= 0) + net_conj(net_conj ~= 0)) / 2;
+    %     ind = find(net_conj ~= 0);
+    %     cylinder1 = zeros(length(ind),4);
+    %     [cylinder1(:,1),cylinder1(:,2)]=ind2sub(size(net),ind);
+    %     cylinder1(:,3) = net(ind);
+    %     cylinder1(:,7) = 2;
+    %
+    %     net_conj = net_conj + net_conj';
+    %     temp(net_conj ~= 0) = 0;
+    %     ind = find(temp ~= 0);
+    %     cylinder2 = zeros(length(ind),4);
+    %     [cylinder2(:,2),cylinder2(:,1)]=ind2sub(size(net),ind);
+    %     cylinder2(:,3) = net(ind);
+    %     cylinder2(:,7) = 1;
+    %
+    %     cylinder = [cylinder1',cylinder2']';
+    %     ncyl = size(cylinder,1);
+end
+ncyl = length(index);
+cylinder = zeros(ncyl,6);
+[cylinder(:,1),cylinder(:,2)]=ind2sub(size(net),index);
+cylinder(:,3) = net(index);
 
 
 % Add by Mingrui Xia, 20120109, draw inter hemisphere edges.
@@ -795,10 +866,13 @@ Viewer(5,:)=[0.045,0.03,0.4387,0.18,-90,-90];
 Viewer(6,:)=[0.52,0.03,0.4387,0.18,90,-90];
 
 
-% Viewer(1,:)=[0.055,0.62,0.2925,0.4,-90,0];
-% Viewer(2,:)=[0.6525,0.62,0.2925,0.4,90,0];
-% Viewer(3,:)=[0.055,0.29,0.2925,0.4,90,0];
-% Viewer(4,:)=[0.6525,0.29,0.2925,0.4,-90,0];
+function Viewer = GenerateView5
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+Viewer(1,:) = [0.055,0.5,0.2925,0.4,-90,0];
+Viewer(2,:) = [0.3,0.29,0.4,0.39,0,90];
+Viewer(3,:) = [0.6525,0.5,0.2925,0.4,90,0];
+Viewer(4,:) = [0.055,0.145,0.2925,0.4,90,0];
+Viewer(5,:) = [0.6525,0.145,0.2925,0.4,-90,0];
 
 
 function Surfmatrix=GenertateSurfM8(surf,tl,tr,vl,vr,cuv)
@@ -872,6 +946,27 @@ if isfield(surf,'T')
 end
 
 
+function Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv)
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+Surfmatrix.tri{1} = surf.tri(tl,:);
+Surfmatrix.tri{2} = surf.tri;
+Surfmatrix.tri{3} = surf.tri(tr,:)-cuv;
+Surfmatrix.tri{4} = surf.tri(tl,:);
+Surfmatrix.tri{5} = surf.tri(tr,:)-cuv;
+Surfmatrix.coord{1} = [surf.coord(1,vl)',surf.coord(2,vl)',surf.coord(3,vl)'];
+Surfmatrix.coord{2} = [surf.coord(1,:)',surf.coord(2,:)',surf.coord(3,:)'];
+Surfmatrix.coord{3} = [surf.coord(1,vr)',surf.coord(2,vr)',surf.coord(3,vr)'];
+Surfmatrix.coord{4} = [surf.coord(1,vl)',surf.coord(2,vl)',surf.coord(3,vl)'];
+Surfmatrix.coord{5} = [surf.coord(1,vr)',surf.coord(2,vr)',surf.coord(3,vr)'];
+if isfield(surf,'T')
+    Surfmatrix.T{1} = surf.T(vl);
+    Surfmatrix.T{2} = surf.T;
+    Surfmatrix.T{3} = surf.T(vr);
+    Surfmatrix.T{4} = surf.T(vl);
+    Surfmatrix.T{5} = surf.T(vr);
+end
+
+
 function a=PlotMesh4(Viewer,Surfmatrix,alpha)
 % Mingrui Xia 111026 Added. For Medium View (4 views)
 global EC
@@ -891,11 +986,13 @@ for i=1:4
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
     end
-    switch i
-        case 1
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
-        case 2
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 2
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
     end
 end
 
@@ -919,11 +1016,13 @@ for i=1:6
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
     end
-    switch i
-        case 1
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
-        case 2
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 2
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
     end
 end
 
@@ -946,11 +1045,13 @@ for i=1:8
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
     end
-    switch i
-        case 1
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
-        case 3
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 3
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
     end
 end
 
@@ -979,7 +1080,8 @@ end
 function a=PlotMesh1(surf,alpha)
 global EC
 global cam
-a=axes;
+% a = axes('position',[0.03,0.03,0.94,0.94]);
+a = axes;
 Brain=trisurf(surf.tri,surf.coord(1,:),surf.coord(2,:),surf.coord(3,:),'EdgeColor','none');
 if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
     hold on
@@ -988,7 +1090,9 @@ if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in 
 end
 whitebg(gcf,EC.bak.color);
 set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
-eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
+eval(['material ',EC.glb.material,';']);
+% material([0.1 0.9 0.2 23,0.1]);
+eval(['shading ',EC.glb.shading,';']);axis off
 set(Brain,'FaceColor',EC.msh.color);
 set(Brain,'FaceAlpha',EC.msh.alpha);
 if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
@@ -1011,6 +1115,36 @@ end
 if alpha~=1
     axis tight;  axis vis3d off;eval(['lighting ',EC.glb.lighting,';']);
     cam = camlight(EC.glb.lightdirection);
+end
+
+
+function a = PlotMesh5(Viewer,Surfmatrix,alpha)
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+global EC
+global cam
+a = zeros(1,5);
+for i = 1:5
+    a(i) = axes('position',Viewer(i,1:4));
+    Brain = trisurf(Surfmatrix.tri{i},Surfmatrix.coord{i}(:,1),Surfmatrix.coord{i}(:,2),Surfmatrix.coord{i}(:,3),'EdgeColor','none');
+    view(Viewer(i,5:6));
+    daspect([1 1 1]);
+    whitebg(gcf,EC.bak.color);
+    set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
+    eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
+    set(Brain,'FaceColor',EC.msh.color);
+    set(Brain,'FaceAlpha',EC.msh.alpha);
+    if alpha~=1
+        eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
+        cam(i) = camlight(EC.glb.lightdirection);
+    end
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 3
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
+    end
 end
 
 
@@ -1153,6 +1287,46 @@ for j = 1:6
 end
 
 
+function a = PlotROI5(fv,a,alpha)
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+global EC
+global cam
+for j = 1:5
+    axes(a(j));
+    switch j
+        case {1,4}
+            hold on
+            for i = 1:length(fv)
+                if fv{i,1}.side == 1
+                    roi =  trisurf(fv{i,1}.faces,fv{i,1}.vertices(:,1),fv{i,1}.vertices(:,2),fv{i,1}.vertices(:,3),'EdgeColor','none');
+                    set(roi,'FaceColor',EC.vol.roi.color(i,:));
+                end
+            end
+            hold off
+        case {2}
+            hold on
+            for i = 1:length(fv)
+                roi =  trisurf(fv{i,1}.faces,fv{i,1}.vertices(:,1),fv{i,1}.vertices(:,2),fv{i,1}.vertices(:,3),'EdgeColor','none');
+                set(roi,'FaceColor',EC.vol.roi.color(i,:));
+            end
+            hold off
+        case{3,5}
+            hold on
+            for i = 1:length(fv)
+                if fv{i,1}.side == 2
+                    roi =  trisurf(fv{i,1}.faces,fv{i,1}.vertices(:,1),fv{i,1}.vertices(:,2),fv{i,1}.vertices(:,3),'EdgeColor','none');
+                    set(roi,'FaceColor',EC.vol.roi.color(i,:));
+                end
+            end
+            hold off
+    end
+    if alpha ~= 1
+        axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
+        cam(i) = camlight(EC.glb.lightdirection);
+    end
+end
+
+
 function a=MapMesh1(surf,low,high,alpha)
 global EC
 global cam
@@ -1175,7 +1349,8 @@ end
 daspect([1 1 1]);
 whitebg(gcf,EC.bak.color);
 set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
-eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
+eval(['material ',EC.glb.material,';']);
+eval(['shading ',EC.glb.shading,';']);axis off
 if alpha~=1
     axis tight; eval(['lighting ',EC.glb.lighting,';']); axis vis3d off;
     cam= camlight(EC.glb.lightdirection);
@@ -1215,11 +1390,13 @@ for i=1:8
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
     end
-    switch i
-        case 1
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
-        case 3
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 3
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
     end
 end
 cb=colorbar('location','South');
@@ -1235,7 +1412,6 @@ else
     cb.AxisLocation = 'out';
     cb.Ticks = cb.Limits;
 end
-
 
 
 function a=MapMesh4(Viewer,Surfmatrix,low,high,alpha)
@@ -1259,11 +1435,13 @@ for i=1:4
         axis tight; eval(['lighting ',EC.glb.lighting,';']); axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
     end
-    switch i
-        case 1
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
-        case 2
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 2
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
     end
 end
 cb=colorbar('location','South');
@@ -1301,11 +1479,13 @@ for i=1:6
         axis tight; eval(['lighting ',EC.glb.lighting,';']); axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
     end
-    switch i
-        case 1
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
-        case 2
-            text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 2
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
     end
 end
 cb=colorbar('location','South');
@@ -1357,6 +1537,49 @@ else
 end
 
 
+function a = MapMesh5(Viewer,Surfmatrix,low,high,alpha)
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+global EC
+global cam
+a = zeros(1,5);
+for i = 1:5
+    a(i) = axes('position',Viewer(i,1:4));
+    Brain = trisurf(Surfmatrix.tri{i},Surfmatrix.coord{i}(:,1),Surfmatrix.coord{i}(:,2),Surfmatrix.coord{i}(:,3),Surfmatrix.T{i},'EdgeColor','none');
+    colormap(EC.vol.CM);
+    set(Brain,'FaceAlpha',EC.msh.alpha);
+    caxis([low,high])
+    view(Viewer(i,5:6));
+    daspect([1 1 1]);
+    whitebg(gcf,EC.bak.color);
+    set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
+    eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
+    if alpha~=1
+        eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
+        cam(i) = camlight(EC.glb.lightdirection);
+    end
+    if EC.glb.lr == 1
+        switch i
+            case 1
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'L','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+            case 3
+                text(0,max(Surfmatrix.coord{i}(:,2)),max(Surfmatrix.coord{i}(:,3)),'R','FontSize',20,'FontWeight','Bold','HorizontalAlignment','center');
+        end
+    end
+end
+cb = colorbar('location','South');
+set(cb,'Position',[0.35 0.085 0.3 0.03]);
+
+% Modified by Mingrui, 20150115, support matlab 2014b
+tmp = version;
+ind = find(tmp == '.');
+if str2double(tmp(1:ind(2)-1))<8.4
+    set(cb,'XAxisLocation','bottom');
+    set(cb,'XTick',get(cb,'XLim'));
+else
+    cb.AxisLocation = 'out';
+    cb.Ticks = cb.Limits;
+end
+
 function a=PlotNode6(Viewer,surf,a,n,EC)
 global cam
 global FLAG
@@ -1393,10 +1616,15 @@ if length(a)>1
         hold off
     end
     % Modified by Mingrui 20150603, Add colorbar for nodes
+    % Modified by Mingrui 20170303, Add fixed color map
     if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         colormap(EC.nod.CM);
         cb=colorbar('location','South');
-        caxis([min(abs(surf.sphere(:,4))),max(abs(surf.sphere(:,4)))]);
+        if EC.nod.color_map_type == 1
+            caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+        else
+            caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+        end
         set(cb,'Position',[0.35 0.085 0.3 0.03]);
         tmp = version;
         ind = find(tmp == '.');
@@ -1449,7 +1677,11 @@ else
     if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         colormap(EC.nod.CM);
         cb=colorbar('location','South');
-        caxis([min(abs(surf.sphere(:,4))),max(abs(surf.sphere(:,4)))]);
+        if EC.nod.color_map_type == 1
+            caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+        else
+            caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+        end
         set(cb,'Position',[0.35 0.085 0.3 0.03]);
         tmp = version;
         ind = find(tmp == '.');
@@ -1585,7 +1817,11 @@ end
 if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
     colormap(EC.nod.CM);
     cb=colorbar('location','South');
-    caxis([min(abs(surf.sphere(:,4))),max(abs(surf.sphere(:,4)))]);
+    if EC.nod.color_map_type == 1
+        caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+    else
+        caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+    end
     set(cb,'Position',[0.4 0.055 0.2 0.03]);
     tmp = version;
     ind = find(tmp == '.');
@@ -1719,7 +1955,11 @@ end
 if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
     colormap(EC.nod.CM);
     cb=colorbar('location','South');
-    caxis([min(abs(surf.sphere(:,4))),max(abs(surf.sphere(:,4)))]);
+    if EC.nod.color_map_type == 1
+        caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+    else
+        caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+    end
     set(cb,'Position',[0.4 0.6 0.2 0.03]);
     tmp = version;
     ind = find(tmp == '.');
@@ -1765,7 +2005,11 @@ if ~isempty(a)
     if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         colormap(EC.nod.CM);
         cb=colorbar('location','East');
-        caxis([min(abs(surf.sphere(:,4))),max(abs(surf.sphere(:,4)))]);
+        if EC.nod.color_map_type == 1
+            caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+        else
+            caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+        end
         set(cb,'Position',[0.9 0.1 0.03 0.3]);
         tmp = version;
         ind = find(tmp == '.');
@@ -1833,7 +2077,11 @@ else
     if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         colormap(EC.nod.CM);
         cb=colorbar('location','East');
-        caxis([min(abs(surf.sphere(:,4))),max(abs(surf.sphere(:,4)))]);
+        if EC.nod.color_map_type == 1
+            caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+        else
+            caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+        end
         set(cb,'Position',[0.9 0.1 0.03 0.3]);
         tmp = version;
         ind = find(tmp == '.');
@@ -1990,7 +2238,11 @@ end
 if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
     colormap(EC.nod.CM);
     cb=colorbar('location','South');
-    caxis([min(abs(surf.sphere(:,4))),max(abs(surf.sphere(:,4)))]);
+    if EC.nod.color_map_type == 1
+        caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+    else
+        caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+    end
     set(cb,'Position',[0.35 0.085 0.3 0.03]);
     tmp = version;
     ind = find(tmp == '.');
@@ -2002,6 +2254,166 @@ if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         cb.Ticks = cb.Limits;
     end
 end
+
+
+function a = PlotNode5(surf,a,flag,centerX,n,EC)
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+global cam
+global FLAG
+for i = 1:5
+    axes(a(i));
+    hold on
+    switch i
+        case {1,4}
+            if flag == 1
+                for j = 1:surf.nsph
+                    if surf.sphere(j,1) < centerX
+                        switch EC.nod.draw
+                            case 1
+                                DrawSphere(surf,j,i,52,EC);
+                            case 2
+                                switch EC.nod.draw_threshold_type
+                                    case 1
+                                        if surf.sphere(j,5) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                    case 2
+                                        if surf.sphere(j,4) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                end
+                            case 3
+                                if ~isempty(find(surf.cylinder(:,1:2) == j, 1))
+                                    DrawSphere(surf,j,i,52,EC);
+                                end
+                        end
+                    end
+                end
+            else
+                for j = 1:surf.nsph
+                    if surf.sphere(j,1) > centerX
+                        switch EC.nod.draw
+                            case 1
+                                DrawSphere(surf,j,i,52,EC);
+                            case 2
+                                switch EC.nod.draw_threshold_type
+                                    case 1
+                                        if surf.sphere(j,5) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                    case 2
+                                        if surf.sphere(j,4) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                end
+                            case 3
+                                if ~isempty(find(surf.cylinder(:,1:2) == j, 1))
+                                    DrawSphere(surf,j,i,52,EC);
+                                end
+                        end
+                    end
+                end
+            end
+        case{3,5}
+            if flag == 2
+                for j = 1:surf.nsph
+                    if surf.sphere(j,1) < centerX
+                        switch EC.nod.draw
+                            case 1
+                                DrawSphere(surf,j,i,52,EC);
+                            case 2
+                                switch EC.nod.draw_threshold_type
+                                    case 1
+                                        if surf.sphere(j,5) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                    case 2
+                                        if surf.sphere(j,4) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                end
+                            case 3
+                                if ~isempty(find(surf.cylinder(:,1:2) == j, 1))
+                                    DrawSphere(surf,j,i,52,EC);
+                                end
+                        end
+                    end
+                end
+            else
+                for j = 1:surf.nsph
+                    if surf.sphere(j,1) > centerX
+                        switch EC.nod.draw
+                            case 1
+                                DrawSphere(surf,j,i,52,EC);
+                            case 2
+                                switch EC.nod.draw_threshold_type
+                                    case 1
+                                        if surf.sphere(j,5) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                    case 2
+                                        if surf.sphere(j,4) > EC.nod.draw_threshold
+                                            DrawSphere(surf,j,i,52,EC);
+                                        end
+                                end
+                            case 3
+                                if ~isempty(find(surf.cylinder(:,1:2) == j, 1))
+                                    DrawSphere(surf,j,i,52,EC);
+                                end
+                        end
+                    end
+                end
+            end
+        case {2}
+            for j = 1:surf.nsph
+                switch EC.nod.draw
+                    case 1
+                        DrawSphere(surf,j,i,52,EC);
+                    case 2
+                        switch EC.nod.draw_threshold_type
+                            case 1
+                                if surf.sphere(j,5) > EC.nod.draw_threshold
+                                    DrawSphere(surf,j,i,52,EC);
+                                end
+                            case 2
+                                if surf.sphere(j,4) > EC.nod.draw_threshold
+                                    DrawSphere(surf,j,i,52,EC);
+                                end
+                        end
+                    case 3
+                        if ~isempty(find(surf.cylinder(:,1:2) == j, 1))
+                            DrawSphere(surf,j,i,52,EC);
+                        end
+                end
+            end
+    end
+    if n > 1
+        axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
+        cam(i) = camlight(EC.glb.lightdirection);
+    end
+    hold off
+end
+% Modified by Mingrui 20150603, Add colorbar for nodes
+if EC.nod.color == 2 && (FLAG.Loadfile < 4 || EC.edg.color ~= 2)
+    colormap(EC.nod.CM);
+    cb = colorbar('location','South');
+    if EC.nod.color_map_type == 1
+        caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
+    else
+        caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
+    end
+    set(cb,'Position',[0.35 0.085 0.3 0.03]);
+    tmp = version;
+    ind = find(tmp == '.');
+    if str2double(tmp(1:ind(2)-1))<8.4
+        set(cb,'XAxisLocation','bottom');
+        set(cb,'XTick',get(cb,'XLim'));
+    else
+        cb.AxisLocation = 'out';
+        cb.Ticks = cb.Limits;
+    end
+end
+
 
 % Modified by Mingrui, 20150318, fix a compatity bug with matlab 2014b.
 function PlotLabel6(surf,i,j)
@@ -2069,6 +2481,25 @@ switch i
             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
         else
             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+        end
+end
+
+
+function PlotLabel5(surf,i,j)
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+global EC
+switch i
+    case {1,3,4,5} %%% Edited by Mingrui Xia, 111028. Combine several same situation, adjust label postion.Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
+        text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        %     case {4,6}
+        %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        %     case 3
+        %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+    case 2
+        if surf.sphere(j,1) <= 0
+            text(surf.sphere(j,1),surf.sphere(j,2) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+        else
+            text(surf.sphere(j,1),surf.sphere(j,2) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
         end
 end
 
@@ -2231,6 +2662,8 @@ if ~isequal(surf.label{j},'-') % Editied by Mingrui Xia, 20131226, fix the bug t
                 PlotLabel4(surf,j);
             elseif n == 5
                 PlotLabel4v(surf,i,j);
+            elseif n == 52 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+                PlotLabel5(surf,i,j);
             else
                 PlotLabel1(surf,j);
             end
@@ -2246,6 +2679,8 @@ if ~isequal(surf.label{j},'-') % Editied by Mingrui Xia, 20131226, fix the bug t
                             PlotLabel4(surf,j);
                         elseif n == 5
                             PlotLabel4v(surf,i,j);
+                        elseif n == 52 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+                            PlotLabel5(surf,i,j);
                         else
                             PlotLabel1(surf,j);
                         end
@@ -2260,6 +2695,8 @@ if ~isequal(surf.label{j},'-') % Editied by Mingrui Xia, 20131226, fix the bug t
                             PlotLabel4(surf,j);
                         elseif n == 5
                             PlotLabel4v(surf,i,j);
+                        elseif n == 52 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+                            PlotLabel5(surf,i,j);
                         else
                             PlotLabel1(surf,j);
                         end
@@ -2289,7 +2726,7 @@ for i=1:6
     axes(a(i));
     hold on
     for j=1:surf.ncyl
-        DrawLine(surf,j);
+        DrawLine(surf,j,6,mod(i,3));
     end
     axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
     cam(i) = camlight(EC.glb.lightdirection);
@@ -2299,11 +2736,16 @@ end
 if EC.edg.color == 2
     colormap(EC.edg.CM);
     cb=colorbar('location','South');
-    if EC.edg.color_abs == 0
-        caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+    if EC.edg.color_map_type == 1 % Modified by Mingrui, 20170303, support fixed color mapping
+        if EC.edg.color_abs == 0
+            caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+        else
+            caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        end
     else
-        caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        caxis([EC.edg.color_map_low,EC.edg.color_map_high]);
     end
+    
     set(cb,'Position',[0.35 0.085 0.3 0.03]);
     % Modified by Mingrui, 20150115, support matlab 2014b
     tmp = version;
@@ -2322,8 +2764,19 @@ function PlotLine1(surf)
 global cam
 global EC
 hold on
-for j=1:surf.ncyl
-    DrawLine(surf,j);
+switch EC.lot.view_direction
+    case {1,4}
+        for j=1:surf.ncyl
+            DrawLine(surf,j,1,1);
+        end
+    case 2
+        for j=1:surf.ncyl
+            DrawLine(surf,j,1,2);
+        end
+    case 3
+        for j=1:surf.ncyl
+            DrawLine(surf,j,1,3);
+        end
 end
 axis tight; axis vis3d off;daspect([1 1 1]);
 eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
@@ -2334,10 +2787,14 @@ if EC.edg.color == 2
     hold on
     colormap(EC.edg.CM);
     cb=colorbar('location','East');
-    if EC.edg.color_abs == 0
-        caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+    if EC.edg.color_map_type == 1 % Modified by Mingrui, 20170303, support fixed color mapping
+        if EC.edg.color_abs == 0
+            caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+        else
+            caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        end
     else
-        caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        caxis([EC.edg.color_map_low,EC.edg.color_map_high]);
     end
     set(cb,'Position',[0.9 0.1 0.03 0.3]);
     % Modified by Mingrui, 20150115, support matlab 2014b
@@ -2365,13 +2822,13 @@ for i=1:8
             if flag==1
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,5,1);
                     end
                 end
             else
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,5,1);
                     end
                 end
             end
@@ -2379,19 +2836,23 @@ for i=1:8
             if flag==2
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,5,1);
                     end
                 end
             else
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,5,1);
                     end
                 end
             end
-        case {2,5,7,8}
+        case {2,5}
             for j=1:surf.ncyl
-                DrawLine(surf,j);
+                DrawLine(surf,j,5,2);
+            end
+        case {7,8}
+            for j=1:surf.ncyl
+                DrawLine(surf,j,5,3);
             end
     end
     axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
@@ -2403,10 +2864,14 @@ end
 if EC.edg.color == 2
     colormap(EC.edg.CM);
     cb=colorbar('location','South');
-    if EC.edg.color_abs == 0
-        caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+    if EC.edg.color_map_type == 1 % Modified by Mingrui, 20170303, support fixed color mapping
+        if EC.edg.color_abs == 0
+            caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+        else
+            caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        end
     else
-        caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        caxis([EC.edg.color_map_low,EC.edg.color_map_high]);
     end
     set(cb,'Position',[0.35 0.085 0.3 0.03]);
     tmp = version;
@@ -2422,6 +2887,79 @@ if EC.edg.color == 2
 end
 
 
+
+function PlotLine5(surf,a,flag,centerX)
+% Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+global cam
+global EC
+for i = 1:5
+    axes(a(i));
+    hold on
+    switch i
+        case {1,4}
+            if flag == 1
+                for j = 1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1) < centerX && surf.sphere(surf.cylinder(j,2),1) < centerX
+                        DrawLine(surf,j,3,1);
+                    end
+                end
+            else
+                for j = 1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1) > centerX && surf.sphere(surf.cylinder(j,2),1) > centerX
+                        DrawLine(surf,j,3,1);
+                    end
+                end
+            end
+        case{3,5}
+            if flag == 2
+                for j = 1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1) < centerX && surf.sphere(surf.cylinder(j,2),1) < centerX
+                        DrawLine(surf,j,3,1);
+                    end
+                end
+            else
+                for j = 1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1) > centerX && surf.sphere(surf.cylinder(j,2),1) > centerX
+                        DrawLine(surf,j,3,1);
+                    end
+                end
+            end
+        case {2}
+            for j = 1:surf.ncyl
+                DrawLine(surf,j,3,2);
+            end
+    end
+    axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
+    cam(i) = camlight(EC.glb.lightdirection);
+    hold off
+end
+
+% Add by Mingrui, 20150114, show colorbar when using colormap
+if EC.edg.color == 2
+    colormap(EC.edg.CM);
+    cb = colorbar('location','South');
+    if EC.edg.color_map_type == 1 % Modified by Mingrui, 20170303, support fixed color mapping
+        if EC.edg.color_abs == 0
+            caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+        else
+            caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        end
+    else
+        caxis([EC.edg.color_map_low,EC.edg.color_map_high]);
+    end
+    set(cb,'Position',[0.35 0.085 0.3 0.03]);
+    tmp = version;
+    ind = find(tmp == '.');
+    if str2double(tmp(1:ind(2)-1))<8.4
+        set(cb,'XAxisLocation','bottom');
+        set(cb,'XTick',get(cb,'XLim'));
+    else
+        cb.AxisLocation = 'out';
+        cb.Ticks = cb.Limits;
+    end
+end
+
+
 function PlotLine4(surf,a,flag,centerX)
 global cam
 global EC
@@ -2433,13 +2971,13 @@ for i=1:4
             if flag==1
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,2,1);
                     end
                 end
             else
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,2,1);
                     end
                 end
             end
@@ -2447,13 +2985,13 @@ for i=1:4
             if flag==2
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,2,1);
                     end
                 end
             else
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,2,1);
                     end
                 end
             end
@@ -2469,10 +3007,14 @@ end
 if EC.edg.color == 2
     colormap(EC.edg.CM);
     cb=colorbar('location','South');
-    if EC.edg.color_abs == 0
-        caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+    if EC.edg.color_map_type == 1 % Modified by Mingrui, 20170303, support fixed color mapping
+        if EC.edg.color_abs == 0
+            caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+        else
+            caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        end
     else
-        caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        caxis([EC.edg.color_map_low,EC.edg.color_map_high]);
     end
     set(cb,'Position',[0.4 0.055 0.2 0.03]);
     tmp = version;
@@ -2494,31 +3036,59 @@ for i=1:6
     axes(a(i));
     hold on
     switch i
-        case {1,3,5}
+        case {1,3}
             if flag==1
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,3,1);
                     end
                 end
             else
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,3,1);
                     end
                 end
             end
-        case{2,4,6}
+        case{2,4}
             if flag==2
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,3,1);
                     end
                 end
             else
                 for j=1:surf.ncyl
                     if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
-                        DrawLine(surf,j);
+                        DrawLine(surf,j,3,1);
+                    end
+                end
+            end
+        case 5
+            if flag==1
+                for j=1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
+                        DrawLine(surf,j,3,2);
+                    end
+                end
+            else
+                for j=1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
+                        DrawLine(surf,j,3,2);
+                    end
+                end
+            end
+        case 6
+            if flag==2
+                for j=1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1)<centerX&&surf.sphere(surf.cylinder(j,2),1)<centerX
+                        DrawLine(surf,j,3,2);
+                    end
+                end
+            else
+                for j=1:surf.ncyl
+                    if surf.sphere(surf.cylinder(j,1),1)>centerX&&surf.sphere(surf.cylinder(j,2),1)>centerX
+                        DrawLine(surf,j,3,2);
                     end
                 end
             end
@@ -2532,10 +3102,14 @@ end
 if EC.edg.color == 2
     colormap(EC.edg.CM);
     cb=colorbar('location','South');
-    if EC.edg.color_abs == 0
-        caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+    if EC.edg.color_map_type == 1 % Modified by Mingrui, 20170303, support fixed color mapping
+        if EC.edg.color_abs == 0
+            caxis([min(surf.cylinder(:,3)),max(surf.cylinder(:,3))]);
+        else
+            caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        end
     else
-        caxis([min(abs(surf.cylinder(:,3))),max(abs(surf.cylinder(:,3)))]);
+        caxis([EC.edg.color_map_low,EC.edg.color_map_high]);
     end
     set(cb,'Position',[0.4 0.6 0.2 0.03]);
     tmp = version;
@@ -2550,7 +3124,7 @@ if EC.edg.color == 2
 end
 
 
-function DrawLine(surf,i)
+function DrawLine(surf,i,nv,iv)
 global EC
 %length_cyl=norm(surf.sphere(surf.cylinder(i,2),:)-surf.sphere(surf.cylinder(i,1),:)); % Fixed a bug by Mingrui Xia, 20120411, the length calculat was wrong.
 
@@ -2624,97 +3198,283 @@ sintheta = sin(theta);
 sintheta(det + 1) = 0;
 
 if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
-    if surf.cylinder(i,7) == 1
-        n = [linspace(0,2.5,9),ones(1,round(length_cyl-9)) * 1]' * n;
-    else
-        n = [linspace(0,2.5,9),ones(1,round(length_cyl-18)) * 1,linspace(2.5,0,9)]' * n;
+    % Modified by Mingrui, 20170309, draw two edges for bidirected network
+    %     if surf.cylinder(i,7) == 1
+    %         n = [linspace(0,1.5,9),ones(1,round(length_cyl-9)) * 1]' * n;
+    %     else
+    %         n = [linspace(0,2,9),ones(1,round(length_cyl-18)) * 1,linspace(2,0,9)]' * n;
+    %     end
+    ind = find(surf.cylinder(:,1)==surf.cylinder(i,2)&surf.cylinder(:,2)==surf.cylinder(i,1));
+    if isempty(ind)
+        n = [linspace(0,2,9),ones(1,round(length_cyl-9)) * 1]' * n;
+        x = n * cos(theta);
+        y = n * sintheta;
+        w = length(n);
+        z = (0:w-1)'/(w-1) * ones(1,det + 1);
+        Line = mesh(x,y,z * length_cyl);
+        unit_Vx=[0 0 1];
+        angle_X1X2=acos( dot( unit_Vx,sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3) )/( norm(unit_Vx)*norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))) )*180/pi;
+        axis_rot=cross([0 0 1],(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3)) );
+        if angle_X1X2~=0 && angle_X1X2~=180 % Modified by Mingrui, 20160918, fix the bug when angle is 180 degree
+            rotate(Line,axis_rot,angle_X1X2,[0 0 0])
+        end
+        set(Line,'XData',get(Line,'XData')+sphere(surf.cylinder(i,1),1) + (sphere(surf.cylinder(i,2),1) -sphere(surf.cylinder(i,1),1))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+        set(Line,'YData',get(Line,'YData')+sphere(surf.cylinder(i,1),2) + (sphere(surf.cylinder(i,2),2) -sphere(surf.cylinder(i,1),2))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+        if angle_X1X2~=180
+            set(Line,'ZData',get(Line,'ZData')+sphere(surf.cylinder(i,1),3) + (sphere(surf.cylinder(i,2),3) -sphere(surf.cylinder(i,1),3))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+        else
+            set(Line,'ZData',get(Line,'ZData')+sphere(surf.cylinder(i,2),3) + (sphere(surf.cylinder(i,1),3) -sphere(surf.cylinder(i,2),3))/norm(sphere(surf.cylinder(i,1),1:3)-sphere(surf.cylinder(i,2),1:3))*sphere(surf.cylinder(i,1),7));
+        end
+        
+        set(Line,'FaceColor',EC.edg.CM(surf.cylinder(i,5),:));
+        set(Line,'EdgeColor','none');
+        set(Line,'FaceAlpha',surf.cylinder(i,6));
+        set(Line,'EdgeAlpha',0);
+    elseif ind > i;
+        n1 = [linspace(0,2,9),ones(1,round(length_cyl-9)) * 1]' * n;
+        n2 = n1;
+        
+        x1 = n1 * cos(theta);
+        y1 = n1 * sintheta;
+        w1 = length(n1);
+        z1 = (0:w1 - 1)'/(w1 - 1) * ones(1,det + 1);
+        Line1 = mesh(x1,y1,z1 * length_cyl);
+        unit_Vx = [0 0 1];
+        angle_X1X2 = acos(dot(unit_Vx,sphere(surf.cylinder(i,2),1:3) - sphere(surf.cylinder(i,1),1:3) )/( norm(unit_Vx)*norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))) )*180/pi;
+        axis_rot = cross([0 0 1],(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3)) );
+        if angle_X1X2~=0 && angle_X1X2~=180 % Modified by Mingrui, 20160918, fix the bug when angle is 180 degree
+            rotate(Line1,axis_rot,angle_X1X2,[0 0 0])
+        end
+        set(Line1,'XData',get(Line1,'XData')+sphere(surf.cylinder(i,1),1) + (sphere(surf.cylinder(i,2),1) -sphere(surf.cylinder(i,1),1))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+        set(Line1,'YData',get(Line1,'YData')+sphere(surf.cylinder(i,1),2) + (sphere(surf.cylinder(i,2),2) -sphere(surf.cylinder(i,1),2))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+        if angle_X1X2~=180
+            set(Line1,'ZData',get(Line1,'ZData')+sphere(surf.cylinder(i,1),3) + (sphere(surf.cylinder(i,2),3) -sphere(surf.cylinder(i,1),3))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+        else
+            set(Line1,'ZData',get(Line1,'ZData')+sphere(surf.cylinder(i,2),3) + (sphere(surf.cylinder(i,1),3) -sphere(surf.cylinder(i,2),3))/norm(sphere(surf.cylinder(i,1),1:3)-sphere(surf.cylinder(i,2),1:3))*sphere(surf.cylinder(i,1),7));
+        end
+        set(Line1,'FaceColor',EC.edg.CM(surf.cylinder(i,5),:));
+        set(Line1,'EdgeColor','none');
+        set(Line1,'FaceAlpha',surf.cylinder(i,6));
+        set(Line1,'EdgeAlpha',0);
+        
+        x2 = n2 * cos(theta);
+        y2 = n2 * sintheta;
+        w2 = length(n2);
+        z2 = (0:w2 - 1)'/(w2 - 1) * ones(1,det + 1);
+        Line2 = mesh(x2,y2,z2 * length_cyl);
+        unit_Vx = [0 0 1];
+        angle_X1X2 = acos(dot(unit_Vx,sphere(surf.cylinder(ind,2),1:3) - sphere(surf.cylinder(ind,1),1:3) )/( norm(unit_Vx)*norm(sphere(surf.cylinder(ind,2),1:3)-sphere(surf.cylinder(ind,1),1:3))) )*180/pi;
+        axis_rot = cross([0 0 1],(sphere(surf.cylinder(ind,2),1:3)-sphere(surf.cylinder(ind,1),1:3)) );
+        if angle_X1X2~=0 && angle_X1X2~=180 % Modified by Mingrui, 20160918, fix the bug when angle is 180 degree
+            rotate(Line2,axis_rot,angle_X1X2,[0 0 0])
+        end
+        set(Line2,'XData',get(Line2,'XData')+sphere(surf.cylinder(ind,1),1) + (sphere(surf.cylinder(ind,2),1) -sphere(surf.cylinder(ind,1),1))/norm(sphere(surf.cylinder(ind,2),1:3)-sphere(surf.cylinder(ind,1),1:3))*sphere(surf.cylinder(ind,1),7));
+        set(Line2,'YData',get(Line2,'YData')+sphere(surf.cylinder(ind,1),2) + (sphere(surf.cylinder(ind,2),2) -sphere(surf.cylinder(ind,1),2))/norm(sphere(surf.cylinder(ind,2),1:3)-sphere(surf.cylinder(ind,1),1:3))*sphere(surf.cylinder(ind,1),7));
+        if angle_X1X2~=180
+            set(Line2,'ZData',get(Line2,'ZData')+sphere(surf.cylinder(ind,1),3) + (sphere(surf.cylinder(ind,2),3) -sphere(surf.cylinder(ind,1),3))/norm(sphere(surf.cylinder(ind,2),1:3)-sphere(surf.cylinder(ind,1),1:3))*sphere(surf.cylinder(ind,1),7));
+        else
+            set(Line2,'ZData',get(Line2,'ZData')+sphere(surf.cylinder(ind,2),3) + (sphere(surf.cylinder(ind,1),3) -sphere(surf.cylinder(ind,2),3))/norm(sphere(surf.cylinder(ind,1),1:3)-sphere(surf.cylinder(ind,2),1:3))*sphere(surf.cylinder(ind,1),7));
+        end
+        set(Line2,'FaceColor',EC.edg.CM(surf.cylinder(ind,5),:));
+        set(Line2,'EdgeColor','none');
+        set(Line2,'FaceAlpha',surf.cylinder(ind,6));
+        set(Line2,'EdgeAlpha',0);
+        
+        edgedirect = [sphere(surf.cylinder(ind,1),1) - sphere(surf.cylinder(ind,2),1), sphere(surf.cylinder(ind,1),2) - sphere(surf.cylinder(ind,2),2),sphere(surf.cylinder(ind,1),3) - sphere(surf.cylinder(ind,2),3)];
+        switch nv
+            case 1
+                switch iv
+                    case 1
+                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                    case 2
+                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                    case 3
+                        normdirect = [1/edgedirect(1),-1/edgedirect(3)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'XData',get(Line1,'XData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                end
+            case 2
+                normdirect = [1/edgedirect(2),-1/edgedirect(3)];
+                movelength = normdirect/norm(normdirect);
+                set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+            case 3
+                switch iv
+                    case 1
+                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                    case 2
+                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                end
+            case 4
+                switch iv
+                    case 1
+                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                    case 2
+                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                end
+            case 5
+                switch iv
+                    case 1
+                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                    case 2
+                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                    case 3
+                        normdirect = [1/edgedirect(1),-1/edgedirect(3)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'XData',get(Line1,'XData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                end
+            case 6
+                switch iv
+                    case {1,0}
+                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                    case 2
+                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
+                        movelength = normdirect/norm(normdirect);
+                        set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                end
+        end
+        
     end
 else
     n = ones(100,1) * 0.5 * n ;
+    x = n * cos(theta);
+    y = n * sintheta;
+    w = length(n);
+    z = (0:w-1)'/(w-1) * ones(1,det + 1);
+    Line = mesh(x,y,z * length_cyl);
+    unit_Vx=[0 0 1];
+    angle_X1X2=acos( dot( unit_Vx,sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3) )/( norm(unit_Vx)*norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))) )*180/pi;
+    axis_rot=cross([0 0 1],(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3)) );
+    if angle_X1X2~=0 && angle_X1X2~=180 % Modified by Mingrui, 20160918, fix the bug when angle is 180 degree
+        rotate(Line,axis_rot,angle_X1X2,[0 0 0])
+    end
+    set(Line,'XData',get(Line,'XData')+sphere(surf.cylinder(i,1),1) + (sphere(surf.cylinder(i,2),1) -sphere(surf.cylinder(i,1),1))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+    set(Line,'YData',get(Line,'YData')+sphere(surf.cylinder(i,1),2) + (sphere(surf.cylinder(i,2),2) -sphere(surf.cylinder(i,1),2))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+    if angle_X1X2~=180
+        set(Line,'ZData',get(Line,'ZData')+sphere(surf.cylinder(i,1),3) + (sphere(surf.cylinder(i,2),3) -sphere(surf.cylinder(i,1),3))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
+    else
+        set(Line,'ZData',get(Line,'ZData')+sphere(surf.cylinder(i,2),3) + (sphere(surf.cylinder(i,1),3) -sphere(surf.cylinder(i,2),3))/norm(sphere(surf.cylinder(i,1),1:3)-sphere(surf.cylinder(i,2),1:3))*sphere(surf.cylinder(i,1),7));
+    end
+    % switch EC.edg.color
+    %     case 1
+    %         ci=1;
+    %     case 2
+    %         switch EC.edg.color_abs %%% Edited by Mingrui Xia, 20120413, fix colormap
+    %             %         for edges
+    %             case 0
+    %                 %                 ci=int32(45*surf.cylinder3(i,3)-3.5);
+    %                 k = 63/(max(surf.cylinder2(:,3)) - min(surf.cylinder2(:,3)));
+    %                 b = 64 - 63/(max(surf.cylinder2(:,3)) - min(surf.cylinder2(:,3))) *...
+    %                     max(surf.cylinder2(:,3));
+    %                 ci = round(k*surf.cylinder2(i,3) + b);
+    %                 if ci<1
+    %                     ci=1;
+    %                 elseif ci>64
+    %                     ci=64;
+    %                 end
+    %             case 1
+    %                 k = 63/(max(abs(surf.cylinder2(:,3))) - min(abs(surf.cylinder2(:,3))));
+    %                 b = 64 - 63/(max(abs(surf.cylinder2(:,3))) - min(abs(surf.cylinder2(:,3))))...
+    %                     * max(abs(surf.cylinder2(:,3)));
+    %                 ci = round(k*abs(surf.cylinder2(i,3)) + b);
+    %                 %                 ci=int32(45*surf.cylinder3(i,3)-3.5);
+    %                 if ci<1
+    %                     ci=1;
+    %                 elseif ci>64
+    %                     ci=64;
+    %                 end
+    %         end
+    %     case 3
+    %         switch EC.edg.color_abs
+    %             case 0
+    %                 if surf.cylinder2(i,3)>EC.edg.color_threshold
+    %                     ci=1;
+    %                 else
+    %                     ci=64;
+    %                 end
+    %             case 1
+    %                 if surf.cylinder2(i,3)>EC.edg.color_threshold||surf.cylinder2(i,3)<-EC.edg.color_threshold
+    %                     ci=1;
+    %                 else
+    %                     ci=64;
+    %                 end
+    %         end
+    %     case 4
+    %         if length_cyl>EC.edg.color_distance
+    %             ci=1;
+    %         else
+    %             ci=64;
+    %         end
+    %     case 5 % Added by Mingrui Xia, 20120809 add edge color according to nodal module
+    %         if sphere(surf.cylinder(i,1),4) == sphere(surf.cylinder(i,2),4)
+    %             ci = find(EC.nod.ModularNumber == sphere(surf.cylinder(i,1),4));
+    %         else
+    %             ci = 21;
+    %         end
+    %
+    % end
+    set(Line,'FaceColor',EC.edg.CM(surf.cylinder(i,5),:));
+    set(Line,'EdgeColor','none');
+    set(Line,'FaceAlpha',surf.cylinder(i,6));
+    set(Line,'EdgeAlpha',0);
 end
-x = n * cos(theta);
-y = n * sintheta;
-w = length(n);
-z = (0:w-1)'/(w-1) * ones(1,det + 1);
-Line = mesh(x,y,z * length_cyl);
-unit_Vx=[0 0 1];
 
-
-angle_X1X2=acos( dot( unit_Vx,sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3) )/( norm(unit_Vx)*norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))) )*180/pi;
-axis_rot=cross([0 0 1],(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3)) );
-if angle_X1X2~=0 && angle_X1X2~=180 % Modified by Mingrui, 20160918, fix the bug when then angle is 180 degree
-    rotate(Line,axis_rot,angle_X1X2,[0 0 0])
-end
-set(Line,'XData',get(Line,'XData')+sphere(surf.cylinder(i,1),1) + (sphere(surf.cylinder(i,2),1) -sphere(surf.cylinder(i,1),1))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
-set(Line,'YData',get(Line,'YData')+sphere(surf.cylinder(i,1),2) + (sphere(surf.cylinder(i,2),2) -sphere(surf.cylinder(i,1),2))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
-if angle_X1X2~=180
-    set(Line,'ZData',get(Line,'ZData')+sphere(surf.cylinder(i,1),3) + (sphere(surf.cylinder(i,2),3) -sphere(surf.cylinder(i,1),3))/norm(sphere(surf.cylinder(i,2),1:3)-sphere(surf.cylinder(i,1),1:3))*sphere(surf.cylinder(i,1),7));
-else
-    set(Line,'ZData',get(Line,'ZData')+sphere(surf.cylinder(i,2),3) + (sphere(surf.cylinder(i,1),3) -sphere(surf.cylinder(i,2),3))/norm(sphere(surf.cylinder(i,1),1:3)-sphere(surf.cylinder(i,2),1:3))*sphere(surf.cylinder(i,1),7));
-end
-
-% switch EC.edg.color
-%     case 1
-%         ci=1;
-%     case 2
-%         switch EC.edg.color_abs %%% Edited by Mingrui Xia, 20120413, fix colormap
-%             %         for edges
-%             case 0
-%                 %                 ci=int32(45*surf.cylinder3(i,3)-3.5);
-%                 k = 63/(max(surf.cylinder2(:,3)) - min(surf.cylinder2(:,3)));
-%                 b = 64 - 63/(max(surf.cylinder2(:,3)) - min(surf.cylinder2(:,3))) *...
-%                     max(surf.cylinder2(:,3));
-%                 ci = round(k*surf.cylinder2(i,3) + b);
-%                 if ci<1
-%                     ci=1;
-%                 elseif ci>64
-%                     ci=64;
-%                 end
-%             case 1
-%                 k = 63/(max(abs(surf.cylinder2(:,3))) - min(abs(surf.cylinder2(:,3))));
-%                 b = 64 - 63/(max(abs(surf.cylinder2(:,3))) - min(abs(surf.cylinder2(:,3))))...
-%                     * max(abs(surf.cylinder2(:,3)));
-%                 ci = round(k*abs(surf.cylinder2(i,3)) + b);
-%                 %                 ci=int32(45*surf.cylinder3(i,3)-3.5);
-%                 if ci<1
-%                     ci=1;
-%                 elseif ci>64
-%                     ci=64;
-%                 end
-%         end
-%     case 3
-%         switch EC.edg.color_abs
-%             case 0
-%                 if surf.cylinder2(i,3)>EC.edg.color_threshold
-%                     ci=1;
-%                 else
-%                     ci=64;
-%                 end
-%             case 1
-%                 if surf.cylinder2(i,3)>EC.edg.color_threshold||surf.cylinder2(i,3)<-EC.edg.color_threshold
-%                     ci=1;
-%                 else
-%                     ci=64;
-%                 end
-%         end
-%     case 4
-%         if length_cyl>EC.edg.color_distance
-%             ci=1;
-%         else
-%             ci=64;
-%         end
-%     case 5 % Added by Mingrui Xia, 20120809 add edge color according to nodal module
-%         if sphere(surf.cylinder(i,1),4) == sphere(surf.cylinder(i,2),4)
-%             ci = find(EC.nod.ModularNumber == sphere(surf.cylinder(i,1),4));
-%         else
-%             ci = 21;
-%         end
-%
-% end
-set(Line,'FaceColor',EC.edg.CM(surf.cylinder(i,5),:));
-set(Line,'EdgeColor','none');
-set(Line,'FaceAlpha',surf.cylinder(i,6));
-set(Line,'EdgeAlpha',0);
 
 
 function DoubleMeshPrepare
@@ -3200,6 +3960,90 @@ else
                     PlotLine4v(surf,a,flag,centerX);
             end
             
+            % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+        case 5
+            switch FLAG.Loadfile
+                case 1
+                    [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
+                    Viewer = GenerateView5;
+                    Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                    a = PlotMesh5(Viewer,Surfmatrix,0);
+                case 3
+                    NodePrepare;
+                    [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
+                    [centerX,flag] = JudgeNode(surf,vl,vr);
+                    Viewer = GenerateView5;
+                    Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                    a = PlotMesh5(Viewer,Surfmatrix,1);
+                    PlotNode5(surf, a, flag, centerX, 2, EC);
+                case 7
+                    NodePrepare;
+                    NetPrepare;
+                    [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
+                    [centerX,flag] = JudgeNode(surf,vl,vr);
+                    Viewer = GenerateView5;
+                    Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                    a = PlotMesh5(Viewer,Surfmatrix,1);
+                    PlotNode5(surf,a,flag,centerX,1,EC);
+                    PlotLine5(surf,a,flag,centerX);
+                case 9
+                    [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf); %%% Edited by Mingrui Xia,111027, move FLAG.IsCalledByREST judgement into function MapCMPrepare.
+                    Viewer = GenerateView5;
+                    if EC.vol.type == 1
+                        [low, high] = MapCMPrepare;
+                        %                     end
+                        if FLAG.MAP == 2
+                            MapPrepare;
+                        end
+                        Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                        a = MapMesh5(Viewer,Surfmatrix,low,high,0);%%% YAN Chao-Gan 111023 Added END. %%%
+                    else
+                        fv = ROIPrepare;
+                        Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                        a = PlotMesh5(Viewer,Surfmatrix,1);
+                        a = PlotROI5(fv,a,2);
+                    end
+                case 11 %%% Added by Mingrui Xia, 20111116, add 11 for volume and node mode
+                    [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
+                    [centerX,flag] = JudgeNode(surf,vl,vr);
+                    NodePrepare;
+                    Viewer = GenerateView5;
+                    if EC.vol.type == 1
+                        [low, high] = MapCMPrepare;
+                        if FLAG.MAP == 2
+                            MapPrepare;
+                        end
+                        Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                        a = MapMesh5(Viewer,Surfmatrix,low,high,1);
+                    else
+                        fv = ROIPrepare;
+                        Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                        a = PlotMesh5(Viewer,Surfmatrix,1);
+                        a = PlotROI5(fv,a,1);
+                    end
+                    PlotNode5(surf, a, flag, centerX, 2, EC);
+                case 15 %%% Added by Mingrui Xia, 20120210, add 15 for volume, node and edge mode
+                    [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
+                    [centerX,flag] = JudgeNode(surf,vl,vr);
+                    NodePrepare;
+                    NetPrepare;
+                    Viewer = GenerateView5;
+                    if EC.vol.type == 1
+                        [low, high] = MapCMPrepare;
+                        if FLAG.MAP == 2
+                            MapPrepare;
+                        end
+                        Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                        a = MapMesh5(Viewer,Surfmatrix,low,high,1);
+                    else
+                        fv = ROIPrepare;
+                        Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
+                        a = PlotMesh5(Viewer,Surfmatrix,1);
+                        a = PlotROI5(fv,a,1);
+                    end
+                    PlotNode5(surf, a, flag, centerX, 1, EC);
+                    PlotLine5(surf,a,flag,centerX);
+            end
     end
 end
 
@@ -3750,7 +4594,7 @@ function NV_m_about_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_about (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-msgbox({'BrainNet Viewer 1.53 Released 20150616';'By Mingrui Xia';'mingruixia@gmail.com'},'About...','help');
+msgbox({'BrainNet Viewer 1.6 Released 20170403';'By Mingrui Xia';'mingruixia@gmail.com'},'About...','help');
 
 
 % --------------------------------------------------------------------
@@ -3911,20 +4755,25 @@ function SagittalView_ClickedCallback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global cam
 global FLAG
-switch FLAG.sagittal
-    case 0
-        view(-90,0);
-        FLAG.sagittal=1;
-    case 1
-        view(90,0);
-        FLAG.sagittal=0;
-end
-if ~isempty(cam)
-    for i = 1:length(cam) % Edited by Mingrui Xia, 20120809 adjust camlight in multi-surface view.
-        camlight(cam(i));
+global EC
+if EC.lot.view == 1
+    axis normal
+    switch FLAG.sagittal
+        case 0
+            view(-90,0);
+            FLAG.sagittal=1;
+        case 1
+            view(90,0);
+            FLAG.sagittal=0;
     end
+    if ~isempty(cam)
+        for i = 1:length(cam) % Edited by Mingrui Xia, 20120809 adjust camlight in multi-surface view.
+            camlight(cam(i));
+        end
+    end
+    axis tight
+    daspect([1 1 1])
 end
-
 
 % --------------------------------------------------------------------
 function AxialView_ClickedCallback(hObject, eventdata, handles)
@@ -3933,20 +4782,25 @@ function AxialView_ClickedCallback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global cam
 global FLAG
-switch FLAG.axial
-    case 0
-        view(0,90);
-        FLAG.axial=1;
-    case 1
-        view(0,-90);
-        FLAG.axial=0;
-end
-if ~isempty(cam)
-    for i = 1:length(cam) % Edited by Mingrui Xia, 20120809 adjust camlight in multi-surface view.
-        camlight(cam(i));
+global EC
+if EC.lot.view == 1
+    axis normal
+    switch FLAG.axial
+        case 0
+            view(0,90);
+            FLAG.axial=1;
+        case 1
+            view(0,-90);
+            FLAG.axial=0;
     end
+    if ~isempty(cam)
+        for i = 1:length(cam) % Edited by Mingrui Xia, 20120809 adjust camlight in multi-surface view.
+            camlight(cam(i));
+        end
+    end
+    axis tight
+    daspect([1 1 1])
 end
-axis tight
 
 
 % --------------------------------------------------------------------
@@ -3956,20 +4810,25 @@ function CoronalView_ClickedCallback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global cam
 global FLAG
-switch FLAG.coronal
-    case 0
-        view(180,00);
-        FLAG.coronal=1;
-    case 1
-        view(0,0);
-        FLAG.coronal=0;
-end
-if ~isempty(cam)
-    for i = 1:length(cam) % Edited by Mingrui Xia, 20120809 adjust camlight in multi-surface view.
-        camlight(cam(i));
+global EC
+if EC.lot.view == 1
+    axis normal
+    switch FLAG.coronal
+        case 0
+            view(180,00);
+            FLAG.coronal=1;
+        case 1
+            view(0,0);
+            FLAG.coronal=0;
     end
+    if ~isempty(cam)
+        for i = 1:length(cam) % Edited by Mingrui Xia, 20120809 adjust camlight in multi-surface view.
+            camlight(cam(i));
+        end
+    end
+    axis tight
+    daspect([1 1 1])
 end
-
 
 % --------------------------------------------------------------------
 function Presentation_ClickedCallback(hObject, eventdata, handles)

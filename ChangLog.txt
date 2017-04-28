@@ -1,9 +1,28 @@
-Version 1.54
+Version 1.61
+- Fix a bug in calling custom colormap for volume mapping
+- Fix a bug in inputing threshold for edges
+
+Version 1.6 Released 20170403
 - Provide a commandline BrainNet_GenSurface.m for generating nv surface file from nifti mask
 - Fix a bug in label setting of option panel
 - Add a colormap for volume mapping
 - Fix a bug when the angle between two nodes in z direction is 180 degree
 - Using gaussian kenrnel in smoothing the ROI culster instead of the default box kernel
+- Change all color squares to pushbuttons
+- Add funtion to fix the colormap range for node
+- Fix a bug in optional panel when changing layout
+- Add funtion to fix the colormap range for edge
+- Fix a bug when changing the view from sagittal to axial, the image exceedes the boundary
+- Add function for define ROI colors from txt file
+- Add support for GIfTI 3D surface
+- Add a swith for displaying 'L' and 'R' or not
+- Changed descriptions of the layout
+- Add a layout of lateral, medial and ventral view
+- Dispaly bidirected edges in two lines
+- Add custom colorbar for edges
+- Add custom colorbar for nodes
+- Fix a bug in locating surface file in Linux and Mac
+- Add support for mz3 surface file of Surf Ice
 
 Version 1.53 Released 20150807
 - Improve the outlay of 6 views

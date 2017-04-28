@@ -1,4 +1,16 @@
 function varargout = BrainNet_MergeMesh(varargin)
+%BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
+%Function to merge two hemisphere files into one
+%-----------------------------------------------------------
+%	Copyright(c) 2017
+%	State Key Laboratory of Cognitive Neuroscience and Learning, Beijing Normal University
+%	Written by Mingrui Xia
+%	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
+%   Version 1.6;
+%   Date 20110531;
+%   Last edited 20170330
+%-----------------------------------------------------------
+%
 % BrainNet_MergeMesh MATLAB code for BrainNet_MergeMesh.fig
 %      BrainNet_MergeMesh, by itself, creates a new BrainNet_MergeMesh or raises the existing
 %      singleton*.
@@ -121,8 +133,109 @@ fclose(fid) ;
 vertex_number=size(vertex,2);
 face_number=size(faces,1);
 
+function [vertex, faces, vertex_number, face_number] = loadg(filename)
+fid = fopen(filename);
+fscanf(fid,'%f',1);
+vertex_number = fscanf(fid,'%f',1);
+face_number = fscanf(fid,'%f',1);
+fscanf(fid,'%f',3);
+vertex = fscanf(fid,'%f',[3,vertex_number]);
+tri = fscanf(fid,'%d',[3,ntri])';
+faces(:,3) = -tri(:,3);
+fclose(fid);
 
+function [vertex, faces, vertex_number, face_number] = loadobjsurf(filename)
+fid = fopen(filename);
+FirstChar = fscanf(fid,'%1s',1);
+if FirstChar == 'P' % ASCII
+    fscanf(fid,'%f',5);
+    vertex_number = fscanf(fid,'%f',1);
+    vertex = fscanf(fid,'%f',[3,vertex_number]);
+    fscanf(fid,'%f',[3,vertex_number]);
+    face_number = fscanf(fid,'%f',1);
+    ind = fscanf(fid,'%f',1);
+    if ind == 0
+        fscanf(fid,'%f',4);
+    else
+        fscanf(fid,'%f',[4,vertex_number]);
+    end
+    fscanf(fid,'%f',face_number);
+    faces = fscanf(fid,'%f',[3,face_number])'+1;
+    fclose(fid);
+else
+    fclose(fid);
+    fid = fopen(filename,'r','b');
+    FirstChar = fread(fid,1);
+    if FirstChar == uint8(112) % binary
+        fread(fid,5,'float');
+        vertex_number = fread(fid,1,'int');
+        vertex = fread(fid,[3,vertex_number],'float');
+        fread(fid,[3,vertex_number],'float');
+        face_number = fread(fid,1,'int');
+        ind = fread(fid,1,'int');
+        if ind == 0
+            uint8(fread(fid,4,'uint8'));
+        else
+            uint8(fread(fid,[4,vertex_number],'uint8'));
+        end
+        fread(fid,face_number,'int');
+        faces = fread(fid,[3,face_number],'int')'+1;
+        fclose(fid);
+    end
+end
 
+function [vertex, faces, vertex_number, face_number] = loadgii(filename)
+g = gifti(filename);
+vertex_number = size(g.vertices,1);
+vertex = g.vertices';
+face_number = size(g.faces,1);
+faces = g.faces;
+
+function [vertex, faces, vertex_number, face_number] = loadmz3(filename)
+streamCopier = com.mathworks.mlwidgets.io.InterruptibleStreamCopier.getInterruptibleStreamCopier;
+baos = java.io.ByteArrayOutputStream;
+fis  = java.io.FileInputStream(filename);
+zis  = java.util.zip.GZIPInputStream(fis);
+streamCopier.copyStream(zis,baos);
+fis.close;
+data = baos.toByteArray;
+%mz3 ALWAYS little endian
+machine = 'ieee-le';
+magic = typecast(data(1:2),'uint16');
+if magic ~= 23117, fprintf('Signature is not MZ3\n'); return; end;
+%attr reports attributes and version
+attr = typecast(data(3:4),'uint16');
+if (attr == 0) || (attr > 7), fprintf('This file uses unsupported features\n'); end;
+isFace = bitand(attr,1);
+isVert = bitand(attr,2);
+isRGBA = bitand(attr,4);
+isSCALAR = bitand(attr,8);
+%read attributes
+nFace = typecast(data(5:8),'uint32');
+nVert = typecast(data(9:12),'uint32');
+nSkip = typecast(data(13:16),'uint32');
+hdrSz = 16+nSkip; %header size in bytes
+%read faces
+if isFace
+    facebytes = nFace * 3 * 4; %each face has 3 indices, each 4 byte int
+    faces = typecast(data(hdrSz+1:hdrSz+facebytes),'int32');
+    faces = double(faces')+1; %matlab indices arrays from 1 not 0
+    %faces = reshape(faces,3,nFace)';
+    faces = reshape(faces,3, nFace)';
+    hdrSz = hdrSz + facebytes;
+end;
+%read vertices
+if isVert
+    vertbytes = nVert * 3 * 4; %each vertex has 3 values (x,y,z), each 4 byte float
+    vertices = typecast(data(hdrSz+1:hdrSz+vertbytes),'single');
+    vertices = double(vertices); %matlab wants doubles
+    %vertices = reshape(vertices,nVert,3);
+    vertices = reshape(vertices,3,nVert);
+    hdrSz = hdrSz + vertbytes;
+end
+vertex_number = nVert;
+vertex = vertices;
+face_number = nFace;
 
 function MergeMesh1(filename1,filename2,filename3)
 if nargin<3
@@ -136,7 +249,15 @@ if nargin<3
             surf.coord(3,:)=109-surf.coord(3,:);
             surf.tri=faces1+1;
         case '.pial'
-            [surf.coord, surf.tri, surf.vertex_number, surf.ntri] =loadpial(filename1);
+            [surf.coord, surf.tri, surf.vertex_number, surf.ntri] = loadpial(filename1);
+        case '.g'
+            [surf.coord, surf.tri, surf.vertex_number, surf.ntri] = loadg(filename1);
+        case '.obj'
+            [surf.coord, surf.tri, surf.vertex_number, surf.ntri] = loadobjsurf(filename1);
+        case '.gii'
+            [surf.coord, surf.tri, surf.vertex_number, surf.ntri] = loadgii(filename1);
+        case '.mz3'
+            [surf.coord, surf.tri, surf.vertex_number, surf.ntri] = loadmz3(filename1);
     end
     fid = fopen(filename2,'wt');
     fprintf(fid,'%d\n',surf.vertex_number);
@@ -157,19 +278,27 @@ else
             fid = fopen(filename1);
             vertex_number1 = fscanf(fid,'%f',1);
             vertex1 = fscanf(fid,'%f',[3,vertex_number1]);
-            vertex1 = vertex1';
+            
             faces_number1 = fscanf(fid,'%f',1);
             faces1 = fscanf(fid,'%d',[3,faces_number1])';
-            fclose(fid);        
+            fclose(fid);
         case '.mesh'
             [vertex1, faces1, vertex_number1, faces_number1] = loadmesh(filename1);
             vertex1(:,1)=91-vertex1(:,1);
             vertex1(:,2)=91-vertex1(:,2);
             vertex1(:,3)=109-vertex1(:,3);
             faces1=faces1+1;
+            vertix1 = vertex1';
         case '.pial'
             [vertex1, faces1, vertex_number1, faces_number1] =loadpial(filename1);
-            vertex1=vertex1';
+        case '.g'
+            [vertex1, faces1, vertex_number1, faces_number1] = loadg(filename1);
+        case '.obj'
+            [vertex1, faces1, vertex_number1, faces_number1] = loadobjsurf(filename1);
+        case '.gii'
+            [vertex1, faces1, vertex_number1, faces_number1] = loadgii(filename1);
+        case '.mz3'
+            [vertex1, faces1, vertex_number1, faces_number1] = loadmz3(filename1);
     end
     [pathstr,name,ext] = fileparts(filename2);
     switch ext
@@ -178,7 +307,7 @@ else
             fid = fopen(filename2);
             vertex_number2 = fscanf(fid,'%f',1);
             vertex2 = fscanf(fid,'%f',[3,vertex_number2]);
-            vertex2 = vertex2';
+            
             faces_number2 = fscanf(fid,'%f',1);
             faces2 = fscanf(fid,'%d',[3,faces_number2])';
             fclose(fid);
@@ -188,17 +317,25 @@ else
             vertex2(:,2)=91-vertex2(:,2);
             vertex2(:,3)=109-vertex2(:,3);
             faces2=faces2+1;
+            vertex2=vertex2';
         case '.pial'
             [vertex2, faces2, vertex_number2, faces_number2] =loadpial(filename2);
-            vertex2=vertex2';
+        case '.g'
+            [vertex2, faces2, vertex_number2, faces_number2] = loadg(filename1);
+        case '.obj'
+            [vertex2, faces2, vertex_number2, faces_number2] = loadobjsurf(filename1);
+        case '.gii'
+            [vertex2, faces2, vertex_number2, faces_number2] = loadgii(filename1);
+        case '.mz3'
+            [vertex2, faces2, vertex_number2, faces_number2] = loadmz3(filename1);
     end
     
     surf.vertex_number=vertex_number1+vertex_number2;
-    surf.coord=[vertex1',vertex2'];
+    surf.coord=[vertex1,vertex2];
     surf.ntri=faces_number1+faces_number2;
-    surf.tri=[(faces1)',(faces2+vertex_number1)']';
-%     surf.coord(3,:) = surf.coord(3,:) + 13;
-%     surf.coord(2,:) = surf.coord(2,:) -13;
+    surf.tri=[(faces1);(faces2+double(vertex_number1))];
+    %     surf.coord(3,:) = surf.coord(3,:) + 13;
+    %     surf.coord(2,:) = surf.coord(2,:) -13;
     
     fid = fopen(filename3,'wt');
     fprintf(fid,'%d\n',surf.vertex_number);
@@ -221,9 +358,12 @@ function ML_button_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Edited by Mingrui 20120930, add support for nv file.
-[filename,pathname]=uigetfile({'*.nv','BrainNet Surface (*.nv)';...
-    '*.mesh','BrainVISA Mesh (*.mesh)';...
-    '*.pial','FreeSurfer Mesh (*.pial)';'*.*','All Files (*.*)'});
+[filename,pathname]=uigetfile({'*.nv','NetViewer Files (*.nv)';'*.mesh',...
+    'BrainVISA Mesh (*.mesh)';'*.pial','FreeSurfer Mesh (*.pial)';...
+    '*.g','BYU file (*.g)';'*.obj','Objective Files (*.obj)';...
+    '*.gii','GIfTI Files (*.gii)';...
+    '*.mz3','Surf Ice Files (*.mz3)';...
+    '*.*','All Files (*.*)'});
 if isequal(filename,0)||isequal(pathname,0)
     return;
 else
@@ -386,9 +526,12 @@ function MR_button_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Edited by Mingrui 20120930, add support for nv file.
-[filename,pathname]=uigetfile({'*.nv','BrainNet Surface (*.nv)';...
-    '*.mesh','BrainVISA Mesh (*.mesh)';...
-    '*.pial','FreeSurfer Mesh (*.pial)';'*.*','All Files (*.*)'});
+[filename,pathname]=uigetfile({'*.nv','NetViewer Files (*.nv)';'*.mesh',...
+    'BrainVISA Mesh (*.mesh)';'*.pial','FreeSurfer Mesh (*.pial)';...
+    '*.g','BYU file (*.g)';'*.obj','Objective Files (*.obj)';...
+    '*.gii','GIfTI Files (*.gii)';...
+    '*.mz3','Surf Ice Files (*.mz3)';...
+    '*.*','All Files (*.*)'});
 if isequal(filename,0)||isequal(pathname,0)
     return;
 else

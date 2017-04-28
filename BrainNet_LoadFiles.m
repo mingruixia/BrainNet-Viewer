@@ -2,13 +2,13 @@ function varargout = BrainNet_LoadFiles(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %Function to load files for graph drawing
 %-----------------------------------------------------------
-%	Copyright(c) 2013
+%	Copyright(c) 2017
 %	State Key Laboratory of Cognitive Neuroscience and Learning, Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
-%   Version 1.52;
+%   Version 1.6;
 %   Date 20110531;
-%   Last edited 20150414
+%   Last edited 20170330
 %-----------------------------------------------------------
 %
 
@@ -455,6 +455,12 @@ else
     vol=BrainNet_spm_read_vols(hdr);
     rmpath(BrainNet_SPMPath);
 end
+% Nii = nifti(filename);
+% hdr.descrip = Nii.descrip;
+% hdr.dim = Nii.dat.dim;
+% hdr.mat = Nii.mat;
+% vol = double(Nii.dat);
+
 
 
 
@@ -465,14 +471,25 @@ function MF_button_Callback(hObject, eventdata, handles)
 % hObject    handle to MF_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[BrainSurfPath] = fileparts(which('BrainMesh_ICBM152.nv')); %%% Edited by Mingrui Xia, 20120412, add default template path to ICBM152.
+[BrainSurfPath] = fileparts(which('BrainMesh_ICBM152_smoothed.nv')); %%% Edited by Mingrui Xia, 20120412, add default template path to ICBM152.
 
 % Edited by Mingrui Xia, 20120918, add support for BYU '*.g' file.
-[filename,pathname]=uigetfile({'*.nv','NetViewer Files (*.nv)';'*.mesh',...
-    'BrainVISA Mesh (*.mesh)';'*.pial','FreeSurfer Mesh (*.pial)';...
-    '*.g','BYU file (*.g)';'*.obj','Objective Files (*.obj)';...
-    '*.*','All Files (*.*)'},...
-    'Select brain template',[BrainSurfPath,'\BrainMesh_ICBM152.nv']);
+if ispc % Edited by Mingrui, 20170321, fix the bug that couldn't locate the surface template in Linux
+    [filename,pathname]=uigetfile({'*.nv','NetViewer Files (*.nv)';'*.mesh',...
+        'BrainVISA Mesh (*.mesh)';'*.pial','FreeSurfer Mesh (*.pial)';...
+        '*.g','BYU file (*.g)';'*.obj','Objective Files (*.obj)';...
+        '*.gii','GIfTI Files (*.gii)';...
+        '*.mz3','Surf Ice Files (*.mz3)';...
+        '*.*','All Files (*.*)'},...
+        'Select brain template',[BrainSurfPath,'\BrainMesh_ICBM152_smoothed.nv']);
+else
+    [filename,pathname]=uigetfile({'*.nv','NetViewer Files (*.nv)';'*.mesh',...
+        'BrainVISA Mesh (*.mesh)';'*.pial','FreeSurfer Mesh (*.pial)';...
+        '*.g','BYU file (*.g)';'*.obj','Objective Files (*.obj)';...
+        '*.gii','GIfTI Files (*.gii)';'*.mz3','Surf Ice Files (*.mz3)';...
+        '*.*','All Files (*.*)'},...
+        'Select brain template',[BrainSurfPath,'/BrainMesh_ICBM152_smoothed.nv']);
+end
 
 if isequal(filename,0)||isequal(pathname,0)
     return;
@@ -667,6 +684,61 @@ switch ext
                 fclose(fid);
             end
         end
+    case '.gii' % Added by Mingrui, 20170309, load gii by using gifti toolbox
+        g = gifti(MF);
+        vertex_number = size(g.vertices,1);
+        coord = g.vertices';
+        ntri = size(g.faces,1);
+        tri = g.faces;
+    case '.mz3'% Added by Mingrui, 20170330, support mz3 from Surf_Ice, modified from readMz3.m, https://github.com/bonilhamusclab/MRIcroS/blob/development/%2BfileUtils/%2Bmz3/readMz3.m
+        %Decode gzip data
+        % http://undocumentedmatlab.com/blog/savezip-utility
+        % http://www.mathworks.com/matlabcentral/fileexchange/39526-byte-encoding-utilities/content/encoder/gzipdecode.m
+        streamCopier = com.mathworks.mlwidgets.io.InterruptibleStreamCopier.getInterruptibleStreamCopier;
+        baos = java.io.ByteArrayOutputStream;
+        fis  = java.io.FileInputStream(MF);
+        zis  = java.util.zip.GZIPInputStream(fis);
+        streamCopier.copyStream(zis,baos);
+        fis.close;
+        data = baos.toByteArray;
+        %mz3 ALWAYS little endian
+        machine = 'ieee-le';
+        magic = typecast(data(1:2),'uint16');
+        if magic ~= 23117, fprintf('Signature is not MZ3\n'); return; end;
+        %attr reports attributes and version
+        attr = typecast(data(3:4),'uint16');
+        if (attr == 0) || (attr > 7), fprintf('This file uses unsupported features\n'); end;
+        isFace = bitand(attr,1);
+        isVert = bitand(attr,2);
+        isRGBA = bitand(attr,4);
+        isSCALAR = bitand(attr,8);
+        %read attributes
+        nFace = typecast(data(5:8),'uint32');
+        nVert = typecast(data(9:12),'uint32');
+        nSkip = typecast(data(13:16),'uint32');
+        hdrSz = 16+nSkip; %header size in bytes
+        %read faces
+        if isFace
+            facebytes = nFace * 3 * 4; %each face has 3 indices, each 4 byte int
+            faces = typecast(data(hdrSz+1:hdrSz+facebytes),'int32');
+            faces = double(faces')+1; %matlab indices arrays from 1 not 0
+            %faces = reshape(faces,3,nFace)';
+            faces = reshape(faces,3, nFace)';
+            hdrSz = hdrSz + facebytes;
+        end;
+        %read vertices
+        if isVert
+            vertbytes = nVert * 3 * 4; %each vertex has 3 values (x,y,z), each 4 byte float
+            vertices = typecast(data(hdrSz+1:hdrSz+vertbytes),'single');
+            vertices = double(vertices); %matlab wants doubles
+            %vertices = reshape(vertices,nVert,3);
+            vertices = reshape(vertices,3,nVert);
+            hdrSz = hdrSz + vertbytes;
+        end
+        vertex_number = nVert;
+        coord = vertices;
+        ntri = nFace;
+        tri = faces;
 end
 
 
