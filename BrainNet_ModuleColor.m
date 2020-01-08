@@ -22,7 +22,7 @@ function varargout = BrainNet_ModuleColor(varargin)
 
 % Edit the above text to modify the response to help BrainNet_ModuleColor
 
-% Last Modified by GUIDE v2.5 26-Oct-2011 19:57:06
+% Last Modified by GUIDE v2.5 17-Oct-2018 17:21:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -83,12 +83,12 @@ for i = 5:-1:0
     if length(textcell) > i
         for j = (i+1):-1:1
             ind = num2str(j);
-            eval(['set(handles.text',ind ',''BackgroundColor'',EC.nod.CMm_temp(',ind,',:));']);
+            eval(['set(handles.mod_c',ind '_button,''BackgroundColor'',EC.nod.CMm_temp(',ind,',:));']);
             eval(['set(handles.popupmenu',ind,',''Value'',',ind,');']);
         end
         for j = 6:-1:i+2
             ind = num2str(j);
-            eval(['set(handles.text',ind ',''Enable'',''off'');']);
+            eval(['set(handles.mod_c',ind '_button,''Enable'',''off'');']);
             eval(['set(handles.popupmenu',ind,',''Enable'',''off'');']);
         end
         break;
@@ -96,12 +96,12 @@ for i = 5:-1:0
 end
         
 % 
-% set(handles.text1,'BackgroundColor',EC.nod.CMm_temp(1,:));
-% set(handles.text2,'BackgroundColor',EC.nod.CMm_temp(2,:));
-% set(handles.text3,'BackgroundColor',EC.nod.CMm_temp(3,:));
-% set(handles.text4,'BackgroundColor',EC.nod.CMm_temp(4,:));
-% set(handles.text5,'BackgroundColor',EC.nod.CMm_temp(5,:));
-% set(handles.text6,'BackgroundColor',EC.nod.CMm_temp(6,:));
+% set(handles.mod_c1_button,'BackgroundColor',EC.nod.CMm_temp(1,:));
+% set(handles.mod_c2_button,'BackgroundColor',EC.nod.CMm_temp(2,:));
+% set(handles.mod_c3_button,'BackgroundColor',EC.nod.CMm_temp(3,:));
+% set(handles.mod_c4_button,'BackgroundColor',EC.nod.CMm_temp(4,:));
+% set(handles.mod_c5_button,'BackgroundColor',EC.nod.CMm_temp(5,:));
+% set(handles.mod_c6_button,'BackgroundColor',EC.nod.CMm_temp(6,:));
 
 
 
@@ -127,7 +127,7 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from popupmenu1
 global EC
 val=get(handles.popupmenu1,'Value');
-set(handles.text1,'BackgroundColor',EC.nod.CMm_temp(val,:));
+set(handles.mod_c1_button,'BackgroundColor',EC.nod.CMm_temp(val,:));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -149,7 +149,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-EC.nod.CMm=EC.nod.CMm_temp;
+EC.nod.CMm = EC.nod.CMm_temp;
 close(findobj('Tag','MC_fig'));
 
 
@@ -159,20 +159,6 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 close(findobj('Tag','MC_fig'));
-
-
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over text1.
-function text1_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to text1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global EC
-c=uisetcolor('Select Color');
-if length(c)==3
-    set(handles.text1,'BackgroundColor',c);
-    EC.nod.CMm_temp(get(handles.popupmenu1,'Value'),:)=c;
-end
 
 
 % --- Executes on selection change in popupmenu2.
@@ -185,7 +171,7 @@ function popupmenu2_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from popupmenu2
 global EC
 val=get(handles.popupmenu2,'Value');
-set(handles.text2,'BackgroundColor',EC.nod.CMm_temp(val,:));
+set(handles.mod_c2_button,'BackgroundColor',EC.nod.CMm_temp(val,:));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -211,7 +197,7 @@ function popupmenu3_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from popupmenu3
 global EC
 val=get(handles.popupmenu3,'Value');
-set(handles.text3,'BackgroundColor',EC.nod.CMm_temp(val,:));
+set(handles.mod_c3_button,'BackgroundColor',EC.nod.CMm_temp(val,:));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -237,7 +223,7 @@ function popupmenu4_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from popupmenu4
 global EC
 val=get(handles.popupmenu4,'Value');
-set(handles.text4,'BackgroundColor',EC.nod.CMm_temp(val,:));
+set(handles.mod_c4_button,'BackgroundColor',EC.nod.CMm_temp(val,:));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -263,7 +249,7 @@ function popupmenu5_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from popupmenu5
 global EC
 val=get(handles.popupmenu5,'Value');
-set(handles.text5,'BackgroundColor',EC.nod.CMm_temp(val,:));
+set(handles.mod_c5_button,'BackgroundColor',EC.nod.CMm_temp(val,:));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -289,7 +275,7 @@ function popupmenu6_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from popupmenu6
 global EC
 val=get(handles.popupmenu6,'Value');
-set(handles.text6,'BackgroundColor',EC.nod.CMm_temp(val,:));
+set(handles.mod_c6_button,'BackgroundColor',EC.nod.CMm_temp(val,:));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -305,71 +291,103 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over text2.
-function text2_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to text2 (see GCBO)
+
+% --- Executes on button press in mod_c1_button.
+function mod_c1_button_Callback(hObject, eventdata, handles)
+% hObject    handle to mod_c1_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-c=uisetcolor('Select Color');
-if length(c)==3
-    set(handles.text2,'BackgroundColor',c);
-    EC.nod.CMm_temp(get(handles.popupmenu2,'Value'),:)=c;
+c = uisetcolor('Select Color');
+if length(c) == 3
+    set(hObject,'BackgroundColor',c);
+    EC.nod.CMm_temp(get(handles.popupmenu1,'Value'),:) = c;
 end
 
 
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over text3.
-function text3_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to text3 (see GCBO)
+% --- Executes on button press in mod_c2_button.
+function mod_c2_button_Callback(hObject, eventdata, handles)
+% hObject    handle to mod_c2_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-c=uisetcolor('Select Color');
-if length(c)==3
-    set(handles.text3,'BackgroundColor',c);
-    EC.nod.CMm_temp(get(handles.popupmenu3,'Value'),:)=c;
+c = uisetcolor('Select Color');
+if length(c) == 3
+    set(hObject,'BackgroundColor',c);
+    EC.nod.CMm_temp(get(handles.popupmenu2,'Value'),:) = c;
 end
 
 
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over text4.
-function text4_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to text4 (see GCBO)
+% --- Executes on button press in mod_c3_button.
+function mod_c3_button_Callback(hObject, eventdata, handles)
+% hObject    handle to mod_c3_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-c=uisetcolor('Select Color');
-if length(c)==3
-    set(handles.text4,'BackgroundColor',c);
-    EC.nod.CMm_temp(get(handles.popupmenu4,'Value'),:)=c;
+c = uisetcolor('Select Color');
+if length(c) == 3
+    set(hObject,'BackgroundColor',c);
+    EC.nod.CMm_temp(get(handles.popupmenu3,'Value'),:) = c;
 end
 
 
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over text5.
-function text5_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to text5 (see GCBO)
+% --- Executes on button press in mod_c4_button.
+function mod_c4_button_Callback(hObject, eventdata, handles)
+% hObject    handle to mod_c4_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-c=uisetcolor('Select Color');
-if length(c)==3
-    set(handles.text5,'BackgroundColor',c);
-    EC.nod.CMm_temp(get(handles.popupmenu5,'Value'),:)=c;
+c = uisetcolor('Select Color');
+if length(c) == 3
+    set(hObject,'BackgroundColor',c);
+    EC.nod.CMm_temp(get(handles.popupmenu4,'Value'),:) = c;
 end
 
 
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over text6.
-function text6_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to text6 (see GCBO)
+% --- Executes on button press in mod_c5_button.
+function mod_c5_button_Callback(hObject, eventdata, handles)
+% hObject    handle to mod_c5_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-c=uisetcolor('Select Color');
-if length(c)==3
-    set(handles.text6,'BackgroundColor',c);
-    EC.nod.CMm_temp(get(handles.popupmenu6,'Value'),:)=c;
+c = uisetcolor('Select Color');
+if length(c) == 3
+    set(hObject,'BackgroundColor',c);
+    EC.nod.CMm_temp(get(handles.popupmenu5,'Value'),:) = c;
+end
+
+
+% --- Executes on button press in mod_c6_button.
+function mod_c6_button_Callback(hObject, eventdata, handles)
+% hObject    handle to mod_c6_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global EC
+c = uisetcolor('Select Color');
+if length(c) == 3
+    set(hObject,'BackgroundColor',c);
+    EC.nod.CMm_temp(get(handles.popupmenu6,'Value'),:) = c;
+end
+
+
+% --- Executes on button press in load_custom_pushbutton.
+function load_custom_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to load_custom_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global EC
+[filename,pathname]=uigetfile({'*.txt','Text files (*.txt)';'*.*','All Files (*.*)'});
+tmp_color = load(fullfile(pathname,filename));
+if max(tmp_color(:))>1
+    tmp_color = tmp_color./255;
+end
+n_tmp_color = length(tmp_color);
+if n_tmp_color<21
+    EC.nod.CMm_temp(1:n_tmp_color,:) = tmp_color;
+else
+    EC.nod.CMm_temp = tmp_color;
+end
+for j = 1:6
+    ind = num2str(j);
+    eval(['set(handles.mod_c',ind '_button,''BackgroundColor'',EC.nod.CMm_temp(',ind,',:));']);
 end

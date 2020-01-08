@@ -71,6 +71,7 @@ end
 
 % Start BrainNet
 [H_BrainNet] = BrainNet;
+
 global FLAG
 FLAG.Loadfile = 0;
 FLAG.IsCalledByCMD = 1;
@@ -98,6 +99,7 @@ if ~isempty(SurfFileName)
     surf.tri = reshape(data{1}(3*surf.vertex_number+3:end),[3,surf.ntri])';
     fclose(fid);
     FLAG.Loadfile = FLAG.Loadfile + 1;
+    EC.msh.alpha = 1;
 end
 
 % Load Node file
@@ -134,6 +136,7 @@ if ~isempty(NodeFileName)
     surf.label = data{6};
     surf.nsph = size(surf.sphere,1);
     FLAG.Loadfile = FLAG.Loadfile + 2;
+    EC.msh.alpha = 0.4;
 end
 
 % Load Edge file
@@ -198,9 +201,42 @@ if ~isempty(VolFileName)
             EC.msh.alpha = 1;
             delete(VolFileName);
     end
+    
+    % Added by Mingrui, 20190122, fix an error in lack of surf.test in
+    % commandlin mode
+    if FLAG.MAP == 2
+        if isempty(strfind(surf.hdr.descrip,'REST'))&&isempty(strfind(surf.hdr.descrip,'SPM'))&&isempty(strfind(surf.hdr.descrip,'DPABI'))
+            surf.test = 'No';
+        else
+            % Modified from REST rest_sliceviwer.m
+            if ~isempty(strfind(surf.hdr.descrip,'{T_['))
+                surf.test = 'T';
+                Tstart = strfind(surf.hdr.descrip,'{T_[')+length('{T_[');
+                Tend = strfind(surf.hdr.descrip,']}')-1;
+                surf.df = str2num(surf.hdr.descrip(Tstart:Tend));
+            elseif ~isempty(strfind(surf.hdr.descrip,'{F_['))
+                surf.test = 'F';
+                Tstart = strfind(surf.hdr.descrip,'{F_[')+length('{F_[');
+                Tend = strfind(surf.hdr.descrip,']}')-1;
+                surf.df = str2num(surf.hdr.descrip(Tstart:Tend));
+            elseif ~isempty(strfind(surf.hdr.descrip,'{R_['))
+                surf.test = 'R';
+                Tstart = strfind(surf.hdr.descrip,'{R_[')+length('{R_[');
+                Tend = strfind(surf.hdr.descrip,']}')-1;
+                surf.df = str2num(surf.hdr.descrip(Tstart:Tend));
+            elseif ~isempty(strfind(surf.hdr.descrip,'{Z_['))
+                surf.test = 'Z';
+            else
+                surf.test = 'No';
+            end
+        end
+        surf.vol(isnan(surf.vol)) = 0; %Added by Mingrui, 20190118, replace NaN to 0
+    end
+    
     EC.vol.display = 1;
     EC.vol.pn = 0;
     EC.vol.nn = 0;
+    
 end
 
 % Load Configure file
@@ -210,6 +246,17 @@ end
 if ~isfield(EC.bak,'color')
     EC.bak.color = [1 1 1];
 end
+
+if ~isfield(EC.msh,'color_type')
+    EC.msh.color_type = 1;
+end
+if isfield(EC.msh,'color_table')
+    EC.msh.color_table = [0.95,0.95,0.95];
+end
+if isfield(EC.msh,'color_table_tmp')
+    EC.msh.color_table_tmp = [0.95,0.95,0.95];
+end
+
 if ~isfield(EC.msh,'color')
     EC.msh.color = [0.95,0.95,0.95];
 end
@@ -218,6 +265,15 @@ if ~isfield(EC.msh,'alpha')
 end
 if ~isfield(EC.msh,'doublebrain')
     EC.msh.doublebrain = 0;
+end
+if ~isfield(EC.msh,'boundary')
+    EC.msh.boundary = 1;
+end
+if ~isfield(EC.msh,'boundary_value')
+    EC.msh.boundary_value = 0;
+end
+if ~isfield(EC.msh,'boundary_color')
+    EC.msh.boundary_color = [0,0,0];
 end
 if ~isfield(EC.nod,'draw')
     EC.nod.draw = 1;
@@ -263,6 +319,16 @@ end
 
 if ~isfield(EC.nod,'ModularNumber')
     EC.nod.ModularNumberm = [];
+end
+
+if ~isfield(EC.nod,'color_map_type')
+    EC.nod.color_map_type = 1;
+end
+if ~isfield(EC.nod,'color_map_low')
+    EC.nod.color_map_low = 0;
+end
+if ~isfield(EC.nod,'color_map_high')
+    EC.nod.color_map_high = 1;
 end
 
 if ~isfield(EC,'lbl')
@@ -421,6 +487,11 @@ end
 if ~isfield(EC.glb,'detail')
     EC.glb.detail = 3;
 end
+
+if ~isfield(EC.glb,'lr')
+    EC.glb.lr = 1;
+end
+
 if ~isfield(EC.vol,'type')
     EC.vol.type = 1;
 end
@@ -493,16 +564,24 @@ if ~isfield(EC.edg,'CM_custom')
 0.211764705882353,0.0274509803921569,0.290196078431373,0.831372549019608,0.709803921568628,0.388235294117647,0,0.223529411764706,0.533333333333333,0.952941176470588,0.690196078431373,0.133333333333333,0.231372549019608,0.313725490196078,0.956862745098039,0.717647058823529,0.282352941176471,0.545098039215686,0.619607843137255,0,1]';
 end
 
-if FLAG.Loadfile ==1 || FLAG.Loadfile == 9 % Add by Mingrui, 20121123, set mesh opacity to 1
-    EC.msh.alpha = 1;
+if ~isfield(EC.vol,'CM_annot')
+    EC.vol.CM_annot = rand(64,3);
 end
+
+if ~isfield(EC,'lbl_front')
+    EC.lbl_front = 0;
+end
+
+% if FLAG.Loadfile ==1 || FLAG.Loadfile == 9 % Add by Mingrui, 20121123, set mesh opacity to 1
+%     EC.msh.alpha = 1;
+% end
 
 if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Add by Mingrui, 20140412, a fix a bug when module number more than option file.
     EC.nod.ModularNumber = unique(surf.sphere(:,4));
 end
 
 % Draw
-set(H_BrainNet,'handlevisib','on');
+set(H_BrainNet,'HandleVisibility','on');
 BrainNet('NV_m_nm_Callback',H_BrainNet);
 
 % Save to image

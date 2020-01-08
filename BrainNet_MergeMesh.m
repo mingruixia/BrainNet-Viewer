@@ -223,7 +223,7 @@ if isFace
     %faces = reshape(faces,3,nFace)';
     faces = reshape(faces,3, nFace)';
     hdrSz = hdrSz + facebytes;
-end;
+end
 %read vertices
 if isVert
     vertbytes = nVert * 3 * 4; %each vertex has 3 values (x,y,z), each 4 byte float
@@ -236,6 +236,16 @@ end
 vertex_number = nVert;
 vertex = vertices;
 face_number = nFace;
+
+
+function [vertex_number, coord, ntri, tri] = loadnv(filename)
+fid=fopen(filename);
+        data = textscan(fid,'%f','CommentStyle','#');
+        vertex_number = data{1}(1);
+        coord  = reshape(data{1}(2:1+3*vertex_number),[3,vertex_number]);
+        ntri = data{1}(3*vertex_number+2);
+        tri = reshape(data{1}(3*vertex_number+3:end),[3,ntri])';
+        fclose(fid);
 
 function MergeMesh1(filename1,filename2,filename3)
 if nargin<3
@@ -275,13 +285,14 @@ else
     switch ext
         % Edited by Mingrui 20120930, add support for nv file.
         case '.nv'
-            fid = fopen(filename1);
-            vertex_number1 = fscanf(fid,'%f',1);
-            vertex1 = fscanf(fid,'%f',[3,vertex_number1]);
-            
-            faces_number1 = fscanf(fid,'%f',1);
-            faces1 = fscanf(fid,'%d',[3,faces_number1])';
-            fclose(fid);
+%             fid = fopen(filename1);
+%             vertex_number1 = fscanf(fid,'%f',1);
+%             vertex1 = fscanf(fid,'%f',[3,vertex_number1]);
+%             
+%             faces_number1 = fscanf(fid,'%f',1);
+%             faces1 = fscanf(fid,'%d',[3,faces_number1])';
+%             fclose(fid);
+            [vertex_number1, vertex1, faces_number1, faces1] = loadnv(filename1);
         case '.mesh'
             [vertex1, faces1, vertex_number1, faces_number1] = loadmesh(filename1);
             vertex1(:,1)=91-vertex1(:,1);
@@ -304,13 +315,14 @@ else
     switch ext
         % Edited by Mingrui 20120930, add support for nv file.
         case '.nv'
-            fid = fopen(filename2);
-            vertex_number2 = fscanf(fid,'%f',1);
-            vertex2 = fscanf(fid,'%f',[3,vertex_number2]);
-            
-            faces_number2 = fscanf(fid,'%f',1);
-            faces2 = fscanf(fid,'%d',[3,faces_number2])';
-            fclose(fid);
+%             fid = fopen(filename2);
+%             vertex_number2 = fscanf(fid,'%f',1);
+%             vertex2 = fscanf(fid,'%f',[3,vertex_number2]);
+%             
+%             faces_number2 = fscanf(fid,'%f',1);
+%             faces2 = fscanf(fid,'%d',[3,faces_number2])';
+%             fclose(fid);
+            [vertex_number2, vertex2, faces_number2, faces2] = loadnv(filename2);
         case '.mesh'
             [vertex2, faces2, vertex_number2, faces_number2] = loadmesh(filename2);
             vertex2(:,1)=91-vertex2(:,1);
@@ -321,13 +333,13 @@ else
         case '.pial'
             [vertex2, faces2, vertex_number2, faces_number2] =loadpial(filename2);
         case '.g'
-            [vertex2, faces2, vertex_number2, faces_number2] = loadg(filename1);
+            [vertex2, faces2, vertex_number2, faces_number2] = loadg(filename2);
         case '.obj'
-            [vertex2, faces2, vertex_number2, faces_number2] = loadobjsurf(filename1);
+            [vertex2, faces2, vertex_number2, faces_number2] = loadobjsurf(filename2);
         case '.gii'
-            [vertex2, faces2, vertex_number2, faces_number2] = loadgii(filename1);
+            [vertex2, faces2, vertex_number2, faces_number2] = loadgii(filename2);
         case '.mz3'
-            [vertex2, faces2, vertex_number2, faces_number2] = loadmz3(filename1);
+            [vertex2, faces2, vertex_number2, faces_number2] = loadmz3(filename2);
     end
     
     surf.vertex_number=vertex_number1+vertex_number2;

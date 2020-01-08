@@ -41,6 +41,7 @@ if nargin > 2
     surf_vol(surf_vol>=threshold) = 1;
 end
 vol = smooth3(surf_vol);
+% vol = surf_vol;
 fv = isosurface(vol);
 coord = fv.vertices(:,1);
 fv.vertices(:,1) = fv.vertices(:,2);

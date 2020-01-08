@@ -180,6 +180,18 @@ else
                         [surf.T]=load(File.VF);
                         surf.test = 'No';
                         FLAG.MAP=1;
+                        
+                        % test code
+                        %                         facevalue = zeros(size(surf.tri));
+                        %                         facevalue(:) = surf.T(surf.tri(:));
+                        %                         facevalue_judge = 1 - all(diff(facevalue,[],2)==0,2);
+                        %                         face_remove = surf.tri(find(facevalue_judge),:);
+                        %                         surf.T(unique(face_remove)) = 0;
+                        
+                        
+                        
+                        
+                        
                     case '.gz' % Added by Mingrui, 20120611, support for .nii.gz files
                         tmp_folder = tempdir;
                         gunzip(File.VF,tmp_folder);
@@ -277,6 +289,9 @@ else
                             surf.df = str2num(surf.hdr.descrip(Tstart:Tend));
                         elseif ~isempty(strfind(surf.hdr.descrip,'{Z_['))
                             surf.test = 'Z';
+                        else % Added by Mingrui 20190723, fix a bug when header description includes toolbox name but not a statistical map
+                            surf.test = 'No';
+                            
                         end
                     end
                 end
@@ -331,6 +346,8 @@ else
                             surf.df = str2num(surf.hdr.descrip(Tstart:Tend));
                         elseif ~isempty(strfind(surf.hdr.descrip,'{Z_['))
                             surf.test = 'Z';
+                        else % Added by Mingrui 20190723, fix a bug when header description includes toolbox name but not a statistical map
+                            surf.test = 'No';
                         end
                     end
                 end
@@ -443,18 +460,20 @@ function [hdr,vol]=VF_load(filename)
 % YAN Chao-Gan 111028. Add the path of BrainNet SPM files every time.
 % [BrainNetPath, fileN, extn] = fileparts(which('BrainNet.m'));
 [BrainNetPath] = fileparts(which('BrainNet.m')); %%% Edited by Mingrui Xia, 20111112, remove two unused var.
-BrainNet_SPMPath = fullfile(BrainNetPath, 'BrainNet_spm8_files');
+BrainNet_SPMPath = fullfile(BrainNetPath, 'BrainNet_spm12_files'); % Edited by Mingrui Xia 20181020, use updated spm12 files
 % rmpath(BrainNet_SPMPath); %%% Edited by Mingrui Xia, 20111116, clear
 % warning
-if exist('spm.m','file') %%% Edited by Mingrui Xia, 111103, check if SPM is installed.
-    hdr=spm_vol(filename); %%% Edited by Mingrui Xia, 111026, integrated SPM NIFTI into BrainNet Viewer.
-    vol=spm_read_vols(hdr);
-else
+if ~exist('BrainNet_spm_file.m','file') %%% Edited by Mingrui Xia, 111103, check if SPM is installed.
+    %    hdr=spm_vol(filename); %%% Edited by Mingrui Xia, 111026, integrated SPM NIFTI into BrainNet Viewer.
+    %    vol=spm_read_vols(hdr);
+    %else
     addpath(BrainNet_SPMPath);
-    hdr=BrainNet_spm_vol(filename); %%% Edited by Mingrui Xia, 111026, integrated SPM NIFTI into BrainNet Viewer.
-    vol=BrainNet_spm_read_vols(hdr);
-    rmpath(BrainNet_SPMPath);
 end
+hdr=BrainNet_spm_vol(filename); %%% Edited by Mingrui Xia, 111026, integrated SPM NIFTI into BrainNet Viewer.
+vol=BrainNet_spm_read_vols(hdr);
+%    rmpath(BrainNet_SPMPath);
+%end
+vol(isnan(vol)) = 0; % Added by Mingrui, 20170605, replace NaN to 0;
 % Nii = nifti(filename);
 % hdr.descrip = Nii.descrip;
 % hdr.dim = Nii.dat.dim;

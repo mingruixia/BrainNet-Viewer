@@ -2,13 +2,13 @@ function varargout = BrainNet_Option(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %Function for control panel
 %-----------------------------------------------------------
-%	Copyright(c) 2017
+%	Copyright(c) 2019
 %	State Key Laboratory of Cognitive Neuroscience and Learning, Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
-%   Version 1.6;
-%   Date 20110531;
-%   Last edited 20170303
+%   Version 1.63;
+%   Create Date 20110531;
+%   Last edited 20190329
 %-----------------------------------------------------------
 %
 % BrainNet_Option MATLAB code for BrainNet_Option.fig
@@ -34,7 +34,7 @@ function varargout = BrainNet_Option(varargin)
 
 % Edit the above text to modify the response to help BrainNet_Option
 
-% Last Modified by GUIDE v2.5 17-Mar-2017 22:04:43
+% Last Modified by GUIDE v2.5 21-May-2019 10:51:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -98,6 +98,7 @@ switch EC.lot.view
             set(handles.LotF_radiobutton,'Enable','off');
             set(handles.LotLM_radiobutton,'Enable','off');
             set(handles.LotLMV_radiobutton,'Enable','off'); % Added by Mingrui Xia, 20130221, add view for medium with ventral
+            set(handles.LotLMD_radiobutton,'Enable','off');
         end
     case 2
         set(handles.LotF_radiobutton,'Value',1);
@@ -293,10 +294,32 @@ set(handles.GlbLR_checkbox,'Value',EC.glb.lr);
 
 % if FLAG.Loadfile==1||FLAG.Loadfile==3||FLAG.Loadfile==7 %%% Edited by
 % Mingrui Xia, add 11 for volume & node mode.
-if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==1||FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15
+% if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==1||FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15
+if FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==1||FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15
+    set(handles.Mesh_color_popupmenu,'Value',EC.msh.color_type);
+    if EC.msh.color_type == 1
+        set(handles.MshC_pushbutton,'Enable','on');
+    else
+        set(handles.MshC_pushbutton,'Enable','off');
+    end        
     set(handles.MshC_pushbutton,'BackgroundColor',EC.msh.color);
     set(handles.MshA_slider, 'Value',EC.msh.alpha);
-    set(handles.MshA_edit, 'String',num2str(EC.msh.alpha,'%6.2f'));
+    set(handles.MshA_edit, 'String',num2str(EC.msh.alpha,'%f'));
+    set(handles.Mesh_boundary_popupmenu,'Value',EC.msh.boundary);
+    if length(EC.msh.boundary_value) == 1
+        set(handles.Mesh_boundary_edit,'String',num2str(EC.msh.boundary_value));
+    else
+        set(handles.Mesh_boundary_edit,'String','0');
+    end
+    set(handles.Mesh_boundary_pushbutton,'BackgroundColor',EC.msh.boundary_color);
+    switch EC.msh.boundary
+        case 1
+            set(handles.Mesh_boundary_edit,'Enable','off');
+            set(handles.Mesh_boundary_pushbutton,'Enable','off');
+        case {2,4}
+            set(handles.Mesh_boundary_edit,'Enable','off');
+    end
+    EC.msh.boundary_value_tmp = EC.msh.boundary_value;
     
     if FLAG.Loadfile < 9 % Added by Mingrui Xia, 20120717, show two brains in one figure
         set(handles.MshDoubleBrain_checkbox,'Value',EC.msh.doublebrain);
@@ -306,20 +329,27 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
     % elseif %% Edited by Mingrui Xia, 20120210, add 15 for volume, node and edge mode.
     %     set(handles.MshC_pushbutton,'Enable','off');
     %     set(handles.MshA_slider, 'Value',EC.msh.alpha);
-    %     set(handles.MshA_edit, 'String',num2str(EC.msh.alpha,'%6.2f'));
+    %     set(handles.MshA_edit, 'String',num2str(EC.msh.alpha,'%f'));
 else
     set(handles.MshC_pushbutton,'Enable','off');
+    set(handles.MshC_text1,'Enable','off');
     set(handles.MshA_slider,'Enable','off');
     set(handles.MshA_edit,'Enable','off');
+    set(handles.MshA_text,'Enable','off');
     
     set(handles.MshDoubleBrain_checkbox,'Enable','off');%%% Added by Mingrui Xia, 20120717, show two brains in one figure
+    
+    set(handles.Mesh_boundary_text,'Enable','off');
+    set(handles.Mesh_boundary_popupmenu,'Enable','off');
+    set(handles.Mesh_boundary_edit,'Enable','off');
+    set(handles.Mesh_boundary_pushbutton,'Enable','off');
 end
 
 % if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6
 % %%% Edited by Mingrui Xia 20111116, add 11 for volume & node mode
 if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui Xia, 20120210, add 15 for volume, node and edge mode.
     EC.nod.ModularNumber = sort(unique(surf.sphere(:,4)));
-    if length(EC.nod.ModularNumber) > size(EC.nod.CMm,1);
+    if length(EC.nod.ModularNumber) > size(EC.nod.CMm,1)
         EC.nod.CMm(22:length(EC.nod.ModularNumber) ,:) = rand(length(EC.nod.ModularNumber) -21,3);
     end
     switch EC.lbl
@@ -339,6 +369,9 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
             set(handles.LblT_edit,'Enable','on');
             set(handles.LblT_popupmenu,'Enable','on');
     end
+    
+    set(handles.Lbl_front_checkbox,'Value',EC.lbl_front);
+    
     switch EC.lbl_threshold_type
         case 1
             if EC.lbl_threshold>max(surf.sphere(:,5))||EC.lbl_threshold<min(surf.sphere(:,5))
@@ -348,7 +381,7 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
             set(handles.LblT_slider,'Max',max(surf.sphere(:,5)));
             set(handles.LblT_slider,'Min',min(surf.sphere(:,5))-0.001);
             set(handles.LblT_slider,'Value',EC.lbl_threshold);
-            set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%6.2f'));
+            set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%f'));
         case 2
             if EC.lbl_threshold>max(surf.sphere(:,4))||EC.lbl_threshold<min(surf.sphere(:,4))
                 EC.lbl_threshold=min(surf.sphere(:,4));
@@ -357,7 +390,7 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
             set(handles.LblT_slider,'Max',max(surf.sphere(:,4)));
             set(handles.LblT_slider,'Min',min(surf.sphere(:,4))-0.001);
             set(handles.LblT_slider,'Value',EC.lbl_threshold);
-            set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%6.2f'));
+            set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%f'));
     end
     switch EC.nod.draw
         case 1
@@ -387,7 +420,7 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
             set(handles.NodDT_slider,'Max',max(surf.sphere(:,5)));
             set(handles.NodDT_slider,'Min',min(surf.sphere(:,5))-0.001);
             set(handles.NodDT_slider,'Value',EC.nod.draw_threshold);
-            set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%6.2f'));
+            set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%f'));
         case 2
             if EC.nod.draw_threshold>max(surf.sphere(:,4))||EC.nod.draw_threshold<min(surf.sphere(:,4))
                 EC.nod.draw_threshold=min(surf.sphere(:,4));
@@ -396,7 +429,7 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
             set(handles.NodDT_slider,'Max',max(surf.sphere(:,4)));
             set(handles.NodDT_slider,'Min',min(surf.sphere(:,4))-0.001);
             set(handles.NodDT_slider,'Value',EC.nod.draw_threshold);
-            set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%6.2f'));
+            set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%f'));
     end
     switch EC.nod.size
         case 1
@@ -423,7 +456,7 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
             set(handles.NodST_edit,'Enable','on');
             set(handles.NodST_checkbox,'Enable','on');
     end
-    set(handles.NodSS_edit,'String',num2str(EC.nod.size_size,'%6.2f'));
+    set(handles.NodSS_edit,'String',num2str(EC.nod.size_size,'%f'));
     set(handles.NodSV_popupmenu,'Value',EC.nod.size_value);
     if EC.nod.size_threshold>max(surf.sphere(:,5))||EC.nod.size_threshold<min(surf.sphere(:,5))
         EC.nod.size_threshold=min(surf.sphere(:,5));
@@ -431,9 +464,9 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
     set(handles.NodST_slider,'Max',max(surf.sphere(:,5)));
     set(handles.NodST_slider,'Min',min(surf.sphere(:,5))-0.001);
     set(handles.NodST_slider,'Value',EC.nod.size_threshold);
-    set(handles.NodST_edit,'String',num2str(EC.nod.size_threshold,'%6.2f'));
+    set(handles.NodST_edit,'String',num2str(EC.nod.size_threshold,'%f'));
     set(handles.NodSVR_slider,'Value',EC.nod.size_ratio);
-    set(handles.NodSVR_edit,'String',num2str(EC.nod.size_ratio,'%6.2f'));
+    set(handles.NodSVR_edit,'String',num2str(EC.nod.size_ratio,'%f'));
     
     switch EC.nod.color % Modified by Mingrui, 20170303, fixed range of color mapping
         case 1
@@ -488,10 +521,10 @@ if FLAG.Loadfile==2||FLAG.Loadfile==3||FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.
     set(handles.NodCT_slider,'Max',max(surf.sphere(:,4)));
     set(handles.NodCT_slider,'Min',min(surf.sphere(:,4))-0.001);
     set(handles.NodCT_slider,'Value',EC.nod.color_threshold);
-    set(handles.NodCT_edit,'String',num2str(EC.nod.color_threshold,'%6.2f'));
+    set(handles.NodCT_edit,'String',num2str(EC.nod.color_threshold,'%f'));
     set(handles.NodCC_Range_popupmenu,'Value',EC.nod.color_map_type);
-    set(handles.NodCC_low_edit,'String',num2str(EC.nod.color_map_low,'%6.2f'));
-    set(handles.NodCC_high_edit,'String',num2str(EC.nod.color_map_high,'%6.2f'));
+    set(handles.NodCC_low_edit,'String',num2str(EC.nod.color_map_low,'%f'));
+    set(handles.NodCC_high_edit,'String',num2str(EC.nod.color_map_high,'%f'));
 else
     set(handles.NodDA_radiobutton,'Enable','off');
     set(handles.NodDT_radiobutton,'Enable','off');
@@ -555,9 +588,9 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgDT_slider,'Max',max(surf.net(:)));
             set(handles.EdgDT_slider,'Min',min(surf.net(:))-0.001);
             set(handles.EdgDT_slider,'Value',EC.edg.draw_threshold);
-            set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%6.2f'));
+            set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%f'));
             set(handles.EdgDS_slider,'Value',length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)));
-            set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+            set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%f'));
         case 1
             if EC.edg.draw_threshold>max(abs(surf.net(:)))||EC.edg.draw_threshold<min(abs(surf.net(:)))
                 EC.edg.draw_threshold=min(abs(surf.net(:)));
@@ -565,9 +598,9 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgDT_slider,'Max',max(abs(surf.net(:))));
             set(handles.EdgDT_slider,'Min',min(abs(surf.net(:)))-0.001);
             set(handles.EdgDT_slider,'Value',EC.edg.draw_threshold);
-            set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%6.2f'));
+            set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%f'));
             set(handles.EdgDS_slider,'Value',length(find(abs(surf.net)>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)));
-            set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+            set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%f'));
     end
     set(handles.EdgDInter_checkbox,'Value',EC.edg.interhemiedges);  % Add by Mingrui Xia, 20120109, draw inter hemisphere edges.
     set(handles.EdgDDirected_checkbox,'Value',EC.edg.directed); % Add by Mingrui Xia, 20120621, draw directed network.
@@ -594,7 +627,7 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgST_edit,'Enable','on');
             set(handles.EdgSV_radiobutton,'Value',1);
     end
-    set(handles.EdgSS_edit,'String',num2str(EC.edg.size_size,'%6.2f'));
+    set(handles.EdgSS_edit,'String',num2str(EC.edg.size_size,'%f'));
     set(handles.EdgSV_popupmenu,'Value',EC.edg.size_value);
     set(handles.EdgS_checkbox,'Value',EC.edg.size_abs);
     switch EC.edg.size_abs
@@ -605,7 +638,7 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgST_slider,'Max',max(surf.net(:)));
             set(handles.EdgST_slider,'Min',min(surf.net(:))-0.001);
             set(handles.EdgST_slider,'Value',EC.edg.size_threshold);
-            set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%6.2f'));
+            set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%f'));
         case 1
             if EC.edg.size_threshold>max(abs(surf.net(:)))||EC.edg.size_threshold<min(abs(surf.net(:)))
                 EC.edg.size_threshold=min(abs(surf.net(:)));
@@ -613,10 +646,10 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgST_slider,'Max',max(abs(surf.net(:))));
             set(handles.EdgST_slider,'Min',min(abs(surf.net(:)))-0.001);
             set(handles.EdgST_slider,'Value',EC.edg.size_threshold);
-            set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%6.2f'));
+            set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%f'));
     end
     set(handles.EdgSRR_slider,'Value',EC.edg.size_ratio);
-    set(handles.EdgSRR_edit,'String',num2str(EC.edg.size_ratio,'%6.2f'));
+    set(handles.EdgSRR_edit,'String',num2str(EC.edg.size_ratio,'%f'));
     switch EC.edg.color % Modified by Mingrui, 20170303, fixed range of color mapping
         case 1
             set(handles.EdgCS_radiobutton,'Value',1);
@@ -652,7 +685,7 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCT_slider,'Enable','on');
             set(handles.EdgCT_edit,'Enable','on');
             set(handles.EdgCT_slider,'Value',EC.edg.color_threshold);
-            set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%6.2f'));
+            set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%f'));
             set(handles.EdgCTH_pushbutton,'BackgroundColor',EC.edg.CM(1,:));
             set(handles.EdgCTL_pushbutton,'BackgroundColor',EC.edg.CM(64,:));
             set(handles.EdgCD_slider,'Enable','off');
@@ -671,7 +704,7 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCDH_pushbutton,'BackgroundColor',EC.edg.CM(1,:));
             set(handles.EdgCDL_pushbutton,'BackgroundColor',EC.edg.CM(64,:));
             set(handles.EdgCD_slider,'Value',EC.edg.color_distance);
-            set(handles.EdgCD_edit,'String',num2str(EC.edg.color_distance,'%6.2f'));
+            set(handles.EdgCD_edit,'String',num2str(EC.edg.color_distance,'%f'));
             set(handles.EdgColorCostum_pushbutton,'Enable','off');
             set(handles.EdgCC_Range_popupmenu,'Enable','off');
             set(handles.EdgCC_low_edit,'Enable','off');
@@ -705,8 +738,8 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
     set(handles.EdgCC_popupmenu,'Value',EC.edg.color_map);
     set(handles.EdgC_checkbox,'Value',EC.edg.color_abs);
     set(handles.EdgCC_Range_popupmenu,'Value',EC.edg.color_map_type);
-    set(handles.EdgCC_low_edit,'String',num2str(EC.edg.color_map_low,'%6.2f'));
-    set(handles.EdgCC_high_edit,'String',num2str(EC.edg.color_map_high,'%6.2f'));
+    set(handles.EdgCC_low_edit,'String',num2str(EC.edg.color_map_low,'%f'));
+    set(handles.EdgCC_high_edit,'String',num2str(EC.edg.color_map_high,'%f'));
     
     switch EC.edg.color_abs
         case 0
@@ -716,7 +749,7 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCT_slider,'Max',max(surf.net(:)));
             set(handles.EdgCT_slider,'Min',min(surf.net(:))-0.001);
             set(handles.EdgCT_slider,'Value',EC.edg.color_threshold);
-            set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%6.2f'));
+            set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%f'));
         case 1
             if EC.edg.color_threshold>max(abs(surf.net(:)))||EC.edg.color_threshold<min(abs(surf.net(:)))
                 EC.edg.color_threshold=min(abs(surf.net(:)));
@@ -724,7 +757,7 @@ if FLAG.Loadfile==7||FLAG.Loadfile==6||FLAG.Loadfile==15 %% Edited by Mingrui Xi
             set(handles.EdgCT_slider,'Max',max(abs(surf.net(:))));
             set(handles.EdgCT_slider,'Min',min(abs(surf.net(:)))-0.001);
             set(handles.EdgCT_slider,'Value',EC.edg.color_threshold);
-            set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%6.2f'));
+            set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%f'));
     end
     
     % Added by Mingrui 20150112 support for edge opacity
@@ -841,9 +874,15 @@ if FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui X
             %         set(handles.VolROICus_edit,'String',['[',num2str(EC.vol.roi.draw),']']);
         end
         
-        textcell = cell(length(EC.vol.roi.drawt),1);
-        for i = 1:length(textcell)
-            textcell{i} = ['ROI ',num2str(EC.vol.roi.drawt(i))];
+        % modified by Mingrui 20170609
+        if length(EC.vol.roi.drawt) < 2000
+            textcell = cell(length(EC.vol.roi.drawt),1);
+            
+            for i = 1:length(textcell)
+                textcell{i} = ['ROI ',num2str(EC.vol.roi.drawt(i))];
+            end
+        else
+            textcell{1} = ['ROI ',num2str(EC.vol.roi.drawt(1))];
         end
         
         set(handles.VolROIColor_popupmenu,'String',textcell);
@@ -925,7 +964,7 @@ if FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui X
             set(handles.VolMapAlgorithm_text,'Enable','off');
             
     end
-    set(handles.VolDR_text,'String',['Volume Data Range:  ',num2str(DataLow,'%6.2f'),'   ',num2str(DataHigh,'%6.2f')]);
+    set(handles.VolDR_text,'String',['Volume Data Range:  ',num2str(DataLow,'%f'),'   ',num2str(DataHigh,'%f')]);
     if ~isempty(EC.vol.display) % Edited by Mingrui Xia, 20120325, add auto juge volume range.
         switch EC.vol.display
             case 1
@@ -941,35 +980,35 @@ if FLAG.Loadfile==9||FLAG.Loadfile==11||FLAG.Loadfile==15 %% Edited by Mingrui X
                 set(handles.VolPRn_edit,'Enable','off');
                 set(handles.VolPRx_edit,'Enable','off');
         end
-        set(handles.VolPRn_edit,'String',num2str(EC.vol.pn,'%6.2f'));
-        set(handles.VolPRx_edit,'String',num2str(EC.vol.px,'%6.2f'));
-        set(handles.VolNRn_edit,'String',num2str(EC.vol.nn,'%6.2f'));
-        set(handles.VolNRx_edit,'String',num2str(EC.vol.nx,'%6.2f'));
+        set(handles.VolPRn_edit,'String',num2str(EC.vol.pn,'%f'));
+        set(handles.VolPRx_edit,'String',num2str(EC.vol.px,'%f'));
+        set(handles.VolNRn_edit,'String',num2str(EC.vol.nn,'%f'));
+        set(handles.VolNRx_edit,'String',num2str(EC.vol.nx,'%f'));
     else
         if DataLow * DataHigh < 0
             set(handles.VolD_popupmenu,'Value',1);
-            set(handles.VolPRn_edit,'String',num2str(0.01,'%6.2f'));
-            set(handles.VolPRx_edit,'String',num2str(DataHigh,'%6.2f'));
-            set(handles.VolNRn_edit,'String',num2str(-0.01,'%6.2f'));
-            set(handles.VolNRx_edit,'String',num2str(DataLow,'%6.2f'));
+            set(handles.VolPRn_edit,'String',num2str(0.01,'%f'));
+            set(handles.VolPRx_edit,'String',num2str(DataHigh,'%f'));
+            set(handles.VolNRn_edit,'String',num2str(-0.01,'%f'));
+            set(handles.VolNRx_edit,'String',num2str(DataLow,'%f'));
         elseif DataLow + DataHigh >= 0
             set(handles.VolD_popupmenu,'Value',2);
             set(handles.VolNR_text,'Enable','off');
             set(handles.VolNRn_edit,'Enable','off');
             set(handles.VolNRx_edit,'Enable','off');
-            set(handles.VolPRn_edit,'String',num2str(DataLow,'%6.2f'));
-            set(handles.VolPRx_edit,'String',num2str(DataHigh,'%6.2f'));
-            set(handles.VolNRn_edit,'String',num2str(-0.01,'%6.2f'));
-            set(handles.VolNRx_edit,'String',num2str(-10,'%6.2f'));
+            set(handles.VolPRn_edit,'String',num2str(DataLow,'%f'));
+            set(handles.VolPRx_edit,'String',num2str(DataHigh,'%f'));
+            set(handles.VolNRn_edit,'String',num2str(-0.01,'%f'));
+            set(handles.VolNRx_edit,'String',num2str(-10,'%f'));
         else
             set(handles.VolD_popupmenu,'Value',3);
             set(handles.VolPR_text,'Enable','off');
             set(handles.VolPRn_edit,'Enable','off');
             set(handles.VolPRx_edit,'Enable','off');
-            set(handles.VolPRn_edit,'String',num2str(0.01,'%6.2f'));
-            set(handles.VolPRx_edit,'String',num2str(10,'%6.2f'));
-            set(handles.VolNRn_edit,'String',num2str(DataHigh,'%6.2f'));
-            set(handles.VolNRx_edit,'String',num2str(DataLow,'%6.2f'));
+            set(handles.VolPRn_edit,'String',num2str(0.01,'%f'));
+            set(handles.VolPRx_edit,'String',num2str(10,'%f'));
+            set(handles.VolNRn_edit,'String',num2str(DataHigh,'%f'));
+            set(handles.VolNRx_edit,'String',num2str(DataLow,'%f'));
         end
     end
     set(handles.VolNCS_pushbutton,'BackgroundColor',EC.vol.null);
@@ -1031,8 +1070,8 @@ end
 set(handles.ImgPW_edit,'String',num2str(EC.img.width));
 set(handles.ImgPH_edit,'String',num2str(EC.img.height));
 set(handles.ImgD_edit,'String',num2str(EC.img.dpi));
-set(handles.ImgDW_edit,'String',num2str(EC.img.width/EC.img.dpi*2.54,'%6.2f'));
-set(handles.ImgDH_edit,'String',num2str(EC.img.height/EC.img.dpi*2.54,'%6.2f'));
+set(handles.ImgDW_edit,'String',num2str(EC.img.width/EC.img.dpi*2.54,'%f'));
+set(handles.ImgDH_edit,'String',num2str(EC.img.height/EC.img.dpi*2.54,'%f'));
 set(handles.ImgDW_popupmenu,'Value',1);
 set(handles.ImgDH_popupmenu,'Value',1);
 set(handles.ImgC_checkbox,'Value',1);
@@ -1250,9 +1289,20 @@ EC.glb.detail = get(handles.GlbGD_popupmenu,'Value'); % Add by Mingrui Xia, 2012
 % Add by Mingrui, 20170309, display LR
 EC.glb.lr = get(handles.GlbLR_checkbox,'Value');
 
+EC.msh.color_type = get(handles.Mesh_color_popupmenu,'Value');
+EC.msh.color_table = EC.msh.color_table_tmp;
 EC.msh.color=get(handles.MshC_pushbutton,'BackgroundColor');
 EC.msh.alpha=str2double(get(handles.MshA_edit,'String'));
 EC.msh.doublebrain = get(handles.MshDoubleBrain_checkbox,'Value'); % Added by Mingrui Xia, 20120717, show two brains in one figure
+
+EC.msh.boundary = get(handles.Mesh_boundary_popupmenu,'Value');
+switch EC.msh.boundary
+    case 3
+        EC.msh.boundary_value = str2double(get(handles.Mesh_boundary_edit,'String'));
+    case 4
+        EC.msh.boundary_value = EC.msh.boundary_value_tmp;
+end
+EC.msh.boundary_color = get(handles.Mesh_boundary_pushbutton,'BackgroundColor');
 
 if get(handles.NodDA_radiobutton,'Value')==1
     EC.nod.draw=1;
@@ -1338,6 +1388,9 @@ else
     EC.lbl_threshold=str2double(get(handles.LblT_edit,'String'));
     EC.lbl_threshold_type=get(handles.LblT_popupmenu,'Value');
 end
+
+EC.lbl_front = get(handles.Lbl_front_checkbox,'Value');
+
 if get(handles.EdgDA_radiobutton,'Value')==1
     EC.edg.draw=1;
 else
@@ -1494,7 +1547,7 @@ function MshA_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.MshA_slider, 'value');
-set(handles.MshA_edit, 'string', num2str(val,'%6.2f'));
+set(handles.MshA_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -1598,7 +1651,7 @@ function NodCT_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.NodCT_slider, 'value');
-set(handles.NodCT_edit, 'string', num2str(val,'%6.2f'));
+set(handles.NodCT_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -1649,7 +1702,7 @@ function NodST_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.NodST_slider, 'value');
-set(handles.NodST_edit, 'string', num2str(val,'%6.2f'));
+set(handles.NodST_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -1700,7 +1753,7 @@ function NodSVR_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.NodSVR_slider, 'value');
-set(handles.NodSVR_edit, 'string', num2str(val,'%6.2f'));
+set(handles.NodSVR_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -1805,7 +1858,7 @@ function NodDT_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.NodDT_slider, 'value');
-set(handles.NodDT_edit, 'string', num2str(val,'%6.2f'));
+set(handles.NodDT_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -1867,7 +1920,7 @@ switch str{n}
         set(handles.NodDT_slider,'Max',max(surf.sphere(:,5)));
         set(handles.NodDT_slider,'Min',min(surf.sphere(:,5)));
         set(handles.NodDT_slider,'Value',EC.nod.draw_threshold);
-        set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%6.2f'));
+        set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%f'));
     case 'Color'
         if EC.nod.draw_threshold>max(surf.sphere(:,4))||EC.nod.draw_threshold<min(surf.sphere(:,4))
             EC.nod.draw_threshold=min(surf.sphere(:,4));
@@ -1875,7 +1928,7 @@ switch str{n}
         set(handles.NodDT_slider,'Max',max(surf.sphere(:,4)));
         set(handles.NodDT_slider,'Min',min(surf.sphere(:,4)));
         set(handles.NodDT_slider,'Value',EC.nod.draw_threshold);
-        set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%6.2f'));
+        set(handles.NodDT_edit,'String',num2str(EC.nod.draw_threshold,'%f'));
 end
 ChangeFlag(handles);
 
@@ -1937,7 +1990,7 @@ function LblT_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.LblT_slider, 'value');
-set(handles.LblT_edit, 'string', num2str(val,'%6.2f'));
+set(handles.LblT_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -2000,7 +2053,7 @@ switch str{n}
         set(handles.LblT_slider,'Max',max(surf.sphere(:,5)));
         set(handles.LblT_slider,'Min',min(surf.sphere(:,5)));
         set(handles.LblT_slider,'Value',EC.lbl_threshold);
-        set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%6.2f'));
+        set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%f'));
     case 'Color'
         if EC.lbl_threshold>max(surf.sphere(:,4))||EC.lbl_threshold<min(surf.sphere(:,4))
             EC.lbl_threshold=min(surf.sphere(:,4));
@@ -2008,7 +2061,7 @@ switch str{n}
         set(handles.LblT_slider,'Max',max(surf.sphere(:,4)));
         set(handles.LblT_slider,'Min',min(surf.sphere(:,4)));
         set(handles.LblT_slider,'Value',EC.lbl_threshold);
-        set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%6.2f'));
+        set(handles.LblT_edit,'String',num2str(EC.lbl_threshold,'%f'));
 end
 ChangeFlag(handles);
 
@@ -2079,7 +2132,7 @@ function EdgCT_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.EdgCT_slider, 'value');
-set(handles.EdgCT_edit, 'string', num2str(val,'%6.2f'));
+set(handles.EdgCT_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -2130,7 +2183,7 @@ function EdgST_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.EdgST_slider, 'value');
-set(handles.EdgST_edit, 'string', num2str(val,'%6.2f'));
+set(handles.EdgST_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -2261,7 +2314,7 @@ function EdgSRR_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.EdgSRR_slider, 'value');
-set(handles.EdgSRR_edit, 'string', num2str(val,'%6.2f'));
+set(handles.EdgSRR_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -2287,14 +2340,14 @@ function EdgDT_slider_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 global surf
 val = get(handles.EdgDT_slider, 'value');
-set(handles.EdgDT_edit, 'string', num2str(val,'%6.2f'));
+set(handles.EdgDT_edit, 'string', num2str(val,'%f'));
 switch get(handles.EdgDT_checkbox,'Value')
     case 0
         set(handles.EdgDS_slider,'Value',length(find(surf.net>val))/(size(surf.net,1)*size(surf.net,2)));
-        set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>val))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+        set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>val))/(size(surf.net,1)*size(surf.net,2)),'%f'));
     case 1
         set(handles.EdgDS_slider,'Value',length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)));
-        set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+        set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)),'%f'));
 end
 ChangeFlag(handles);
 
@@ -2327,10 +2380,10 @@ set(handles.EdgDT_slider,'Value',val);
 switch get(handles.EdgDT_checkbox,'Value')
     case 0
         set(handles.EdgDS_slider,'Value',length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)));
-        set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+        set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%f'));
     case 1
         set(handles.EdgDS_slider,'Value',length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)));
-        set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+        set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>val))/(size(surf.net,1)*size(surf.net,2)),'%f'));
 end
 ChangeFlag(handles);
 
@@ -2382,13 +2435,13 @@ function ImgPW_edit_Callback(hObject, eventdata, handles)
 global EC
 switch get(handles.ImgDW_popupmenu,'Value')
     case 1
-        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%6.2f'));
+        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%f'));
     case 2
-        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%6.2f'));
+        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%f'));
 end
 if get(handles.ImgC_checkbox,'Value')==1
     set(handles.ImgPH_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))*EC.img.height/EC.img.width,'%5d'));
-    set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgDW_edit,'String'))*EC.img.height/EC.img.width,'%6.2f'));
+    set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgDW_edit,'String'))*EC.img.height/EC.img.width,'%f'));
 end
 
 
@@ -2416,13 +2469,13 @@ function ImgPH_edit_Callback(hObject, eventdata, handles)
 global EC
 switch get(handles.ImgDW_popupmenu,'Value')
     case 1
-        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%6.2f'));
+        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%f'));
     case 2
-        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%6.2f'));
+        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%f'));
 end
 if get(handles.ImgC_checkbox,'Value')==1
     set(handles.ImgPW_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))*EC.img.width/EC.img.height,'%5d'));
-    set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgDH_edit,'String'))*EC.img.width/EC.img.height,'%6.2f'));
+    set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgDH_edit,'String'))*EC.img.width/EC.img.height,'%f'));
 end
 
 
@@ -2854,6 +2907,16 @@ global EC
 if isfield(tmp.EC.bak,'color')
     EC.bak.color = tmp.EC.bak.color;
 end
+if isfield(tmp.EC.msh,'color_type')
+    EC.msh.color_type = tmp.EC.msh.color_type;
+end
+if isfield(tmp.EC.msh,'color_table')
+    EC.msh.color_table = tmp.EC.msh.color_table;
+end
+if isfield(tmp.EC.msh,'color_table_tmp')
+    EC.msh.color_table_tmp = tmp.EC.msh.color_table_tmp;
+end
+
 if isfield(tmp.EC.msh,'color')
     EC.msh.color = tmp.EC.msh.color;
 end
@@ -2862,6 +2925,15 @@ if isfield(tmp.EC.msh,'alpha')
 end
 if isfield(tmp.EC.msh,'doublebrain')
     EC.msh.doublebrain = tmp.EC.msh.doublebrain;
+end
+if isfield(tmp.EC.msh,'boundary')
+    EC.msh.boundary = tmp.EC.msh.boundary;
+end
+if isfield(tmp.EC.msh,'boundary_value')
+    EC.msh.boundary_value = tmp.EC.msh.boundary_value;
+end
+if isfield(tmp.EC.msh,'boundary_color')
+    EC.msh.boundary_color = tmp.EC.msh.boundary_color;
 end
 if isfield(tmp.EC.nod,'draw')
     EC.nod.draw = tmp.EC.nod.draw;
@@ -3063,6 +3135,9 @@ end
 if isfield(tmp.EC.vol,'CM')
     EC.vol.CM = tmp.EC.vol.CM;
 end
+if isfield(tmp.EC.vol,'CMt')
+    EC.vol.CMt = tmp.EC.vol.CMt;
+end
 if isfield(tmp.EC.vol,'color_map')
     EC.vol.color_map = tmp.EC.vol.color_map;
 end
@@ -3184,6 +3259,10 @@ if isfield(tmp.EC.vol,'CM_annot')
     EC.vol.CM_annot = tmp.EC.vol.CM_annot;
 end
 
+if isfield(tmp.EC,'front')
+    EC.lbl_front = tmp.EC.lbl_front;
+end
+
 % --- Executes on button press in Save_button.
 function Save_button_Callback(hObject, eventdata, handles)
 % hObject    handle to Save_button (see GCBO)
@@ -3227,7 +3306,7 @@ function EdgCD_slider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(handles.EdgCD_slider, 'value');
-set(handles.EdgCD_edit, 'string', num2str(val,'%6.2f'));
+set(handles.EdgCD_edit, 'string', num2str(val,'%f'));
 ChangeFlag(handles);
 
 
@@ -3305,7 +3384,7 @@ function EdgDS_slider_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 global surf
 val = get(handles.EdgDS_slider, 'value');
-set(handles.EdgDS_edit, 'string', num2str(val,'%6.2f'));
+set(handles.EdgDS_edit, 'string', num2str(val,'%f'));
 sq=surf.nsph^2;
 switch get(handles.EdgDT_checkbox,'Value')
     case 0
@@ -3320,7 +3399,7 @@ elseif index>sq
     index=sq;
 end
 set(handles.EdgDT_slider,'Value',temp(index));
-set(handles.EdgDT_edit,'String',num2str(temp(index),'%6.2f'));
+set(handles.EdgDT_edit,'String',num2str(temp(index),'%f'));
 ChangeFlag(handles);
 
 
@@ -3361,7 +3440,7 @@ elseif index>sq
     index=sq;
 end
 set(handles.EdgDT_slider,'Value',temp(index));
-set(handles.EdgDT_edit,'String',num2str(temp(index),'%6.2f'));
+set(handles.EdgDT_edit,'String',num2str(temp(index),'%f'));
 ChangeFlag(handles);
 
 
@@ -3405,7 +3484,7 @@ switch get(handles.EdgS_checkbox,'Value')
         set(handles.EdgST_slider,'Max',max(surf.net(:)));
         set(handles.EdgST_slider,'Min',min(surf.net(:))-0.001);
         set(handles.EdgST_slider,'Value',EC.edg.size_threshold);
-        set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%6.2f'));
+        set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%f'));
     case 1
         if EC.edg.size_threshold>max(abs(surf.net(:)))||EC.edg.size_threshold<min(abs(surf.net(:)))
             EC.edg.size_threshold=min(abs(surf.net(:)));
@@ -3413,7 +3492,7 @@ switch get(handles.EdgS_checkbox,'Value')
         set(handles.EdgST_slider,'Max',max(abs(surf.net(:))));
         set(handles.EdgST_slider,'Min',min(abs(surf.net(:)))-0.001);
         set(handles.EdgST_slider,'Value',EC.edg.size_threshold);
-        set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%6.2f'));
+        set(handles.EdgST_edit,'String',num2str(EC.edg.size_threshold,'%f'));
 end
 ChangeFlag(handles);
 
@@ -3435,9 +3514,9 @@ switch get(handles.EdgDT_checkbox,'Value')
         set(handles.EdgDT_slider,'Max',max(surf.net(:)));
         set(handles.EdgDT_slider,'Min',min(surf.net(:))-0.001);
         set(handles.EdgDT_slider,'Value',EC.edg.draw_threshold);
-        set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%6.2f'));
+        set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%f'));
         set(handles.EdgDS_slider,'Value',length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)));
-        set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+        set(handles.EdgDS_edit,'String',num2str(length(find(surf.net>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%f'));
     case 1
         if EC.edg.draw_threshold>max(abs(surf.net(:)))||EC.edg.draw_threshold<min(abs(surf.net(:)))
             EC.edg.draw_threshold=min(abs(surf.net(:)));
@@ -3445,9 +3524,9 @@ switch get(handles.EdgDT_checkbox,'Value')
         set(handles.EdgDT_slider,'Max',max(abs(surf.net(:))));
         set(handles.EdgDT_slider,'Min',min(abs(surf.net(:)))-0.001);
         set(handles.EdgDT_slider,'Value',EC.edg.draw_threshold);
-        set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%6.2f'));
+        set(handles.EdgDT_edit,'String',num2str(EC.edg.draw_threshold,'%f'));
         set(handles.EdgDS_slider,'Value',length(find(abs(surf.net)>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)));
-        set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%6.2f'));
+        set(handles.EdgDS_edit,'String',num2str(length(find(abs(surf.net)>EC.edg.draw_threshold))/(size(surf.net,1)*size(surf.net,2)),'%f'));
 end
 ChangeFlag(handles);
 
@@ -3469,7 +3548,7 @@ switch get(handles.EdgC_checkbox,'Value')
         set(handles.EdgCT_slider,'Max',max(surf.net(:)));
         set(handles.EdgCT_slider,'Min',min(surf.net(:))-0.001);
         set(handles.EdgCT_slider,'Value',EC.edg.color_threshold);
-        set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%6.2f'));
+        set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%f'));
     case 1
         if EC.edg.color_threshold>max(abs(surf.net(:)))||EC.edg.color_threshold<min(abs(surf.net(:)))
             EC.edg.color_threshold=min(abs(surf.net(:)));
@@ -3477,7 +3556,7 @@ switch get(handles.EdgC_checkbox,'Value')
         set(handles.EdgCT_slider,'Max',max(abs(surf.net(:))));
         set(handles.EdgCT_slider,'Min',min(abs(surf.net(:)))-0.001);
         set(handles.EdgCT_slider,'Value',EC.edg.color_threshold);
-        set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%6.2f'));
+        set(handles.EdgCT_edit,'String',num2str(EC.edg.color_threshold,'%f'));
 end
 ChangeFlag(handles);
 
@@ -3581,7 +3660,7 @@ switch get(handles.ImgDH_popupmenu,'Value')
         set(handles.ImgPH_edit,'String',num2str(str2double(get(handles.ImgDH_edit,'String'))*str2double(get(handles.ImgD_edit,'String')),'%5.0f'));
 end
 if get(handles.ImgC_checkbox,'Value')==1
-    set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgDH_edit,'String'))*EC.img.width/EC.img.height,'%6.2f'));
+    set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgDH_edit,'String'))*EC.img.width/EC.img.height,'%f'));
     set(handles.ImgPW_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))*EC.img.width/EC.img.height,'%5.0f'));
 end
 
@@ -3616,7 +3695,7 @@ switch get(handles.ImgDW_popupmenu,'Value')
         set(handles.ImgPW_edit,'String',num2str(str2double(get(handles.ImgDW_edit,'String'))*str2double(get(handles.ImgD_edit,'String')),'%5.0f'));
 end
 if get(handles.ImgC_checkbox,'Value')==1
-    set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgDW_edit,'String'))*EC.img.height/EC.img.width,'%6.2f'));
+    set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgDW_edit,'String'))*EC.img.height/EC.img.width,'%f'));
     set(handles.ImgPH_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))*EC.img.height/EC.img.width,'%5.0f'));
 end
 
@@ -3646,11 +3725,11 @@ val=get(handles.ImgDW_popupmenu,'Value');
 set(handles.ImgDH_popupmenu,'Value',val);
 switch val
     case 1
-        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%6.2f'));
-        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%6.2f'));
+        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%f'));
+        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%f'));
     case 2
-        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%6.2f'));
-        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%6.2f'));
+        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%f'));
+        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%f'));
 end
 
 
@@ -3680,11 +3759,11 @@ val=get(handles.ImgDH_popupmenu,'Value');
 set(handles.ImgDW_popupmenu,'Value',val);
 switch val
     case 1
-        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%6.2f'));
-        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%6.2f'));
+        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%f'));
+        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String'))*2.54,'%f'));
     case 2
-        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%6.2f'));
-        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%6.2f'));
+        set(handles.ImgDW_edit,'String',num2str(str2double(get(handles.ImgPW_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%f'));
+        set(handles.ImgDH_edit,'String',num2str(str2double(get(handles.ImgPH_edit,'String'))/str2double(get(handles.ImgD_edit,'String')),'%f'));
 end
 
 
@@ -4558,10 +4637,12 @@ if get(hObject,'Value') == 1
     set(handles.LotF_radiobutton,'Enable','off');
     set(handles.LotLM_radiobutton,'Enable','off');
     set(handles.LotLMV_radiobutton,'Enable','off'); % Fix the bug that when double surface mode is selected, the vetral view is still active. By Mingrui, 20130208
+    set(handles.LotLMD_radiobutton,'Enable','off');
 else
     set(handles.LotF_radiobutton,'Enable','on');
     set(handles.LotLM_radiobutton,'Enable','on');
     set(handles.LotLMV_radiobutton,'Enable','on');
+    set(handles.LotLMD_radiobutton,'Enable','on');
 end
 
 
@@ -5447,6 +5528,153 @@ ChangeFlag(handles);
 % --- Executes during object creation, after setting all properties.
 function VolROISmooth_popupmenu_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to VolROISmooth_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in Lbl_front_checkbox.
+function Lbl_front_checkbox_Callback(hObject, eventdata, handles)
+% hObject    handle to Lbl_front_checkbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of Lbl_front_checkbox
+ChangeFlag(handles);
+
+
+% --- Executes on selection change in Mesh_boundary_popupmenu.
+function Mesh_boundary_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to Mesh_boundary_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns Mesh_boundary_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from Mesh_boundary_popupmenu
+global EC
+global surf
+switch get(hObject,'Value')
+    case 1
+        set(handles.Mesh_boundary_edit,'Enable','off');
+        set(handles.Mesh_boundary_pushbutton,'Enable','off');
+    case 2
+        set(handles.Mesh_boundary_edit,'Enable','off');
+        set(handles.Mesh_boundary_pushbutton,'Enable','on');
+    case 3
+        set(handles.Mesh_boundary_edit,'Enable','on');
+        set(handles.Mesh_boundary_pushbutton,'Enable','on');
+    case 4
+        set(handles.Mesh_boundary_edit,'Enable','off');
+        set(handles.Mesh_boundary_pushbutton,'Enable','on');
+        [filename,pathname]=uigetfile({'*.txt','Text files (*.txt)';'*.*','All Files (*.*)'});
+        if isequal(filename,0)||isequal(pathname,0)
+            set(hObject,'Value',EC.msh.boundary);
+            return;
+        else
+            fpath=fullfile(pathname,filename);
+            fid = fopen(fpath);
+            data = textscan(fid,'%f','CommentStyle','#');
+            fclose(fid);
+            EC.msh.boundary_value_tmp = cell2mat(data);
+            if length(EC.msh.boundary_value_tmp) ~= surf.vertex_number
+                msgbox('The boundary file does not match this brain surface.','Error','error');
+                set(hObject,'Value',EC.msh.boundary);
+            end
+        end
+end
+ChangeFlag(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function Mesh_boundary_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Mesh_boundary_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function Mesh_boundary_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to Mesh_boundary_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Mesh_boundary_edit as text
+%        str2double(get(hObject,'String')) returns contents of Mesh_boundary_edit as a double
+ChangeFlag(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function Mesh_boundary_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Mesh_boundary_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in Mesh_boundary_pushbutton.
+function Mesh_boundary_pushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to Mesh_boundary_pushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+c = uisetcolor('Select Color');
+if length(c) == 3
+    set(hObject,'BackgroundColor',c);
+    ChangeFlag(handles);
+end
+
+
+% --- Executes on selection change in Mesh_color_popupmenu.
+function Mesh_color_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to Mesh_color_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns Mesh_color_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from Mesh_color_popupmenu
+global EC
+global surf
+switch get(hObject,'Value')
+    case 1
+        set(handles.MshC_pushbutton,'Enable','on');
+    case 2
+        set(handles.MshC_pushbutton,'Enable','off');
+        [filename,pathname]=uigetfile({'*.txt','Text files (*.txt)';'*.*','All Files (*.*)'});
+        if isequal(filename,0)||isequal(pathname,0)
+            set(hObject,'Value',1);
+            return;            
+        else
+            fpath=fullfile(pathname,filename);
+            fid = fopen(fpath);
+            data = textscan(fid,'%f','CommentStyle','#');
+            fclose(fid);
+            EC.msh.color_table_tmp = reshape(cell2mat(data),3,[])';
+            if length(EC.msh.color_table_tmp) ~= surf.vertex_number
+                msgbox('The color table does not match this brain surface.','Error','error');
+                set(hObject,'Value',1);
+            end
+        end
+end
+ChangeFlag(handles);
+
+% --- Executes during object creation, after setting all properties.
+function Mesh_color_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Mesh_color_popupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

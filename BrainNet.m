@@ -1,13 +1,13 @@
 function varargout = BrainNet(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %-----------------------------------------------------------
-%	Copyright(c) 2017
+%	Copyright(c) 2019
 %	Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
-%   Version 1.6;
-%   Date 20110906;
-%   Last edited 20170303
+%   Version 1.63;
+%   Create Date 20110906;
+%   Last edited 20190329
 %-----------------------------------------------------------
 %
 % BrainNet MATLAB code for BrainNet.fig
@@ -33,7 +33,7 @@ function varargout = BrainNet(varargin)
 
 % Edit the above text to modify the response to help BrainNet
 
-% Last Modified by GUIDE v2.5 16-Jun-2013 22:51:23
+% Last Modified by GUIDE v2.5 21-Jun-2019 10:08:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -62,7 +62,9 @@ function BrainNet_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to BrainNet (see VARARGIN)
-warning off %#ok<WNOFF>
+
+
+warning off
 fprintf('Please cite:\nXia M, Wang J, He Y (2013) BrainNet Viewer: A Network Visualization Tool for Human Brain Connectomics. PLoS ONE 8: e68910.\nAn example:\n''The brain networks were visualized with the BrainNet Viewer (http://www.nitrc.org/projects/bnv/) (Xia et al., 2013)''.\n');
 
 % Choose default command line output for BrainNet
@@ -75,7 +77,8 @@ guidata(hObject, handles);
 %     figFrame = get(handles.NV_fig,'JavaFrame');
 %     figFrame.setFigureIcon(newIcon);
 % end
-movegui(handles.NV_fig,'center');
+% movegui(handles.NV_fig,'center');
+movegui(hObject,'center');
 
 %opengl software;  %% Add by Mingrui, 20140815 enable to fix upside-down text
 
@@ -95,9 +98,20 @@ global EC
 EC=[];
 EC.bak.color=[1,1,1];
 
+EC.msh.color_type = 1; %Added by Mingrui, 20190521, load color for each vertex; 1 for same; 2 for defined
+
 EC.msh.color=[0.95,0.95,0.95];
+EC.msh.color_table = EC.msh.color;
+EC.msh.color_table_tmp = EC.msh.color;
+
 EC.msh.alpha=0.3;
 EC.msh.doublebrain = 0; %%% Added by Mingrui Xia, 20120717, show two brains in one figure, 0 for one brain, 1 for two brains.
+
+% Added by Mingrui, 20190327, parameters for boundary
+EC.msh.boundary = 1;
+% 1 for none, 2 for auto, 3 for threshold, and 4 for file
+EC.msh.boundary_value = 0;
+EC.msh.boundary_color = [0 0 0];
 
 EC.nod.draw=1;
 EC.nod.draw_threshold_type=1;
@@ -202,6 +216,9 @@ EC.lbl_font.FontAngle='normal';
 EC.lbl_font.FontSize=11;
 EC.lbl_font.FontUnits='points';
 
+% Added by Mingrui Xia, 20170919, add option to show label in front.
+EC.lbl_front = 0;
+
 
 EC.lot.view=1;
 % 1 for single view
@@ -247,6 +264,8 @@ EC.vol.rmm = 18;
 % 8 for Extremum Voxel
 % 9 for Most Neighbour Voxel, Added by Mingrui Xia, 20130104
 EC.vol.mapalgorithm = 5;
+
+
 
 EC.glb.material = 'dull';% Added by Mingrui Xia, 20120316, modify object material, shading, light.
 EC.glb.material_ka = '0.5';
@@ -315,6 +334,7 @@ else
 end
 dcm_obj = datacursormode(hObject);
 set(dcm_obj,'UpdateFcn',@BrainNet_Output_txt)
+% set(hObject,'toolbar','figure')
 % set(gcf,'Renderer','OpenGL');
 %set(handles.NV_fig,'position',get(0,'screensize'));
 
@@ -333,13 +353,11 @@ function varargout = BrainNet_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 %set(handles.NV_axes,'Position',get(handles.NV_fig,'Position'))
 
-
 % --------------------------------------------------------------------
 function NV_m_file_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_file (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 
 % --------------------------------------------------------------------
 function NV_m_exit_Callback(hObject, eventdata, handles)
@@ -352,7 +370,6 @@ if ~isempty(a)
     a=[];
 end
 close(findobj('Tag','NV_fig'));
-
 
 % --------------------------------------------------------------------
 function NV_m_nm_Callback(hObject, eventdata, handles)
@@ -381,7 +398,6 @@ else
     a=FileView;
 end
 FLAG.IsCalledByREST = 0;
-
 
 function NetPrepare
 global surf
@@ -538,58 +554,6 @@ switch EC.edg.opacity
         tmp(tmp > EC.edg.opacity_max) = EC.edg.opacity_max;
         surf.cylinder(:,6) = tmp;
 end
-% switch EC.edg.size_abs
-%     case 0
-%         surf.cylinder=surf.cylinder2;
-%     case 1
-%         surf.cylinder=abs(surf.cylinder2);
-% end
-% if EC.edg.color_abs==1
-%     %     surf.cylinder3=surf.cylinder2; %%Edited by Mingrui, 20140505, fix a bug when use absolute value in edge color
-%     surf.cylinder3=abs(surf.cylinder2);
-%     if min(surf.cylinder3(:,3))<0
-%         surf.cylinder3(:,3)=surf.cylinder3(:,3)-min(surf.cylinder3(:,3));
-%     end
-%     if min(surf.cylinder3(:,3))<1;
-%         surf.cylinder3(:,3)=surf.cylinder3(:,3)+1;
-%     end
-%     while max(surf.cylinder3(:,3))/min(surf.cylinder3(:,3))>10
-%         surf.cylinder3(:,3)=log(surf.cylinder3(:,3));
-%         if min(surf.cylinder3(:,3))<1;
-%             surf.cylinder3(:,3)=surf.cylinder3(:,3)+1;
-%         end
-%     end
-%     if max(surf.cylinder3(:,3))~=min(surf.cylinder3(:,3))
-%         EC.Net.k=0.6/(max(surf.cylinder3(:,3))-min(surf.cylinder3(:,3)));
-%         EC.Net.b=1-EC.Net.k*max(surf.cylinder3(:,3));
-%     else
-%         EC.Net.k=0;
-%         EC.Net.b=0.7;
-%     end
-%     surf.cylinder3(:,3)=surf.cylinder3(:,3)*EC.Net.k+EC.Net.b;
-% end
-%
-% if min(surf.cylinder(:,3))<0
-%     surf.cylinder(:,3)=surf.cylinder(:,3)-min(surf.cylinder(:,3));
-% end
-% if min(surf.cylinder(:,3))<1;
-%     surf.cylinder(:,3)=surf.cylinder(:,3)+1;
-% end
-% while max(surf.cylinder(:,3))/min(surf.cylinder(:,3))>10
-%     surf.cylinder(:,3)=log(surf.cylinder(:,3));
-%     if min(surf.cylinder(:,3))<1;
-%         surf.cylinder(:,3)=surf.cylinder(:,3)+1;
-%     end
-% end
-% if max(surf.cylinder(:,3))~=min(surf.cylinder(:,3))
-%     EC.Net.k=5.6/(max(surf.cylinder(:,3))-min(surf.cylinder(:,3)));
-%     EC.Net.b=6-EC.Net.k*max(surf.cylinder(:,3)); % Edited by Mingrui Xia, 20120413, adjust edge value between 0.4~6
-% else
-%     EC.Net.k=0;
-%     EC.Net.b=2;
-% end
-% surf.cylinder(:,3)=surf.cylinder(:,3)*EC.Net.k+EC.Net.b;
-
 
 function NodePrepare
 global surf
@@ -618,14 +582,17 @@ if EC.nod.color==2
         lowend = EC.nod.color_map_low;
         highend = EC.nod.color_map_high;
     end
-    
+    %Editied by Mingrui, 20181123, fix a bug when the length for inputed
+    %colormap is not 64
+    colormap_length = length(EC.nod.CM);
     if highend~=lowend
-        EC.nod.k=63/(highend-lowend);
-        EC.nod.b=64-EC.nod.k*highend;
+        EC.nod.k = (colormap_length-1)/(highend-lowend);
+        EC.nod.b = colormap_length-EC.nod.k*highend;
     else
         EC.nod.k=0;
         EC.nod.b=1;
     end
+    
     surf.sphere(:,6)=surf.sphere(:,6)*EC.nod.k+EC.nod.b;
 else
     surf.sphere(:,6)=surf.sphere(:,4);
@@ -665,7 +632,6 @@ switch EC.nod.size
 end
 surf.sphere(:,7) = surf.sphere(:,7) * EC.nod.size_ratio;
 
-
 function fv = ROIPrepare
 global EC
 global surf
@@ -696,16 +662,16 @@ for i = 1:length(fv)
     if EC.vol.roi.smooth == 1
         %         vol = smooth3(vol,'gaussian');
         if EC.vol.roi.smooth_kernal == 1
-        vol = smooth3(vol);
+            vol = smooth3(vol);
         else
             vol = smooth3(vol,'gaussian');
         end
-%         vol = smooth3(vol);
+        %         vol = smooth3(vol);
     end
     fv{i,1} = isosurface(vol);
     while size(fv{i,1}.vertices,1) == 0 %% Added by Mingrui Xia, expand ROI while it is too small
-         if EC.vol.roi.smooth_kernal == 1
-        vol = smooth3(vol);
+        if EC.vol.roi.smooth_kernal == 1
+            vol = smooth3(vol);
         else
             vol = smooth3(vol,'gaussian');
         end% Modified by Mingrui Xia 20160921, using Gaussian kernel instead of the 'box' kernel
@@ -730,7 +696,6 @@ for i = 1:length(fv)
         fv{i,1}.side = 2;
     end
 end
-
 
 function [ncyl,cylinder]=Nettrans(net,t)
 % Modified by Mingrui, 20170309, draw two edges for bidirected edges
@@ -789,7 +754,6 @@ if EC.edg.interhemiedges == 1
     ncyl=size(cylinder,1);
 end
 
-
 function [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf)
 t=size(surf.tri,1);
 v=size(surf.coord,2);
@@ -815,12 +779,10 @@ r=max(surf.coord,[],2)-min(surf.coord,[],2);
 w1=h/r(2)*r(1)*3/4;
 h1=h/r(2)*r(1);
 
-
 function w1=NoMeshPage(surf)
 h=0.39;
 r=max(surf.sphere,[],1)-min(surf.sphere,[],1)*2;
 w1=h/r(2)*r(1)*3/4;
-
 
 function Viewer=GenerateView8(h1,w1)
 Viewer(1,:)=[0.055,0.62,0.2925,0.4,-90,0];
@@ -831,7 +793,6 @@ Viewer(5,:)=[0.3,0.18,0.4,0.39,0,-90];
 Viewer(6,:)=[0.6525,0.29,0.2925,0.4,-90,0];
 Viewer(7,:)=[0.055,0.02,w1,h1,180,0];
 Viewer(8,:)=[0.945-w1,0.02,w1,h1,0,0];
-
 
 function Viewer=GenerateView6(w1)
 % Viewer(1,:)=[0.05,0.58,0.34,0.4,-90,0];
@@ -847,14 +808,12 @@ Viewer(4,:)=[0.055,0.15,0.2925,0.4,90,0];
 Viewer(5,:)=[0.3,0.18,0.4,0.39,0,-90];
 Viewer(6,:)=[0.6525,0.15,0.2925,0.4,-90,0];
 
-
 function Viewer=GenerateView4
 % YAN Chao-Gan 111023 Added. For Medium View (4 views)
 Viewer(1,:)=[0.045,0.45,0.4387,0.6,-90,0];
 Viewer(2,:)=[0.52,0.45,0.4387,0.6,90,0];
 Viewer(3,:)=[0.045,-0.01,0.4387,0.6,90,0];
 Viewer(4,:)=[0.52,-0.01,0.4387,0.6,-90,0];
-
 
 function Viewer=GenerateView4v
 % Lijie Huang 130221 Added. For Medium View (4 views) and 2 Ventral Views
@@ -865,7 +824,6 @@ Viewer(4,:)=[0.52,0.23,0.4387,0.36,-90,0];
 Viewer(5,:)=[0.045,0.03,0.4387,0.18,-90,-90];
 Viewer(6,:)=[0.52,0.03,0.4387,0.18,90,-90];
 
-
 function Viewer = GenerateView5
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
 Viewer(1,:) = [0.055,0.5,0.2925,0.4,-90,0];
@@ -874,8 +832,8 @@ Viewer(3,:) = [0.6525,0.5,0.2925,0.4,90,0];
 Viewer(4,:) = [0.055,0.145,0.2925,0.4,90,0];
 Viewer(5,:) = [0.6525,0.145,0.2925,0.4,-90,0];
 
-
 function Surfmatrix=GenertateSurfM8(surf,tl,tr,vl,vr,cuv)
+global EC
 Surfmatrix.tri{1}=surf.tri(tl,:);
 Surfmatrix.tri{2}=surf.tri;
 Surfmatrix.tri{3}=surf.tri(tr,:)-cuv;
@@ -902,10 +860,31 @@ if isfield(surf,'T')
     Surfmatrix.T{7}=surf.T;
     Surfmatrix.T{8}=surf.T;
 end
+if isfield(surf,'boundary_value')
+    Surfmatrix.boundary_value{1}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{2}=surf.boundary_value;
+    Surfmatrix.boundary_value{3}=surf.boundary_value(vr);
+    Surfmatrix.boundary_value{4}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{5}=surf.boundary_value;
+    Surfmatrix.boundary_value{6}=surf.boundary_value(vr);
+    Surfmatrix.boundary_value{7}=surf.boundary_value;
+    Surfmatrix.boundary_value{8}=surf.boundary_value;
+end
 
+if EC.msh.color_type == 2
+    Surfmatrix.color_table{1} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{2} = EC.msh.color_table;
+    Surfmatrix.color_table{3} = EC.msh.color_table(vr,:);
+    Surfmatrix.color_table{4} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{5} = EC.msh.color_table;
+    Surfmatrix.color_table{6} = EC.msh.color_table(vr,:);
+    Surfmatrix.color_table{7} = EC.msh.color_table;
+    Surfmatrix.color_table{8} = EC.msh.color_table;
+end
 
 function Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv)
 % YAN Chao-Gan 111023 Added. For Medium View (4 views)
+global EC
 Surfmatrix.tri{1}=surf.tri(tl,:);
 Surfmatrix.tri{2}=surf.tri(tr,:)-cuv;
 Surfmatrix.tri{3}=surf.tri(tl,:);
@@ -920,10 +899,24 @@ if isfield(surf,'T')
     Surfmatrix.T{3}=surf.T(vl);
     Surfmatrix.T{4}=surf.T(vr);
 end
+if isfield(surf,'boundary_value')
+    Surfmatrix.boundary_value{1}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{2}=surf.boundary_value(vr);
+    Surfmatrix.boundary_value{3}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{4}=surf.boundary_value(vr);
+end
+
+if EC.msh.color_type == 2
+    Surfmatrix.color_table{1} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{2} = EC.msh.color_table(vr,:);
+    Surfmatrix.color_table{3} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{4} = EC.msh.color_table(vr,:);
+end
 
 
 function Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv)
 % Lijie Huang 130221 Added. For Medium View (4 views) and 2 ventral views
+global EC
 Surfmatrix.tri{1}=surf.tri(tl,:);
 Surfmatrix.tri{2}=surf.tri(tr,:)-cuv;
 Surfmatrix.tri{3}=surf.tri(tl,:);
@@ -944,10 +937,27 @@ if isfield(surf,'T')
     Surfmatrix.T{5}=surf.T(vl);
     Surfmatrix.T{6}=surf.T(vr);
 end
+if isfield(surf,'boundary_value')
+    Surfmatrix.boundary_value{1}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{2}=surf.boundary_value(vr);
+    Surfmatrix.boundary_value{3}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{4}=surf.boundary_value(vr);
+    Surfmatrix.boundary_value{5}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{6}=surf.boundary_value(vr);
+end
 
+if EC.msh.color_type == 2
+    Surfmatrix.color_table{1} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{2} = EC.msh.color_table(vr,:);
+    Surfmatrix.color_table{3} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{4} = EC.msh.color_table(vr,:);
+    Surfmatrix.color_table{5} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{6} = EC.msh.color_table(vr,:);
+end
 
 function Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv)
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
+global EC
 Surfmatrix.tri{1} = surf.tri(tl,:);
 Surfmatrix.tri{2} = surf.tri;
 Surfmatrix.tri{3} = surf.tri(tr,:)-cuv;
@@ -965,7 +975,21 @@ if isfield(surf,'T')
     Surfmatrix.T{4} = surf.T(vl);
     Surfmatrix.T{5} = surf.T(vr);
 end
+if isfield(surf,'boundary_value')
+    Surfmatrix.boundary_value{1}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{2}=surf.boundary_value;
+    Surfmatrix.boundary_value{3}=surf.boundary_value(vr);
+    Surfmatrix.boundary_value{4}=surf.boundary_value(vl);
+    Surfmatrix.boundary_value{5}=surf.boundary_value(vr);
+end
 
+if EC.msh.color_type == 2
+    Surfmatrix.color_table{1} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{2} = EC.msh.color_table;
+    Surfmatrix.color_table{3} = EC.msh.color_table(vr,:);
+    Surfmatrix.color_table{4} = EC.msh.color_table(vl,:);
+    Surfmatrix.color_table{5} = EC.msh.color_table(vr,:);
+end
 
 function a=PlotMesh4(Viewer,Surfmatrix,alpha)
 % Mingrui Xia 111026 Added. For Medium View (4 views)
@@ -982,6 +1006,22 @@ for i=1:4
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']);eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
     set(Brain,'FaceAlpha',EC.msh.alpha);
+    
+    if EC.msh.color_type == 2
+        Brain.FaceColor = 'flat';
+        Brain.FaceVertexCData = Surfmatrix.color_table{i};
+    end
+    
+    if EC.msh.boundary == 4
+        Brain.FaceColor = 'flat';
+        if EC.msh.color_type == 1
+            Brain.FaceVertexCData = repmat(EC.msh.color,length(Surfmatrix.boundary_value{i}),1);
+        else
+            Brain.FaceVertexCData = Surfmatrix.color_table{i};
+        end
+        Brain.FaceVertexCData(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+    end
+    
     if alpha~=1
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
@@ -995,7 +1035,6 @@ for i=1:4
         end
     end
 end
-
 
 function a=PlotMesh4v(Viewer,Surfmatrix,alpha)
 % Mingrui Xia 111026 Added. For Medium View (4 views)
@@ -1012,6 +1051,22 @@ for i=1:6
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']);eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
     set(Brain,'FaceAlpha',EC.msh.alpha);
+    
+    if EC.msh.color_type == 2
+        Brain.FaceColor = 'flat';
+        Brain.FaceVertexCData = Surfmatrix.color_table{i};
+    end
+    
+    if EC.msh.boundary == 4
+        Brain.FaceColor = 'flat';
+        if EC.msh.color_type == 1
+            Brain.FaceVertexCData = repmat(EC.msh.color,length(Surfmatrix.boundary_value{i}),1);
+        else
+            Brain.FaceVertexCData = Surfmatrix.color_table{i};
+        end
+        Brain.FaceVertexCData(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+    end
+    
     if alpha~=1
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
@@ -1025,7 +1080,6 @@ for i=1:6
         end
     end
 end
-
 
 function a=PlotMesh8(Viewer,Surfmatrix,alpha)
 global EC
@@ -1041,6 +1095,22 @@ for i=1:8
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
     set(Brain,'FaceAlpha',EC.msh.alpha);
+    
+    if EC.msh.color_type == 2
+        Brain.FaceColor = 'flat';
+        Brain.FaceVertexCData = Surfmatrix.color_table{i};
+    end
+    
+    if EC.msh.boundary == 4
+        Brain.FaceColor = 'flat';
+        if EC.msh.color_type == 1
+            Brain.FaceVertexCData = repmat(EC.msh.color,length(Surfmatrix.boundary_value{i}),1);
+        else
+            Brain.FaceVertexCData = Surfmatrix.color_table{i};
+        end
+        Brain.FaceVertexCData(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+    end
+    
     if alpha~=1
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
@@ -1054,7 +1124,6 @@ for i=1:8
         end
     end
 end
-
 
 function a=PlotMesh6(Viewer,surf,alpha)
 global EC
@@ -1070,12 +1139,28 @@ for i=1:6
     eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
     set(Brain,'FaceAlpha',EC.msh.alpha);
+    
+    if EC.msh.color_type == 2
+        Brain.FaceColor = 'flat';
+        Brain.FaceVertexCData = EC.msh.color_table;
+    end
+    
+    if EC.msh.boundary == 4
+        Brain.FaceColor = 'flat';
+        if EC.msh.color_type == 1
+            Brain.FaceVertexCData = repmat(EC.msh.color,surf.vertex_number,1);
+        else
+            Brain.FaceVertexCData = EC.msh.color_table;
+        end
+        Brain.FaceVertexCData(surf.boundary_value == 1,:) = repmat(EC.msh.boundary_color,sum(surf.boundary_value),1);
+    end
+    
+    
     if alpha~=1
         axis tight; eval(['lighting ',EC.glb.lighting,';']);axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
     end
 end
-
 
 function a=PlotMesh1(surf,alpha)
 global EC
@@ -1095,9 +1180,30 @@ eval(['material ',EC.glb.material,';']);
 eval(['shading ',EC.glb.shading,';']);axis off
 set(Brain,'FaceColor',EC.msh.color);
 set(Brain,'FaceAlpha',EC.msh.alpha);
+
+if EC.msh.color_type == 2
+    Brain.FaceColor = 'flat';
+    Brain.FaceVertexCData = EC.msh.color_table;
+end
+
+if EC.msh.boundary == 4
+    Brain.FaceColor = 'flat';
+    if EC.msh.color_type == 1
+        Brain.FaceVertexCData = repmat(EC.msh.color,surf.vertex_number,1);
+    else
+        Brain.FaceVertexCData = EC.msh.color_table;
+    end
+    Brain.FaceVertexCData(surf.boundary_value == 1,:) = repmat(EC.msh.boundary_color,sum(surf.boundary_value),1);
+end
+
 if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
     set(Brain2,'FaceColor',EC.msh.color);
     set(Brain2,'FaceAlpha',EC.msh.alpha);
+    if EC.msh.boundary == 4
+        Brain2.FaceColor = 'flat';
+        Brain2.FaceVertexCData = repmat(EC.msh.color,surf.vertex_number,1);
+        Brain2.FaceVertexCData(surf.boundary_value == 1,:) = repmat(EC.msh.boundary_color,sum(surf.boundary_value),1);
+    end
 end
 daspect([1 1 1])
 % Edited  by Mingrui Xia, 20120806, add custom view for single brain.
@@ -1117,7 +1223,6 @@ if alpha~=1
     cam = camlight(EC.glb.lightdirection);
 end
 
-
 function a = PlotMesh5(Viewer,Surfmatrix,alpha)
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
 global EC
@@ -1133,6 +1238,11 @@ for i = 1:5
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
     set(Brain,'FaceAlpha',EC.msh.alpha);
+    if EC.msh.boundary == 4
+        Brain.FaceColor = 'flat';
+        Brain.FaceVertexCData = repmat(EC.msh.color,length(Surfmatrix.boundary_value{i}),1);
+        Brain.FaceVertexCData(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+    end
     if alpha~=1
         eval(['lighting ',EC.glb.lighting,';']);axis tight; axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
@@ -1147,22 +1257,23 @@ for i = 1:5
     end
 end
 
-
 function a = PlotROI1(fv,a,alpha)
 % Added by Mingrui, 20120529, DrawROI
 global EC
 global cam
 hold on
+% axis manual
 for i = 1:length(fv)
     roi =  trisurf(fv{i,1}.faces,fv{i,1}.vertices(:,1),fv{i,1}.vertices(:,2),fv{i,1}.vertices(:,3),'EdgeColor','none');
     set(roi,'FaceColor',EC.vol.roi.color(i,:));
+    %     set(roi,'FaceAlpha',20);
 end
 hold off
 if alpha ~= 1
-    axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
+    axis tight;
+    axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
     cam = camlight(EC.glb.lightdirection);
 end
-
 
 function a = PlotROI8(fv,a,alpha)
 % Added by Mingrui, 20120529, DrawROI
@@ -1199,10 +1310,9 @@ for j = 1:8
     end
     if alpha ~= 1
         axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
-        cam(i) = camlight(EC.glb.lightdirection);
+        cam(j) = camlight(EC.glb.lightdirection);
     end
 end
-
 
 function a = PlotROI6(fv,a,alpha)
 % Added by Mingrui, 20120529, DrawROI
@@ -1218,10 +1328,9 @@ for j = 1:6
     hold off
     if alpha ~= 1
         axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
-        cam(i) = camlight(EC.glb.lightdirection);
+        cam(j) = camlight(EC.glb.lightdirection);
     end
 end
-
 
 function a = PlotROI4(fv,a,alpha)
 global EC
@@ -1250,10 +1359,9 @@ for j = 1:4
     end
     if alpha ~= 1
         axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
-        cam(i) = camlight(EC.glb.lightdirection);
+        cam(j) = camlight(EC.glb.lightdirection);
     end
 end
-
 
 function a = PlotROI4v(fv,a,alpha)
 global EC
@@ -1282,10 +1390,9 @@ for j = 1:6
     end
     if alpha ~= 1
         axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
-        cam(i) = camlight(EC.glb.lightdirection);
+        cam(j) = camlight(EC.glb.lightdirection);
     end
 end
-
 
 function a = PlotROI5(fv,a,alpha)
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
@@ -1322,10 +1429,9 @@ for j = 1:5
     end
     if alpha ~= 1
         axis tight; axis vis3d off;eval(['material ',EC.glb.material,';']);eval(['lighting ',EC.glb.lighting,';']);
-        cam(i) = camlight(EC.glb.lightdirection);
+        cam(j) = camlight(EC.glb.lightdirection);
     end
 end
-
 
 function a=MapMesh1(surf,low,high,alpha)
 global EC
@@ -1336,6 +1442,12 @@ Brain=trisurf(surf.tri,surf.coord(1,:),surf.coord(2,:),surf.coord(3,:),surf.T,'E
 set(Brain,'FaceAlpha',EC.msh.alpha);
 colormap(EC.vol.CM);
 caxis([low,high]);
+if EC.msh.boundary ~= 1
+    index = fix((Brain.FaceVertexCData-low)/(high-low)*length(EC.vol.CM))+1;
+    RGB = squeeze(ind2rgb(index,EC.vol.CM));
+    RGB(surf.boundary_value == 1,:) = repmat(EC.msh.boundary_color,sum(surf.boundary_value),1);
+    Brain.FaceVertexCData = RGB;
+end
 switch EC.lot.view_direction
     case 1
         view(-90,0);
@@ -1369,7 +1481,6 @@ else
     cb.Ticks = cb.Limits;
 end
 
-
 function a=MapMesh8(Viewer,Surfmatrix,low,high,alpha)
 %%% Edited by Mingrui Xia, 20111116, add translucency show
 global EC
@@ -1381,6 +1492,12 @@ for i=1:8
     colormap(EC.vol.CM);
     set(Brain,'FaceAlpha',EC.msh.alpha);
     caxis([low,high])
+    if EC.msh.boundary ~= 1
+        index = fix((Brain.FaceVertexCData-low)/(high-low)*length(EC.vol.CM))+1;
+        RGB = squeeze(ind2rgb(index,EC.vol.CM));
+        RGB(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+        Brain.FaceVertexCData = RGB;
+    end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
     whitebg(gcf,EC.bak.color);
@@ -1413,7 +1530,6 @@ else
     cb.Ticks = cb.Limits;
 end
 
-
 function a=MapMesh4(Viewer,Surfmatrix,low,high,alpha)
 % YAN Chao-Gan 111023 Added. For Medium View (4 views)
 %%% Edited by Mingrui Xia, 20111116, add translucency show
@@ -1426,6 +1542,12 @@ for i=1:4
     set(Brain,'FaceAlpha',EC.msh.alpha);
     colormap(EC.vol.CM);
     caxis([low,high])
+    if EC.msh.boundary ~= 1
+        index = fix((Brain.FaceVertexCData-low)/(high-low)*length(EC.vol.CM))+1;
+        RGB = squeeze(ind2rgb(index,EC.vol.CM));
+        RGB(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+        Brain.FaceVertexCData = RGB;
+    end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
     whitebg(gcf,EC.bak.color);
@@ -1457,7 +1579,6 @@ else
     cb.Ticks = cb.Limits;
 end
 
-
 function a=MapMesh4v(Viewer,Surfmatrix,low,high,alpha)
 % Lijie Huang 130221 Added. For Medium View (4 views) and 2 ventral views
 %%% Edited by Mingrui Xia, 20111116, add translucency show
@@ -1470,6 +1591,12 @@ for i=1:6
     set(Brain,'FaceAlpha',EC.msh.alpha);
     colormap(EC.vol.CM);
     caxis([low,high])
+    if EC.msh.boundary ~= 1
+        index = fix((Brain.FaceVertexCData-low)/(high-low)*length(EC.vol.CM))+1;
+        RGB = squeeze(ind2rgb(index,EC.vol.CM));
+        RGB(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+        Brain.FaceVertexCData = RGB;
+    end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
     whitebg(gcf,EC.bak.color);
@@ -1501,7 +1628,6 @@ else
     cb.Ticks = cb.Limits;
 end
 
-
 function a=MapMesh6(Viewer,surf,low,high,alpha)
 %%% Edited by Mingrui Xia, 20111116, add translucency show
 global EC
@@ -1518,6 +1644,12 @@ for i=1:6
     eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     colormap(EC.vol.CM);
     caxis([low,high]);
+    if EC.msh.boundary ~= 1
+        index = fix((Brain.FaceVertexCData-low)/(high-low)*length(EC.vol.CM))+1;
+        RGB = squeeze(ind2rgb(index,EC.vol.CM));
+        RGB(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+        Brain.FaceVertexCData = RGB;
+    end
     if alpha~=1
         axis tight; eval(['lighting ',EC.glb.lighting,';']); axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
@@ -1536,7 +1668,6 @@ else
     cb.Ticks = cb.Limits;
 end
 
-
 function a = MapMesh5(Viewer,Surfmatrix,low,high,alpha)
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
 global EC
@@ -1548,6 +1679,12 @@ for i = 1:5
     colormap(EC.vol.CM);
     set(Brain,'FaceAlpha',EC.msh.alpha);
     caxis([low,high])
+    if EC.msh.boundary ~= 1
+        index = fix((Brain.FaceVertexCData-low)/(high-low)*length(EC.vol.CM))+1;
+        RGB = squeeze(ind2rgb(index,EC.vol.CM));
+        RGB(Surfmatrix.boundary_value{i} == 1,:) = repmat(EC.msh.boundary_color,sum(Surfmatrix.boundary_value{i}),1);
+        Brain.FaceVertexCData = RGB;
+    end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
     whitebg(gcf,EC.bak.color);
@@ -1617,8 +1754,18 @@ if length(a)>1
     end
     % Modified by Mingrui 20150603, Add colorbar for nodes
     % Modified by Mingrui 20170303, Add fixed color map
-    if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
-        colormap(EC.nod.CM);
+    % Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+    % Modified by Mingrui 20181115, Fix a bug in display node color with volume
+    % mapping
+    if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+        
+        switch(EC.nod.color)
+            case 2
+                tmp = EC.nod.CM;
+            case 3
+                tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+        end
+        colormap(tmp);
         cb=colorbar('location','South');
         if EC.nod.color_map_type == 1
             caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
@@ -1674,8 +1821,18 @@ else
         hold off
     end
     % Modified by Mingrui 20150603, Add colorbar for nodes
-    if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
-        colormap(EC.nod.CM);
+    % Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+    % Modified by Mingrui 20181115, Fix a bug in display node color with volume
+    % mapping
+    if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+        
+        switch(EC.nod.color)
+            case 2
+                tmp = EC.nod.CM;
+            case 3
+                tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+        end
+        colormap(tmp);
         cb=colorbar('location','South');
         if EC.nod.color_map_type == 1
             caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
@@ -1694,7 +1851,6 @@ else
         end
     end
 end
-
 
 function a=PlotNode4(surf, a, flag, centerX, n, EC)
 % Mingrui Xia 111026 Added. For Medium View (4 views)
@@ -1814,8 +1970,17 @@ for i=1:4
     hold off
 end
 % Modified by Mingrui 20150603, Add colorbar for nodes
-if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
-    colormap(EC.nod.CM);
+% Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+% Modified by Mingrui 20181115, Fix a bug in display node color with volume
+% mapping
+if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+    switch(EC.nod.color)
+        case 2
+            tmp = EC.nod.CM;
+        case 3
+            tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+    end
+    colormap(tmp);
     cb=colorbar('location','South');
     if EC.nod.color_map_type == 1
         caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
@@ -1833,7 +1998,6 @@ if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         cb.Ticks = cb.Limits;
     end
 end
-
 
 function a=PlotNode4v(surf, a, flag, centerX, n, EC)
 % Lijie Huang 130221 Added. For Medium View (4 views) and 2 ventral views
@@ -1952,8 +2116,18 @@ for i=1:6
     hold off
 end
 % Modified by Mingrui 20150603, Add colorbar for nodes
-if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
-    colormap(EC.nod.CM);
+% Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+% Modified by Mingrui 20181115, Fix a bug in display node color with volume
+% mapping
+if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+    
+    switch(EC.nod.color)
+        case 2
+            tmp = EC.nod.CM;
+        case 3
+            tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+    end
+    colormap(tmp);
     cb=colorbar('location','South');
     if EC.nod.color_map_type == 1
         caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
@@ -1971,7 +2145,6 @@ if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         cb.Ticks = cb.Limits;
     end
 end
-
 
 function a=PlotNode1(surf,a,n,EC)
 global cam
@@ -2002,15 +2175,26 @@ if ~isempty(a)
     end
     
     % Modified by Mingrui 20150603, Add colorbar for nodes
-    if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
-        colormap(EC.nod.CM);
-        cb=colorbar('location','East');
+    % Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+    % Modified by Mingrui 20181115, Fix a bug in display node color with volume
+    % mapping
+    if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+        
+        switch(EC.nod.color)
+            case 2
+                tmp = EC.nod.CM;
+            case 3
+                tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+        end
+        colormap(tmp);
+        cb=colorbar('location','eastoutside');
         if EC.nod.color_map_type == 1
             caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
         else
             caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
         end
         set(cb,'Position',[0.9 0.1 0.03 0.3]);
+        %         set(gca, 'FontSize', 30);
         tmp = version;
         ind = find(tmp == '.');
         if str2double(tmp(1:ind(2)-1))<8.4
@@ -2074,8 +2258,18 @@ else
     end
     
     % Modified by Mingrui 20150603, Add colorbar for nodes
-    if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
-        colormap(EC.nod.CM);
+    % Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+    % Modified by Mingrui 20181115, Fix a bug in display node color with volume
+    % mapping
+    if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+        
+        switch(EC.nod.color)
+            case 2
+                tmp = EC.nod.CM;
+            case 3
+                tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+        end
+        colormap(tmp);
         cb=colorbar('location','East');
         if EC.nod.color_map_type == 1
             caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
@@ -2096,7 +2290,6 @@ else
     
     hold off
 end
-
 
 function PlotNode8(surf,a,flag,centerX,n,EC)
 global cam
@@ -2235,8 +2428,18 @@ for i=1:8
     hold off
 end
 % Modified by Mingrui 20150603, Add colorbar for nodes
-if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
-    colormap(EC.nod.CM);
+% Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+% Modified by Mingrui 20181115, Fix a bug in display node color with volume
+% mapping
+if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+    
+    switch(EC.nod.color)
+        case 2
+            tmp = EC.nod.CM;
+        case 3
+            tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+    end
+    colormap(tmp);
     cb=colorbar('location','South');
     if EC.nod.color_map_type == 1
         caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
@@ -2254,7 +2457,6 @@ if EC.nod.color == 2 && (FLAG.Loadfile<4||EC.edg.color~=2)
         cb.Ticks = cb.Limits;
     end
 end
-
 
 function a = PlotNode5(surf,a,flag,centerX,n,EC)
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
@@ -2394,8 +2596,18 @@ for i = 1:5
     hold off
 end
 % Modified by Mingrui 20150603, Add colorbar for nodes
-if EC.nod.color == 2 && (FLAG.Loadfile < 4 || EC.edg.color ~= 2)
-    colormap(EC.nod.CM);
+% Modified by Mingrui 20170807, Add colorbar for nodes in modular option
+% Modified by Mingrui 20181115, Fix a bug in display node color with volume
+% mapping
+if (EC.nod.color == 2||EC.nod.color == 3)&&(FLAG.Loadfile<4||EC.edg.color~=2)&&(FLAG.Loadfile<8||EC.vol.type~=1)
+    
+    switch(EC.nod.color)
+        case 2
+            tmp = EC.nod.CM;
+        case 3
+            tmp = EC.nod.CM(1:length(EC.nod.ModularNumber),:);
+    end
+    colormap(tmp);
     cb = colorbar('location','South');
     if EC.nod.color_map_type == 1
         caxis([min(surf.sphere(:,4)),max(surf.sphere(:,4))]);
@@ -2414,160 +2626,311 @@ if EC.nod.color == 2 && (FLAG.Loadfile < 4 || EC.edg.color ~= 2)
     end
 end
 
-
 % Modified by Mingrui, 20150318, fix a compatity bug with matlab 2014b.
 function PlotLabel6(surf,i,j)
 global EC
-switch i % Edited by Mingrui Xia, 111028. Adjust label postion. Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
-    
-    case {1,4,3,6}
-        text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-    case 2
-        if surf.sphere(j,1)<=0
-            text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        else
-            text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        end
-        %     case 3
-        %         if surf.sphere(j,1)<=0
-        %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        %         else
-        %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        %         end
-    case 5
-        if surf.sphere(j,1)<=0
-            text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)*EC.nod.size_ratio-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        else
-            text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)*EC.nod.size_ratio-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        end
-        %     case 6
-        %         if surf.sphere(j,1)<=0
-        %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        %         else
-        %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        %         end
+if EC.lbl_front == 0
+    switch i % Edited by Mingrui Xia, 111028. Adjust label postion. Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
+        case {1,4,3,6}
+            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case 2
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+            %     case 3
+            %         if surf.sphere(j,1)<=0
+            %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            %         else
+            %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            %         end
+        case 5
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+            %     case 6
+            %         if surf.sphere(j,1)<=0
+            %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            %         else
+            %             text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            %         end
+    end
+else
+    switch i
+        case {1,6}
+            pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
+            text(pos-surf.sphere(j,7)-2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case {3,4}
+            pos = max([max(surf.coord(1,:)),max(surf.sphere(:,1))]);
+            text(pos+surf.sphere(j,7)+1,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            
+        case 2
+            pos = max([max(surf.coord(3,:)),max(surf.sphere(:,3))]);
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+        case 5
+            pos = min([min(surf.coord(3,:)),min(surf.sphere(:,3))]);
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,pos-surf.sphere(j,7)-2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,pos-surf.sphere(j,7)-2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+    end
 end
-
 
 function PlotLabel8(surf,i,j)
 global EC
-switch i
-    case {1,3,4,6} %%% Edited by Mingrui Xia, 111028. Combine several same situation, adjust label postion.Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
-        text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-        %     case {4,6}
-        %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-        %     case 3
-        %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-    case 2
-        if surf.sphere(j,1)<=0
-            text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        else
-            text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        end
-    case 7
-        if surf.sphere(j,1)<=0
-            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        else
-            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        end
-    case 5
-        if surf.sphere(j,1)<=0
-            text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)*EC.nod.size_ratio-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        else
-            text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)*EC.nod.size_ratio-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        end
-    case 8
-        if surf.sphere(j,1)<=0
-            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        else
-            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        end
+if EC.lbl_front == 0
+    switch i
+        case {1,3,4,6} %%% Edited by Mingrui Xia, 111028. Combine several same situation, adjust label postion.Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
+            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            %     case {4,6}
+            %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            %     case 3
+            %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case 2
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+        case 7
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            end
+        case 5
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+        case 8
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+    end
+else
+    switch i
+        case {1,6}
+            pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
+            text(pos-surf.sphere(j,7)-2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            
+        case {3,4}
+            pos = max([max(surf.coord(1,:)),max(surf.sphere(:,1))]);
+            text(pos+surf.sphere(j,7)+1,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            
+        case 2
+            pos = max([max(surf.coord(3,:)),max(surf.sphere(:,3))]);
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+        case 7
+            pos = max([max(surf.coord(2,:)),max(surf.sphere(:,2))]);
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),pos+surf.sphere(j,7)+1,surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            else
+                text(surf.sphere(j,1),pos+surf.sphere(j,7)+1,surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            end
+        case 5
+            pos = min([min(surf.coord(3,:)),min(surf.sphere(:,3))]);
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,pos-surf.sphere(j,7)-2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)-surf.sphere(j,7)-2,pos-surf.sphere(j,7)-2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+        case 8
+            pos = min([min(surf.coord(2,:)),min(surf.sphere(:,2))]);
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),pos+surf.sphere(j,7)+1,surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),pos+surf.sphere(j,7)+1,surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+    end
 end
-
 
 function PlotLabel5(surf,i,j)
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
 global EC
-switch i
-    case {1,3,4,5} %%% Edited by Mingrui Xia, 111028. Combine several same situation, adjust label postion.Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
-        text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-        %     case {4,6}
-        %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-        %     case 3
-        %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-    case 2
-        if surf.sphere(j,1) <= 0
-            text(surf.sphere(j,1),surf.sphere(j,2) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-        else
-            text(surf.sphere(j,1),surf.sphere(j,2) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-        end
+if EC.lbl_front == 0
+    switch i
+        case {1,3,4,5}
+            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            
+        case 2
+            if surf.sphere(j,1) <= 0
+                text(surf.sphere(j,1),surf.sphere(j,2) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2) + surf.sphere(j,7) * EC.nod.size_ratio + 2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+    end
+else
+    switch i
+        case {1,5}
+            pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
+            text(pos-surf.sphere(j,7)-2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case {3,4}
+            pos = max([max(surf.coord(1,:)),max(surf.sphere(:,1))]);
+            text(pos+surf.sphere(j,7)+1,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case 2
+            pos = max([max(surf.coord(3,:)),max(surf.sphere(:,3))]);
+            if surf.sphere(j,1)<=0
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+            else
+                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+            end
+    end
 end
-
 
 function PlotLabel4v(surf,i,j)
 global EC
-switch i
-    case {1,2,3,4}
-        text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-    case 5
-        text(surf.sphere(j,1)-surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,2),surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-    case 6
-        text(surf.sphere(j,1)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,2),surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+if EC.lbl_front == 0
+    switch i
+        case {1,2,3,4}
+            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case 5
+            text(surf.sphere(j,1)-surf.sphere(j,7)+1,surf.sphere(j,2),surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case 6
+            text(surf.sphere(j,1)+surf.sphere(j,7)+1,surf.sphere(j,2),surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+    end
+else
+    switch i
+        case {1,4}
+            pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
+            text(pos-surf.sphere(j,7)-2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case {2,3}
+            pos = max([max(surf.coord(1,:)),max(surf.sphere(:,1))]);
+            text(pos+surf.sphere(j,7)+1,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            
+        case 5
+            pos = min([min(surf.coord(3,:)),min(surf.sphere(:,3))]);
+            text(surf.sphere(j,1)-surf.sphere(j,7)-2,surf.sphere(j,2),pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case 6
+            pos = min([min(surf.coord(3,:)),min(surf.sphere(:,3))]);
+            text(surf.sphere(j,1)+surf.sphere(j,7)+1,surf.sphere(j,2),pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+    end
 end
-
 
 function PlotLabel1(surf,j)
 %%% Added by Mingrui Xia, 111028. Plot label for single view.
 %%% Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
 global EC
-
-if EC.msh.doublebrain == 1 %% Edited by Mingrui Xia, 20130818, fix the bug that the label only appear in the first brain
-    switch EC.lot.view_direction
-        case {1,4}
-            %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-            text(0,surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-        case 2
-            if surf.sphere2(j,1)<=0
-                text(surf.sphere2(j,1),surf.sphere2(j,2)+surf.sphere2(j,7)*EC.nod.size_ratio+2,surf.sphere2(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-            else
-                text(surf.sphere2(j,1),surf.sphere2(j,2)+surf.sphere2(j,7)*EC.nod.size_ratio+2,surf.sphere2(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-            end
-        case 3
-            if surf.sphere2(j,1)<=0
-                text(surf.sphere2(j,1),surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-            else
-                text(surf.sphere2(j,1),surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-            end
-            
+if EC.lbl_front == 0
+    if EC.msh.doublebrain == 1 %% Edited by Mingrui Xia, 20130818, fix the bug that the label only appear in the first brain
+        switch EC.lot.view_direction
+            case {1,4}
+                %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+                text(0,surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            case 2
+                if surf.sphere2(j,1)<=0
+                    text(surf.sphere2(j,1),surf.sphere2(j,2)+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.sphere2(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                else
+                    text(surf.sphere2(j,1),surf.sphere2(j,2)+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.sphere2(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                end
+            case 3
+                if surf.sphere2(j,1)<=0
+                    text(surf.sphere2(j,1),surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                else
+                    text(surf.sphere2(j,1),surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                end
+                
+        end
+    else
+        switch EC.lot.view_direction
+            case {1,4}
+                %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            case 2
+                if surf.sphere(j,1)<=0
+                    text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                else
+                    text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                end
+            case 3
+                if surf.sphere(j,1)<=0
+                    text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                else
+                    text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                end
+                
+        end
     end
 else
-    switch EC.lot.view_direction
-        case {1,4}
-            %         text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-            text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-        case 2
-            if surf.sphere(j,1)<=0
-                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-            else
-                text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.sphere(j,3),surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-            end
-        case 3
-            if surf.sphere(j,1)<=0
-                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
-            else
-                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
-            end
-            
+    if EC.msh.doublebrain == 1
+        switch EC.lot.view_direction
+            case 1
+                pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
+                text(pos-surf.sphere2(j,7)*EC.nod.size_ratio-2,surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            case 2
+                pos = max([max(surf.coord(3,:)),max(surf.sphere(:,3))]);
+                if surf.sphere2(j,1)<=0
+                    text(surf.sphere2(j,1),surf.sphere2(j,2)+surf.sphere2(j,7)*EC.nod.size_ratio+1,pos+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                else
+                    text(surf.sphere2(j,1),surf.sphere2(j,2)+surf.sphere2(j,7)*EC.nod.size_ratio+1,pos+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                end
+            case 3
+                pos = min([min(surf.coord(3,:)),min(surf.sphere(:,3))]);
+                if surf.sphere2(j,1)<=0
+                    text(surf.sphere2(j,1),surf.sphere2(j,2)-surf.sphere2(j,7)*EC.nod.size_ratio-2,pos-surf.sphere2(j,7)*EC.nod.size_ratio-2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                else
+                    text(surf.sphere2(j,1),surf.sphere2(j,2)-surf.sphere2(j,7)*EC.nod.size_ratio-2,pos-surf.sphere2(j,7)*EC.nod.size_ratio-2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                end
+            case 4
+                text(surf.sphere2(j,1),surf.sphere2(j,2),surf.sphere2(j,3)+surf.sphere2(j,7)*EC.nod.size_ratio+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+                
+        end
+    else
+        switch EC.lot.view_direction
+            case 1
+                pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
+                text(pos-surf.sphere(j,7)-2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+            case 2
+                pos = max([max(surf.coord(3,:)),max(surf.sphere(:,3))]);
+                if surf.sphere(j,1)<=0
+                    text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                else
+                    text(surf.sphere(j,1),surf.sphere(j,2)+surf.sphere(j,7)+1,pos+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                end
+            case 3
+                pos = max([max(surf.coord(2,:)),max(surf.sphere(:,2))]);
+                if surf.sphere(j,1)<=0
+                    text(surf.sphere(j,1),pos+surf.sphere(j,7)+1,surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','left')
+                else
+                    text(surf.sphere(j,1),pos+surf.sphere(j,7)+1,surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','right')
+                end
+            case 4
+                text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        end
     end
 end
 
-
-function PlotLabel4(surf,j)
+function PlotLabel4(surf,i,j)
 % Mingrui Xia 111026 Added. For Medium View (4 views)
 %%% Edited by Mingrui Xia, 20111113, label position plus radius times ratio.
 global EC
-text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)*EC.nod.size_ratio+2,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
-
+if EC.lbl_front == 0
+    text(surf.sphere(j,1),surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+else
+    switch i
+        case {1,4}
+            pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
+            text(pos-surf.sphere(j,7)-2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+3,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+        case {2,3}
+            pos = max([max(surf.coord(1,:)),max(surf.sphere(:,1))]);
+            text(pos+surf.sphere(j,7)+1,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+3,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+    end
+end
 
 function DrawSphere(surf,j,i,n,EC)
 % switch EC.nod.size
@@ -2628,11 +2991,16 @@ switch EC.nod.color
         ci=1;
     case 2
         ci=int32(surf.sphere(j,6));
+        
+        %Editied by Mingrui, 20181123, fix a bug when the length for
+        %inputed colormap is not 64
+        colormap_length = length(EC.nod.CM);
         if ci<1
             ci=1;
-        elseif ci>64
-            ci=64;
+        elseif ci>colormap_length
+            ci = colormap_length;
         end
+        
     case 3
         ci = find(EC.nod.ModularNumber == surf.sphere(j,4));
         %         ci=int32(surf.sphere(j,4));
@@ -2659,7 +3027,7 @@ if ~isequal(surf.label{j},'-') % Editied by Mingrui Xia, 20131226, fix the bug t
             elseif n==6
                 PlotLabel6(surf,i,j);
             elseif n==4 %%% Edited by Mingrui Xia, 111028. Add label plot for medium view and single view.
-                PlotLabel4(surf,j);
+                PlotLabel4(surf,i,j);
             elseif n == 5
                 PlotLabel4v(surf,i,j);
             elseif n == 52 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
@@ -2676,7 +3044,7 @@ if ~isequal(surf.label{j},'-') % Editied by Mingrui Xia, 20131226, fix the bug t
                         elseif n==6
                             PlotLabel6(surf,i,j);
                         elseif n==4 %%% Edited by Mingrui Xia, 111028. Add label plot for medium view and single view.
-                            PlotLabel4(surf,j);
+                            PlotLabel4(surf,i,j);
                         elseif n == 5
                             PlotLabel4v(surf,i,j);
                         elseif n == 52 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
@@ -2692,7 +3060,7 @@ if ~isequal(surf.label{j},'-') % Editied by Mingrui Xia, 20131226, fix the bug t
                         elseif n==6
                             PlotLabel6(surf,i,j);
                         elseif n==4 %%% Edited by Mingrui Xia, 111028. Add label plot for medium view and single view.
-                            PlotLabel4(surf,j);
+                            PlotLabel4(surf,i,j);
                         elseif n == 5
                             PlotLabel4v(surf,i,j);
                         elseif n == 52 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
@@ -2705,7 +3073,6 @@ if ~isequal(surf.label{j},'-') % Editied by Mingrui Xia, 20131226, fix the bug t
     end
 end
 
-
 function [centerX,flag]=JudgeNode(surf,vl,vr)
 if abs(min(surf.coord(1,vl))-max(surf.coord(1,vr)))<abs(max(surf.coord(1,vl))-min(surf.coord(1,vr)))
     centerX=(min(surf.coord(1,vl))+max(surf.coord(1,vr)))/2;
@@ -2717,7 +3084,6 @@ if  max(surf.coord(1,vl))<max(surf.coord(1,vr))
 else
     flag=2;
 end
-
 
 function PlotLine6(surf,a)
 global cam
@@ -2758,7 +3124,6 @@ if EC.edg.color == 2
         cb.Ticks = cb.Limits;
     end
 end
-
 
 function PlotLine1(surf)
 global cam
@@ -2809,7 +3174,6 @@ if EC.edg.color == 2
     end
 end
 hold off
-
 
 function PlotLine8(surf,a,flag,centerX)
 global cam
@@ -2886,8 +3250,6 @@ if EC.edg.color == 2
     
 end
 
-
-
 function PlotLine5(surf,a,flag,centerX)
 % Added by Mingrui, 20170309, add layout for lateral, medial and dorsal view
 global cam
@@ -2959,7 +3321,6 @@ if EC.edg.color == 2
     end
 end
 
-
 function PlotLine4(surf,a,flag,centerX)
 global cam
 global EC
@@ -3027,7 +3388,6 @@ if EC.edg.color == 2
         cb.Ticks = cb.Limits;
     end
 end
-
 
 function PlotLine4v(surf,a,flag,centerX)
 global cam
@@ -3122,7 +3482,6 @@ if EC.edg.color == 2
         cb.Ticks = cb.Limits;
     end
 end
-
 
 function DrawLine(surf,i,nv,iv)
 global EC
@@ -3285,108 +3644,135 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
             case 1
                 switch iv
                     case 1
-                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(3)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                     case 2
-                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(1)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                     case 3
-                        normdirect = [1/edgedirect(1),-1/edgedirect(3)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(1),edgedirect(3)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'XData',get(Line1,'XData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                 end
             case 2
-                normdirect = [1/edgedirect(2),-1/edgedirect(3)];
-                movelength = normdirect/norm(normdirect);
+                normdirect = [edgedirect(2),edgedirect(3)];
+                if sum(normdirect(:))~=0
+                movelength = null(normdirect/norm(normdirect));
                 set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                 set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                 set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                 set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                end
             case 3
                 switch iv
                     case 1
-                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(3)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                     case 2
-                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(1)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                 end
             case 4
                 switch iv
                     case 1
-                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(3)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                     case 2
-                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(1)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                 end
             case 5
                 switch iv
                     case 1
-                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(3)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                     case 2
-                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(1)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                     case 3
-                        normdirect = [1/edgedirect(1),-1/edgedirect(3)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(1),edgedirect(3)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'XData',get(Line1,'XData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
+                       
                 end
             case 6
                 switch iv
                     case {1,0}
-                        normdirect = [1/edgedirect(2),-1/edgedirect(3)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(3)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                     case 2
-                        normdirect = [1/edgedirect(2),-1/edgedirect(1)];
-                        movelength = normdirect/norm(normdirect);
+                        normdirect = [edgedirect(2),edgedirect(1)];
+                        if sum(normdirect(:))~=0
+                        movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        end
                 end
         end
         
@@ -3475,8 +3861,6 @@ else
     set(Line,'EdgeAlpha',0);
 end
 
-
-
 function DoubleMeshPrepare
 % Added by Mingrui Xia, 20120717, show two brains in one figure
 global surf
@@ -3487,14 +3871,13 @@ switch EC.lot.view_direction
         width = 0.1 * (max(surf.coord(2,:)) - min(surf.coord(2,:)));
         %         surf.coord2(1,:) = -surf.coord2(1,:);
         %         surf.coord2(2,:) = -surf.coord(2,:) + 2 * min(surf.coord(2,:)) - width;
-        surf.coord2(1,:) = surf.coord2(1,:);
-        surf.coord2(2,:) = surf.coord(2,:) + 2 * min(surf.coord(2,:)) - width;
+        surf.coord2(1,:) = -surf.coord2(1,:);
+        surf.coord2(2,:) = -surf.coord(2,:) + 2 * min(surf.coord(2,:)) - width;
     case 2
         surf.coord2(1,:) = surf.coord(1,:) + 1.1 * (max(surf.coord(1,:)) - min(surf.coord(1,:)));
     case 3
         surf.coord2(1,:) = surf.coord(1,:) - 1.1 * (max(surf.coord(1,:)) - min(surf.coord(1,:)));
 end
-
 
 function DoubleNodePrepare
 % Added by Mingrui Xia, 20120717, show two brains in one figure
@@ -3506,14 +3889,48 @@ switch EC.lot.view_direction
         width = 0.1 * (max(surf.coord(2,:)) - min(surf.coord(2,:)));
         %         surf.sphere2(floor(surf.nsph/2) + 1:end,1) = -surf.sphere2(floor(surf.nsph/2) + 1:end,1);
         %         surf.sphere2(floor(surf.nsph/2) + 1:end,2) = -surf.sphere2(floor(surf.nsph/2) + 1:end,2) + 2 * min(surf.coord(2,:)) - width;
-        surf.sphere2(floor(surf.nsph/2) + 1:end,1) = surf.sphere2(floor(surf.nsph/2) + 1:end,1);
-        surf.sphere2(floor(surf.nsph/2) + 1:end,2) = surf.sphere2(floor(surf.nsph/2) + 1:end,2) + 2 * min(surf.coord(2,:)) - width;
+        surf.sphere2(floor(surf.nsph/2) + 1:end,1) = -surf.sphere2(floor(surf.nsph/2) + 1:end,1);
+        surf.sphere2(floor(surf.nsph/2) + 1:end,2) = -surf.sphere2(floor(surf.nsph/2) + 1:end,2) + 2 * min(surf.coord(2,:)) - width;
     case 2
         surf.sphere2(floor(surf.nsph/2) + 1:end,1) = surf.sphere2(floor(surf.nsph/2) + 1:end,1) + 1.1 * (max(surf.coord(1,:)) - min(surf.coord(1,:)));
     case 3
         surf.sphere2(floor(surf.nsph/2) + 1:end,1) = surf.sphere2(floor(surf.nsph/2) + 1:end,1) - 1.1 * (max(surf.coord(1,:)) - min(surf.coord(1,:)));
 end
 
+function BoundaryPrepare
+%Added by Mingrui, 20190327, draw boundary
+global surf
+global EC
+switch EC.msh.boundary
+    case 2
+        if isfield(surf,'T')
+            mask = surf.T;
+            if sum(surf.T-fix(surf.T))~=0
+                mask(mask~=0) = 1;
+            end
+            facevalue = zeros(size(surf.tri));
+            facevalue(:) = mask(surf.tri(:));
+            facevalue_judge = 1 - all(diff(facevalue,[],2)==0,2);
+            face_remove = surf.tri(facevalue_judge==1,:);
+            surf.boundary_value = zeros(surf.vertex_number,1);
+            surf.boundary_value(unique(face_remove)) = 1;
+            surf.boundary_value(surf.T==0) = 0;
+        end
+    case 3
+        if isfield(surf,'T')
+            mask = zeros(surf.vertex_number,1);
+            mask(surf.T>EC.msh.boundary_value) = 1;
+            facevalue = zeros(size(surf.tri));
+            facevalue(:) = mask(surf.tri(:));
+            facevalue_judge = 1 - all(diff(facevalue,[],2)==0,2);
+            face_remove = surf.tri(facevalue_judge==1,:);
+            surf.boundary_value = zeros(surf.vertex_number,1);
+            surf.boundary_value(unique(face_remove)) = 1;
+            surf.boundary_value(surf.T==0) = 0;
+        end
+    case 4
+        surf.boundary_value = EC.msh.boundary_value;
+end
 
 function a=FileView
 global FLAG
@@ -3536,6 +3953,7 @@ else
                     if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
                         DoubleMeshPrepare;
                     end
+                    BoundaryPrepare;
                     a=PlotMesh1(surf,0);
                 case 2
                     NodePrepare;
@@ -3549,10 +3967,10 @@ else
                         DoubleMeshPrepare;
                         DoubleNodePrepare;
                     end
+                    BoundaryPrepare;
                     a=PlotMesh1(surf,1);
                     a=PlotNode1(surf,a,2,EC);
                 case 6
-                    
                     NodePrepare;
                     NetPrepare;
                     if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
@@ -3561,13 +3979,13 @@ else
                     a=PlotNode1(surf,a,1,EC);
                     PlotLine1(surf);
                 case 7
-                    
                     NodePrepare;
                     NetPrepare;
                     if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
                         DoubleMeshPrepare;
                         DoubleNodePrepare;
                     end
+                    BoundaryPrepare;
                     a=PlotMesh1(surf,1);
                     a=PlotNode1(surf,a,1,EC);
                     PlotLine1(surf);
@@ -3581,9 +3999,11 @@ else
                         %                     else
                         [low high]=MapCMPrepare;
                         %                     end
+                        BoundaryPrepare;
                         a=MapMesh1(surf,low,high,0);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         a = PlotMesh1(surf,1);
                         a = PlotROI1(fv,a,0);
                     end
@@ -3593,12 +4013,12 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
-                        
-                        
+                        BoundaryPrepare;
                         [low high]=MapCMPrepare;
                         a=MapMesh1(surf,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         a = PlotMesh1(surf,1);
                         a = PlotROI1(fv,a,1);
                     end
@@ -3610,10 +4030,12 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         [low high]=MapCMPrepare;
                         a=MapMesh1(surf,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         a = PlotMesh1(surf,1);
                         a = PlotROI1(fv,a,1);
                     end
@@ -3623,6 +4045,7 @@ else
         case 2
             switch FLAG.Loadfile
                 case 1
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     if cut<t
                         Viewer=GenerateView8(h1,w1);
@@ -3639,6 +4062,7 @@ else
                     a=PlotNode6(Viewer,surf,0,2,EC);
                 case 3
                     NodePrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     if cut<t
                         [centerX,flag]=JudgeNode(surf,vl,vr);
@@ -3661,6 +4085,7 @@ else
                 case 7
                     NodePrepare;
                     NetPrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     if cut<t
                         [centerX,flag]=JudgeNode(surf,vl,vr);
@@ -3686,6 +4111,7 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         if cut<t
                             Viewer=GenerateView8(h1,w1);
                             Surfmatrix=GenertateSurfM8(surf,tl,tr,vl,vr,cuv);
@@ -3695,6 +4121,7 @@ else
                             a=MapMesh6(Viewer,surf,low,high,0);
                         end
                     else
+                        BoundaryPrepare;
                         fv = ROIPrepare;
                         if cut<t
                             Viewer=GenerateView8(h1,w1);
@@ -3715,6 +4142,7 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         if cut<t
                             [centerX,flag]=JudgeNode(surf,vl,vr);
                             Viewer=GenerateView8(h1,w1);
@@ -3728,6 +4156,7 @@ else
                         end
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         if cut<t
                             [centerX,flag]=JudgeNode(surf,vl,vr);
                             Viewer=GenerateView8(h1,w1);
@@ -3751,6 +4180,7 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         if cut<t
                             [centerX,flag]=JudgeNode(surf,vl,vr);
                             Viewer=GenerateView8(h1,w1);
@@ -3766,6 +4196,7 @@ else
                         end
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         if cut<t
                             [centerX,flag]=JudgeNode(surf,vl,vr);
                             Viewer=GenerateView8(h1,w1);
@@ -3783,7 +4214,6 @@ else
                         end
                     end
             end
-            
         case 3  %%% YAN Chao-Gan 111023 Added BEGIN. For medium view (4 views). Only finished for volume view mode
             switch FLAG.Loadfile
                 case 9
@@ -3793,29 +4223,31 @@ else
                     %                     else
                     
                     Viewer=GenerateView4;
-                    
                     if EC.vol.type == 1
                         [low high]=MapCMPrepare;
                         %                     end
                         if FLAG.MAP == 2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv);
                         a=MapMesh4(Viewer,Surfmatrix,low,high,0);%%% YAN Chao-Gan 111023 Added END. %%%
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv);
                         a=PlotMesh4(Viewer,Surfmatrix,1);
                         a = PlotROI4(fv,a,2);
                     end
-                    
                 case 1 %%% Mingrui Xia 110226 Added below.
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     Viewer=GenerateView4;
+                    BoundaryPrepare;
                     Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv);
                     a=PlotMesh4(Viewer,Surfmatrix,0);
                 case 3
                     NodePrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     [centerX,flag]=JudgeNode(surf,vl,vr);
                     Viewer=GenerateView4;
@@ -3825,6 +4257,7 @@ else
                 case 7
                     NodePrepare;
                     NetPrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     [centerX,flag]=JudgeNode(surf,vl,vr);
                     Viewer=GenerateView4;
@@ -3842,10 +4275,12 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv);
                         a=MapMesh4(Viewer,Surfmatrix,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv);
                         a=PlotMesh4(Viewer,Surfmatrix,1);
                         a = PlotROI4(fv,a,1);
@@ -3863,10 +4298,12 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv);
                         a=MapMesh4(Viewer,Surfmatrix,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4(surf,tl,tr,vl,vr,cuv);
                         a=PlotMesh4(Viewer,Surfmatrix,1);
                         a = PlotROI4(fv,a,1);
@@ -3885,10 +4322,12 @@ else
                         if FLAG.MAP == 2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv);
                         a=MapMesh4v(Viewer,Surfmatrix,low,high,0);%%% YAN Chao-Gan 111023 Added END. %%%
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv);
                         a=PlotMesh4v(Viewer,Surfmatrix,1);
                         a = PlotROI4v(fv,a,2);
@@ -3897,10 +4336,12 @@ else
                 case 1 %%% Mingrui Xia 110226 Added below.
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     Viewer=GenerateView4v;
+                    BoundaryPrepare;
                     Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv);
                     a=PlotMesh4v(Viewer,Surfmatrix,0);
                 case 3
                     NodePrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     [centerX,flag]=JudgeNode(surf,vl,vr);
                     Viewer=GenerateView4v;
@@ -3910,6 +4351,7 @@ else
                 case 7
                     NodePrepare;
                     NetPrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv]=CutMesh(surf);
                     [centerX,flag]=JudgeNode(surf,vl,vr);
                     Viewer=GenerateView4v;
@@ -3927,10 +4369,12 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv);
                         a=MapMesh4v(Viewer,Surfmatrix,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv);
                         a=PlotMesh4v(Viewer,Surfmatrix,1);
                         a = PlotROI4v(fv,a,1);
@@ -3948,10 +4392,12 @@ else
                         if FLAG.MAP==2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv);
                         a=MapMesh4v(Viewer,Surfmatrix,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix=GenertateSurfM4v(surf,tl,tr,vl,vr,cuv);
                         a=PlotMesh4v(Viewer,Surfmatrix,1);
                         a = PlotROI4v(fv,a,1);
@@ -3966,10 +4412,12 @@ else
                 case 1
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
                     Viewer = GenerateView5;
+                    BoundaryPrepare;
                     Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
                     a = PlotMesh5(Viewer,Surfmatrix,0);
                 case 3
                     NodePrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
                     [centerX,flag] = JudgeNode(surf,vl,vr);
                     Viewer = GenerateView5;
@@ -3979,6 +4427,7 @@ else
                 case 7
                     NodePrepare;
                     NetPrepare;
+                    BoundaryPrepare;
                     [t,tl,tr,vl,vr,h1,w1,cut,cuv] = CutMesh(surf);
                     [centerX,flag] = JudgeNode(surf,vl,vr);
                     Viewer = GenerateView5;
@@ -3995,10 +4444,12 @@ else
                         if FLAG.MAP == 2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
                         a = MapMesh5(Viewer,Surfmatrix,low,high,0);%%% YAN Chao-Gan 111023 Added END. %%%
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
                         a = PlotMesh5(Viewer,Surfmatrix,1);
                         a = PlotROI5(fv,a,2);
@@ -4013,10 +4464,12 @@ else
                         if FLAG.MAP == 2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
                         a = MapMesh5(Viewer,Surfmatrix,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
                         a = PlotMesh5(Viewer,Surfmatrix,1);
                         a = PlotROI5(fv,a,1);
@@ -4033,10 +4486,12 @@ else
                         if FLAG.MAP == 2
                             MapPrepare;
                         end
+                        BoundaryPrepare;
                         Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
                         a = MapMesh5(Viewer,Surfmatrix,low,high,1);
                     else
                         fv = ROIPrepare;
+                        BoundaryPrepare;
                         Surfmatrix = GenertateSurfM5(surf,tl,tr,vl,vr,cuv);
                         a = PlotMesh5(Viewer,Surfmatrix,1);
                         a = PlotROI5(fv,a,1);
@@ -4047,26 +4502,25 @@ else
     end
 end
 
-
 function MapPrepare
 global surf
 global EC
 
 % Added by Mingrui, 20140925, statistic for SPM or REST nifti files
 % Edited by Mingrui, 20150302, remove judge for statistical map
-% if ~strcmp(surf.test,'No')
-vol_tmp = surf.vol;
-vol_tmp(vol_tmp < EC.vol.threshold & vol_tmp > -EC.vol.threshold) = 0;
-[L, num] = bwlabeln(vol_tmp,EC.vol.rmm);
-for x = 1:num
-    theCurrentCluster = L == x;
-    if length(find(theCurrentCluster)) < EC.vol.clustersize
-        vol_tmp(logical(theCurrentCluster)) = 0;
+if ~strcmp(surf.test,'No')
+    vol_tmp = surf.vol;
+    vol_tmp(vol_tmp < EC.vol.threshold & vol_tmp > -EC.vol.threshold) = 0;
+    [L, num] = bwlabeln(vol_tmp,EC.vol.rmm);
+    for x = 1:num
+        theCurrentCluster = L == x;
+        if length(find(theCurrentCluster)) < EC.vol.clustersize
+            vol_tmp(logical(theCurrentCluster)) = 0;
+        end
     end
+else
+    vol_tmp = surf.vol;
 end
-% else
-%     vol_tmp = surf.vol;
-% end
 
 % Edited by Mingrui Xia, 20120726, selection for different mapping algorithm.
 % 1 for Nearest Voxel
@@ -4234,20 +4688,28 @@ switch EC.vol.mapalgorithm
         for i = 1:surf.vertex_number
             if ind(i) ~=1
                 tmpT = reshape(vol_tmp(index(1,i)-rad:index(1,i)+rad,index(2,i)-rad:index(2,i)+rad,index(3,i)-rad:index(3,i)+rad),1,[]);
-                X = setdiff(unique(tmpT),[0]);
+                X = setdiff(unique(tmpT),0);
                 if isempty(X),continue;end
                 [Y,x] = max(histc(tmpT,X));
                 surf.T(i)=X(x);
-                mn = histc(tmpT(:),unique(tmpT));
-                if length(find(tmpT==0)) && mn(1)>0.6*length(tmpT),surf.T(i)=0;end
+                %                 mn = histc(tmpT(:),unique(tmpT));
+                %                 if length(find(tmpT==0)) && mn(1)>0.6*length(tmpT),surf.T(i)=0;end
             end
         end
+        %         iteration = 20;
+        %         for j = 1:iteration
+        %         tmpT = surf.T;
+        %         for i = 1:surf.vertex_number
+        %             [m,n] = find(surf.tri == i);
+        %             neibour = unique(surf.tri(m,:));
+        %             surf.T(i) = median(tmpT(neibour));
+        %         end
+        %         end
 end
-surf.T(isnan(surf.T)) = 0; % Added by Mingrui, 20140410, replace NaN to 0;
+% surf.T(isnan(surf.T)) = 0; % Added by Mingrui, 20140410, replace NaN to 0;
 % for i=1:surf.vertex_number
 %     surf.T(i)=vol_tmp(index(1,i),index(2,i),index(3,i));
 % end
-
 
 function [low high]=MapCMPrepare
 global EC
@@ -4388,7 +4850,6 @@ else
     end
 end
 
-
 function NewColorMap=AdjustColorMap(OriginalColorMap,NullColor,NMax,NMin,PMin,PMax)
 %%% Added by Mingrui Xia, 20111025, to adjust colormap.
 % Adjust the colormap to leave blank to values under threshold, the orginal color map with be set into [NMax NMin] and [PMin PMax]. Written by YAN Chao-Gan, 111023
@@ -4425,16 +4886,15 @@ end
 PositiveIndex = round(linspace(501,1000,PositiveColorSegment));
 NewColorMap(end-PositiveColorSegment+1:end,:) = OriginalColorMap(PositiveIndex,:);
 
-
 % --------------------------------------------------------------------
 function NV_m_save_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_save (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-[filename,pathname]=uiputfile({'*.jpg','JPEG 24-bit';'*.tif','TIFF 24-bit';...
+[filename,pathname]=uiputfile({'*.tif','TIFF 24-bit';'*.jpg','JPEG 24-bit';...
     '*.bmp','BMP 24-bit';'*.eps','EPS color';'*.png','PNG 24-bit';...
-    '*.fig','Matlab Figure'},'Save Image');
+    '*.fig','Matlab Figure';'*.wrl','VRML'},'Save Image');
 if isequal(filename,0)||isequal(pathname,0)
     return;
 else
@@ -4450,20 +4910,24 @@ else
             print(gcf,fpath,'-dtiff',['-r',num2str(EC.img.dpi)])
         case '.jpg'
             print(gcf,fpath,'-djpeg',['-r',num2str(EC.img.dpi)])
+            %             saveas(gcf,fpath);
         case '.bmp'
             print(gcf,fpath,'-dbmp',['-r',num2str(EC.img.dpi)])
         case '.eps'
             print(gcf,fpath,'-depsc',['-r',num2str(EC.img.dpi)])
             
-            % add by Mingrui Xia, save as matlab figure.
+            % added by Mingrui Xia, save as matlab figure.
             % Modified by Mingrui, 20150112, using lowercase to be compatible with
             % higher version
         case '.fig'
             saveas(gcf,fpath,'fig');
+            
+            % added by Mingrui, 20170904, save as vrml format.
+        case '.wrl'
+            vrml(gcf,fpath);
     end
     msgbox('Image has saved!','Success','help');
 end
-
 
 % --------------------------------------------------------------------
 function NV_m_es_Callback(hObject, eventdata, handles)
@@ -4493,7 +4957,6 @@ if FLAG.EC==1
     cla;
     a=FileView;
 end
-
 
 % --------------------------------------------------------------------
 function NV_m_LF_Callback(hObject, eventdata, handles)
@@ -4530,13 +4993,11 @@ if FLAG.LF==1
     FLAG.LF=0;
 end
 
-
 % --------------------------------------------------------------------
 function NV_m_Visualize_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_Visualize (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 
 % --------------------------------------------------------------------
 function NV_m_tools_Callback(hObject, eventdata, handles)
@@ -4544,13 +5005,11 @@ function NV_m_tools_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
 % --------------------------------------------------------------------
 function NV_m_others_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_others (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 
 % --------------------------------------------------------------------
 function NV_m_cf_Callback(hObject, eventdata, handles)
@@ -4572,7 +5031,6 @@ if exist('BrainNet_background.tif','file')==2
     imshow(imread('BrainNet_background.tif'));
 end
 
-
 % --------------------------------------------------------------------
 function NV_m_mm_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_mm (see GCBO)
@@ -4581,21 +5039,18 @@ function NV_m_mm_Callback(hObject, eventdata, handles)
 H=BrainNet_MergeMesh;
 uiwait(H);
 
-
 % --------------------------------------------------------------------
 function NV_m_help_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_help (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
 % --------------------------------------------------------------------
 function NV_m_about_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_about (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-msgbox({'BrainNet Viewer 1.6 Released 20170403';'By Mingrui Xia';'mingruixia@gmail.com'},'About...','help');
-
+msgbox({'BrainNet Viewer 1.63 Released 20181219';'By Mingrui Xia';'mingruixia@gmail.com'},'About...','help');
 
 % --------------------------------------------------------------------
 % function NV_m_batch_Callback(hObject, eventdata, handles)
@@ -4624,7 +5079,7 @@ msgbox({'BrainNet Viewer 1.6 Released 20170403';'By Mingrui Xia';'mingruixia@gma
 % surf.tri=fscanf(fid,'%d',[3,surf.ntri])';
 % fclose(fid);
 %
-% [filename3,pathname3]=uiputfile({'*.TIF','TIFF 24-bit';'*.BMP','BMP 24-bit';'*.EPS','EPS color';'*.JPG','JPEG 24-bit';'*.PNG','PNG 24-bit'},'Save Image');
+% [filename3,pathname3]=uiputfile({'*.TIF','TIFF 24-bit';'*.BMP','BMP 24-bit';'*.EPS','EPS color';'*.','JPEG 24-bit';'*.PNG','PNG 24-bit'},'Save Image');
 % if isequal(filename,0)||isequal(pathname,0)
 %     return;
 % else
@@ -4665,7 +5120,6 @@ msgbox({'BrainNet Viewer 1.6 Released 20170403';'By Mingrui Xia';'mingruixia@gma
 %     end
 % end
 % msgbox('Image has saved!','Success','help');
-
 
 % --------------------------------------------------------------------
 function LoadFile_ClickedCallback(hObject, eventdata, handles)
@@ -4708,16 +5162,16 @@ if FLAG.LF==1
     FLAG.LF=0;
 end
 
-
 % --------------------------------------------------------------------
 function SaveImage_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to SaveImage (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-[filename,pathname]=uiputfile({'*.jpg','JPEG 24-bit';...
-    '*.tif','TIFF 24-bit';'*.bmp','BMP 24-bit';'*.eps','EPS color';...
-    '*.png','PNG 24-bit';'*.fig','Matlab Figure'},'Save Image');
+[filename,pathname]=uiputfile({'*.tif','TIFF 24-bit';'*.jpg','JPEG 24-bit';...
+    '*.bmp','BMP 24-bit';'*.eps','EPS color';...
+    '*.png','PNG 24-bit';'*.fig','Matlab Figure';'*.wrl','VRML'},...
+    'Save Image');
 if isequal(filename,0)||isequal(pathname,0)
     return;
 else
@@ -4743,10 +5197,13 @@ else
             % higher version
         case '.fig'
             saveas(gcf,fpath,'fig');
+            
+            % added by Mingrui, 20170904, save as vrml format.
+        case '.wrl'
+            vrml(gcf,fpath);
     end
     msgbox('Image has saved!','Success','help');
 end
-
 
 % --------------------------------------------------------------------
 function SagittalView_ClickedCallback(hObject, eventdata, handles)
@@ -4790,7 +5247,8 @@ if EC.lot.view == 1
             view(0,90);
             FLAG.axial=1;
         case 1
-            view(0,-90);
+            %             view(0,-90);
+            view(-180,-90); % Edited by Mingrui Xia, 20181016, adjust ventral view.
             FLAG.axial=0;
     end
     if ~isempty(cam)
@@ -4801,7 +5259,6 @@ if EC.lot.view == 1
     axis tight
     daspect([1 1 1])
 end
-
 
 % --------------------------------------------------------------------
 function CoronalView_ClickedCallback(hObject, eventdata, handles)
@@ -4846,8 +5303,6 @@ while FLAG.Rotate == 1
     drawnow;
 end
 
-
-
 % --------------------------------------------------------------------
 function Stop_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to Stop (see GCBO)
@@ -4855,7 +5310,6 @@ function Stop_ClickedCallback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global FLAG
 FLAG.Rotate=0;
-
 
 % --------------------------------------------------------------------
 function NV_m_movie_Callback(hObject, eventdata, handles)
@@ -4885,7 +5339,6 @@ else
     msgbox('Movie Saved!','Success','help');
 end
 
-
 % --------------------------------------------------------------------
 function NV_m_so_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_so (see GCBO)
@@ -4901,13 +5354,11 @@ else
     msgbox('Configure Saved!','Success','help');
 end
 
-
 % --------------------------------------------------------------------
 function NV_m_option_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_option (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 
 % --------------------------------------------------------------------
 function NV_m_lo_Callback(hObject, eventdata, handles)
@@ -4926,15 +5377,12 @@ else
     msgbox('Option Loaded!','Success','help');
 end
 
-
-
 % --------------------------------------------------------------------
 function uipushtool3_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to uipushtool3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 printpreview;
-
 
 % --------------------------------------------------------------------
 function uitoggletool1_OffCallback(hObject, eventdata, handles)
@@ -4945,7 +5393,6 @@ global cam
 for i = 1:length(cam)
     camlight(cam(i));
 end
-
 
 % --------------------------------------------------------------------
 function NV_m_manual_Callback(hObject, eventdata, handles)
@@ -4958,15 +5405,12 @@ else
     msgbox('Cannot find the manual file!','Error','error');
 end
 
-
 % --------------------------------------------------------------------
 function NV_m_ColormapEditor_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_ColormapEditor (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 colormapeditor;
-
-
 
 % --------------------------------------------------------------------
 function NV_m_ApplyColormap_Callback(hObject, eventdata, handles)
@@ -4975,21 +5419,20 @@ function NV_m_ApplyColormap_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global EC
 global a
-EC.vol.CM = get(gcf,'Colormap');
+EC.vol.CM = get(gca,'Colormap');
 EC.vol.color_map = 22;
 MapRange = get(a(end),'CLim');
 for i = 1:length(a)
     axes(a(i));
+    colormap(EC.vol.CM);
     caxis(MapRange);
 end
-
 
 % --------------------------------------------------------------------
 function uitoggletool5_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to uitoggletool5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 
 % --- Executes during object deletion, before destroying properties.
 function NV_fig_DeleteFcn(hObject, eventdata, handles)
@@ -5002,14 +5445,13 @@ clear global FLAG
 clear global File
 display('Thank you for using BrainNet Viewer!');
 
-
 % --------------------------------------------------------------------
 function NV_m_SaveColormap_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_SaveColormap (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %%% Added by Mingrui Xia, 20120710 save current colormap
-Colormap = get(gcf,'Colormap');
+Colormap = get(gca,'Colormap');
 [filename,pathname]=uiputfile({'*.txt','Text Files'},'Save Colormap');
 if isequal(filename,0)||isequal(pathname,0)
     return;
@@ -5023,7 +5465,6 @@ else
     fprintf(fid,'%f %f %f]',Colormap(end,:));
     fclose(fid);
 end
-
 
 % --------------------------------------------------------------------
 function MV_m_ViewMatrix_Callback(hObject, eventdata, handles)
@@ -5050,3 +5491,52 @@ if ~isempty(surf.net)
     daspect([1,1,1]);
     colorbar;
 end
+
+
+% --------------------------------------------------------------------
+function NV_menu_saveboundary_Callback(hObject, eventdata, handles)
+% hObject    handle to NV_menu_saveboundary (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global surf
+global File
+if isfield(surf,'boundary_value')
+    [filename,pathname]=uiputfile({'*.txt','Text Files'},'Save Boundary');
+    if isequal(filename,0)||isequal(pathname,0)
+        return;
+    else
+        fpath=fullfile(pathname,filename);
+        [~,meshname] = fileparts(File.MF);
+        fid = fopen(fpath,'wt');
+        fprintf(fid,'%s\n',['# for ',meshname]);
+        for i = 1:length(surf.boundary_value)
+            fprintf(fid,'%d\n',surf.boundary_value(i));
+        end
+        fclose(fid);
+    end
+else
+end
+
+
+% --------------------------------------------------------------------
+function PlotEdit_toggle_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to PlotEdit_toggle (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+% --------------------------------------------------------------------
+function PlotEdit_toggle_OffCallback(hObject, eventdata, handles)
+% hObject    handle to PlotEdit_toggle (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+plotedit('off');
+
+
+% --------------------------------------------------------------------
+function PlotEdit_toggle_OnCallback(hObject, eventdata, handles)
+% hObject    handle to PlotEdit_toggle (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+plotedit('on');
