@@ -5330,25 +5330,36 @@ function NV_m_movie_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global cam
+% global EC
 [filename,pathname]=uiputfile({'*.avi','AVI movie'},'Save Movie');
 if isequal(filename,0)||isequal(pathname,0)
     return;
 else
     fpath=fullfile(pathname,filename);
-    vidObj = VideoWriter(fpath);
-    open(vidObj);
+    %     vidObj = VideoWriter(fpath);
+    %     open(vidObj);
+    % t = getframe(gcf);
+    
     for num=1:360
         camorbit(1,0,'camera');
         camlight(cam);
         drawnow;
-        print(gcf,[pathname,'temp.bmp'],'-dbmp');
-        tempimg=imread([pathname,'temp.bmp']);
-        currFrame=im2frame(tempimg);
-        currFrame.cdata=imresize(currFrame.cdata,[534,735]);
-        writeVideo(vidObj,currFrame);
+        %         print(gcf,[pathname,'temp.bmp'],'-dbmp');
+        %         print(gcf,[pathname,'temp.bmp'],'-dbmp',['-r',num2str(EC.img.dpi)])
+        %         tempimg=imread([pathname,'temp.bmp']);
+        
+        %         currFrame=im2frame(tempimg);
+        F(num)=getframe(gcf);
+        %         currFrame.cdata=imresize(currFrame.cdata,[534,735]);
+        F(num).cdata=imresize(F(num).cdata, min(1080/size(F(num).cdata,1),1920/size(F(num).cdata,1)));
+        %         writeVideo(vidObj,currFrame);
     end
+    vidObj = VideoWriter(fpath);
+%     vidObj.Quality = 100;
+    open(vidObj);
+    writeVideo(vidObj,F);
     close(vidObj);
-    delete([pathname,'temp.bmp']);
+    %     delete([pathname,'temp.bmp']);
     msgbox('Movie Saved!','Success','help');
 end
 

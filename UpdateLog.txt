@@ -1,5 +1,10 @@
 Version 1.71
 - Fix a bug in BrainNet_MapCfg.m when loading txt file
+- Fix an incompatible bug in saving figure as vrml format
+- Add a colorbar blue-white-red
+- Fix a bug in drawing edge size for directed network
+- Modify the position of node colorbar to avoid overlap
+- Modify movie code to increase efficiency
 
 Version 1.7 Release 20191031
 - Add a new feature to draw boundary of parcellation or cluster
