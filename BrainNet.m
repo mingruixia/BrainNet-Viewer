@@ -1438,6 +1438,8 @@ global EC
 global cam
 a=axes('position',[0.07,0.1,0.8,0.8]);
 Brain=trisurf(surf.tri,surf.coord(1,:),surf.coord(2,:),surf.coord(3,:),surf.T,'EdgeColor','none');
+% Z = surf.T;
+% save('Z.txt','Z','-ascii');
 % Edited by Mingrui Xia, 20111116, add translucency show
 set(Brain,'FaceAlpha',EC.msh.alpha);
 colormap(EC.vol.CM);
@@ -1552,7 +1554,10 @@ for i=1:4
     daspect([1 1 1]);
     whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
-    eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
+%     eval(['lighting ',EC.glb.lighting,';']); 
+    eval(['material ',EC.glb.material,';']); 
+    eval(['shading ',EC.glb.shading,';']);    
+    axis off
     if alpha~=1
         axis tight; eval(['lighting ',EC.glb.lighting,';']); axis vis3d off;
         cam(i) = camlight(EC.glb.lightdirection);
@@ -2193,7 +2198,7 @@ if ~isempty(a)
         else
             caxis([EC.nod.color_map_low,EC.nod.color_map_high]);
         end
-        set(cb,'Position',[0.9 0.1 0.03 0.3]);
+        set(cb,'Position',[0.95 0.1 0.03 0.3]); %%adjusted by Mingrui 20220605, to avoid overlap with brain mesh
         %         set(gca, 'FontSize', 30);
         tmp = version;
         ind = find(tmp == '.');
@@ -2893,8 +2898,12 @@ else
     else
         switch EC.lot.view_direction
             case 1
+                % left side
                 pos = min([min(surf.coord(1,:)),min(surf.sphere(:,1))]);
                 text(pos-surf.sphere(j,7)-2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
+                % right side
+%                 pos = max([max(surf.coord(1,:)),max(surf.sphere(:,1))]);
+%                 text(pos+surf.sphere(j,7)+2,surf.sphere(j,2),surf.sphere(j,3)+surf.sphere(j,7)+1,surf.label{j},'FontName',EC.lbl_font.FontName,'FontWeight',EC.lbl_font.FontWeight,'FontAngle',EC.lbl_font.FontAngle,'FontSize',EC.lbl_font.FontSize,'FontUnits',EC.lbl_font.FontUnits,'HorizontalAlignment','center');
             case 2
                 pos = max([max(surf.coord(3,:)),max(surf.sphere(:,3))]);
                 if surf.sphere(j,1)<=0
@@ -3589,9 +3598,9 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
         set(Line,'EdgeColor','none');
         set(Line,'FaceAlpha',surf.cylinder(i,6));
         set(Line,'EdgeAlpha',0);
-    elseif ind > i;
+    elseif ind > i
         n1 = [linspace(0,2,9),ones(1,round(length_cyl-9)) * 1]' * n;
-        n2 = n1;
+        n2 = [linspace(0,2,9),ones(1,round(length_cyl-9)) * 1]' * surf.cylinder(ind,4) * EC.edg.size_ratio;;
         
         x1 = n1 * cos(theta);
         y1 = n1 * sintheta;
@@ -3649,8 +3658,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                     case 2
                         normdirect = [edgedirect(2),edgedirect(1)];
@@ -3658,8 +3667,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                     case 3
                         normdirect = [edgedirect(1),edgedirect(3)];
@@ -3667,8 +3676,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'XData',get(Line1,'XData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                 end
             case 2
@@ -3677,8 +3686,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                 movelength = null(normdirect/norm(normdirect));
                 set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                 set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                 end
             case 3
                 switch iv
@@ -3688,8 +3697,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                     case 2
                         normdirect = [edgedirect(2),edgedirect(1)];
@@ -3697,8 +3706,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                 end
             case 4
@@ -3709,8 +3718,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                     case 2
                         normdirect = [edgedirect(2),edgedirect(1)];
@@ -3718,8 +3727,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                 end
             case 5
@@ -3730,8 +3739,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                     case 2
                         normdirect = [edgedirect(2),edgedirect(1)];
@@ -3739,8 +3748,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                     case 3
                         normdirect = [edgedirect(1),edgedirect(3)];
@@ -3748,8 +3757,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'XData',get(Line1,'XData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                        
                 end
@@ -3761,8 +3770,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'ZData',get(Line1,'ZData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'ZData',get(Line2,'ZData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                     case 2
                         normdirect = [edgedirect(2),edgedirect(1)];
@@ -3770,8 +3779,8 @@ if EC.edg.directed == 1% Add by Mingrui Xia, 20120621, draw directed network.
                         movelength = null(normdirect/norm(normdirect));
                         set(Line1,'YData',get(Line1,'YData')+ movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
                         set(Line1,'XData',get(Line1,'XData')+ movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
-                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(i,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'YData',get(Line2,'YData')- movelength(1)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
+                        set(Line2,'XData',get(Line2,'XData')- movelength(2)*surf.cylinder(ind,4) * EC.edg.size_ratio * 1.3);
                         end
                 end
         end
@@ -4731,6 +4740,8 @@ else
         %%% Edited by Mingrui Xia, 130624, arrange colormap order by name.
         case 13
             EC.vol.CMt=jet(1000);
+% load('D:\SynologyDrive\Projects\2019_MDD_gradient\5.Figures\cm_mean_map.mat');
+% EC.vol.CMt = cm;
         case 12
             EC.vol.CMt=hsv(1000);
         case 11
@@ -4811,6 +4822,8 @@ else
             EC.vol.CMt = EC.vol.CM_annot;
         case 26
             EC.vol.CMt = [zeros(1,500),ones(1,500);linspace(0.8,68/255,500),linspace(68/255,1,500);ones(1,500),zeros(1,500)]';
+        case 27 % Add by Mingrui Xia 20200414 a blue-white-red color map
+            EC.vol.CMt = [linspace(0.01,1),linspace(1,0.81);linspace(0.33,1),linspace(1,0.01);linspace(0.7,1),linspace(1,0.01)]';
     end
     if EC.vol.adjustCM == 1
         switch EC.vol.display
@@ -4823,14 +4836,14 @@ else
                 low=EC.vol.pn;
                 high=EC.vol.px;
                 %                 ind = round(linspace(1, size(EC.vol.CMt, 1), 999));
-                ind = floor(linspace(1, size(EC.vol.CMt, 1) + 0.9999, 999)); % Edited by Mingrui Xia, 20120724 fix colormap adjusting
+                ind = round(linspace(1, size(EC.vol.CMt, 1),999)); % Edited by Mingrui Xia, 20210222 fix colormap adjusting
                 EC.vol.CM(2:1000,:)=EC.vol.CMt(ind,:);
                 EC.vol.CM(1,:)=EC.vol.null;
             case 3
                 low=EC.vol.nx;
                 high=EC.vol.nn;
                 %                 ind = round(linspace(1, size(EC.vol.CMt, 1), 999));
-                ind = floor(linspace(1, size(EC.vol.CMt, 1) + 0.9999, 999));% Edited by Mingrui Xia, 20120724 fix colormap adjusting
+                ind = round(linspace(1, size(EC.vol.CMt, 1), 999));% Edited by Mingrui Xia, 20210222 fix colormap adjusting
                 EC.vol.CM(1:999,:)=EC.vol.CMt(ind,:);
                 EC.vol.CM(1000,:)=EC.vol.null;
         end
@@ -5050,7 +5063,7 @@ function NV_m_about_Callback(hObject, eventdata, handles)
 % hObject    handle to NV_m_about (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-msgbox({'BrainNet Viewer 1.63 Released 20181219';'By Mingrui Xia';'mingruixia@gmail.com'},'About...','help');
+msgbox({'BrainNet Viewer 1.7 Released 20191031';'By Mingrui Xia';'mingruixia@gmail.com'},'About...','help');
 
 % --------------------------------------------------------------------
 % function NV_m_batch_Callback(hObject, eventdata, handles)
