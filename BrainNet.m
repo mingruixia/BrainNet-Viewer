@@ -802,10 +802,10 @@ function Viewer=GenerateView6(w1)
 % Viewer(5,:)=[0.4,0.15,0.2,0.39,0,-90];
 % Viewer(6,:)=[0.61,0.15,0.34,0.4,0,0];
 Viewer(1,:)=[0.055,0.58,0.2925,0.4,-90,0];
-Viewer(2,:)=[0.3,0.58,0.4,0.39,0,90];
+Viewer(2,:)=[0.35,0.58,0.3,0.39,0,90];
 Viewer(3,:)=[0.6525,0.58,0.2925,0.4,90,0];
 Viewer(4,:)=[0.055,0.15,0.2925,0.4,90,0];
-Viewer(5,:)=[0.3,0.18,0.4,0.39,0,-90];
+Viewer(5,:)=[0.35,0.15,0.3,0.39,0,-90];
 Viewer(6,:)=[0.6525,0.15,0.2925,0.4,-90,0];
 
 function Viewer=GenerateView4
@@ -1136,7 +1136,7 @@ for i=1:6
     daspect([1 1 1]);
     whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
-    eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
+    eval(['lighting ',EC.glb.lighting,';']);eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
     set(Brain,'FaceAlpha',EC.msh.alpha);
     
