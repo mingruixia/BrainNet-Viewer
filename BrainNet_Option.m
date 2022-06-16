@@ -2531,7 +2531,24 @@ function BakC_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to BakC_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+if ismac %Edited by Mingrui, 20200329, provied RGB input for macos catalina
+    [status, OSVersion] = system('sw_vers -productVersion');
+    parts = sscanf(OSVersion,'%d.%d.%d');
+    if parts(1) ~= 10
+        results = parts(1)>=10;
+    elseif parts(2) ~= 15
+        results = parts(2)>=15;
+    else
+        results = parts(3)>=3;
+    end
+end        
+
+if results == 1
+    s = inputdlg('Please input the RGB value (0-1)');    
+    c = eval(['[',s{1},'];']);
+else
+    c=uisetcolor('Select Color');
+end
 if length(c)==3
     set(handles.BakC_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -2544,7 +2561,24 @@ function MshC_pushbutton_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to MshC_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+if ismac %Edited by Mingrui, 20200329, provied RGB input for macos catalina
+    [status, OSVersion] = system('sw_vers -productVersion');
+    parts = sscanf(OSVersion,'%d.%d.%d');
+    if parts(1) ~= 10
+        results = parts(1)>=10;
+    elseif parts(2) ~= 15
+        results = parts(2)>=15;
+    else
+        results = parts(3)>=3;
+    end
+end        
+
+if results == 1
+    s = inputdlg('Please input the RGB value (0-1)');    
+    c = eval(['[',s{1},'];']);
+else
 c=uisetcolor('Select Color');
+end
 if length(c)==3
     set(handles.MshC_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5178,10 +5212,35 @@ function VolNCS_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to VolNCS_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(hObject,'BackgroundColor',c);
     ChangeFlag(handles);
+end
+
+function c = getcolor(hObject)
+results = 0;
+if ismac %Edited by Mingrui, 20200329, provied RGB input for macos catalina
+    [status, OSVersion] = system('sw_vers -productVersion');
+    parts = sscanf(OSVersion,'%d.%d.%d');
+    if parts(1) ~= 10
+        results = parts(1)>=10;
+    elseif parts(2) ~= 15
+        results = parts(2)>=15;
+    else
+        results = parts(3)>=3;
+    end
+end        
+
+if results == 1
+    c = get(hObject,'BackgroundColor');
+    s = inputdlg('Please input the RGB value (eg. 1 0 0 for red)',...
+        'Select Color',[1 50],{num2str(c)});    
+    if ~isempty(s)
+        c = eval(['[',s{1},'];']);
+    end
+else
+    c=uisetcolor('Select Color');
 end
 
 
@@ -5191,7 +5250,7 @@ function VolROIColorSQ_pushbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global EC
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     EC.vol.roi.colort(get(handles.VolROIColor_popupmenu,'Value'),:) = c;
     set(hObject,'BackgroundColor',c);
@@ -5204,7 +5263,7 @@ function EdgCS_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to EdgCS_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.EdgCS_pushbutton,'BackgroundColor',c);
 end
@@ -5216,7 +5275,7 @@ function EdgCTL_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to EdgCTL_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.EdgCTL_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5228,7 +5287,7 @@ function EdgCTH_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to EdgCTH_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.EdgCTH_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5240,7 +5299,7 @@ function EdgCDL_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to EdgCDL_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.EdgCDL_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5252,7 +5311,7 @@ function EdgCDH_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to EdgCDH_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.EdgCDH_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5264,7 +5323,7 @@ function NodCS_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to NodCS_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.NodCS_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5276,7 +5335,7 @@ function NodCTL_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to NodCTL_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.NodCTL_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5288,7 +5347,7 @@ function NodCTH_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to NodCTH_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.NodCTH_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5300,7 +5359,7 @@ function MshC_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to MshC_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.MshC_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5312,7 +5371,7 @@ function BakC_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to BakC_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c=uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c)==3
     set(handles.BakC_pushbutton,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5632,7 +5691,7 @@ function Mesh_boundary_pushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to Mesh_boundary_pushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-c = uisetcolor('Select Color');
+c = getcolor(hObject);
 if length(c) == 3
     set(hObject,'BackgroundColor',c);
     ChangeFlag(handles);
@@ -5664,9 +5723,17 @@ switch get(hObject,'Value')
             data = textscan(fid,'%f','CommentStyle','#');
             fclose(fid);
             EC.msh.color_table_tmp = reshape(cell2mat(data),3,[])';
+            % revised compatibility with double brain, by Mingrui 20220616
+            if get(handles.MshDoubleBrain_checkbox, 'Value') == 1
+                if length(EC.msh.color_table_tmp) ~= surf.vertex_number * 2
+                msgbox('The color table does not match this brain surface.','Error','error');
+                set(hObject,'Value',1);
+            end
+            else
             if length(EC.msh.color_table_tmp) ~= surf.vertex_number
                 msgbox('The color table does not match this brain surface.','Error','error');
                 set(hObject,'Value',1);
+            end
             end
         end
 end

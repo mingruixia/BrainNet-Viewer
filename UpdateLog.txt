@@ -5,6 +5,8 @@ Version 1.71
 - Fix a bug in drawing edge size for directed network
 - Modify the position of node colorbar to avoid overlap
 - Modify movie code to increase efficiency
+- Modify layot of 6 brain view to avoid overlap
+- Fix surface color load compatibility for double brain
 
 Version 1.7 Release 20191031
 - Add a new feature to draw boundary of parcellation or cluster

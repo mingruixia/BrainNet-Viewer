@@ -803,10 +803,10 @@ function Viewer=GenerateView6(w1)
 % Viewer(6,:)=[0.61,0.15,0.34,0.4,0,0];
 Viewer(1,:)=[0.055,0.58,0.2925,0.4,-90,0];
 Viewer(2,:)=[0.35,0.58,0.3,0.39,0,90];
-Viewer(3,:)=[0.6525,0.58,0.2925,0.4,90,0];
+Viewer(3,:)=[0.6525,0.6,0.25,0.33,180,0];
 Viewer(4,:)=[0.055,0.15,0.2925,0.4,90,0];
 Viewer(5,:)=[0.35,0.15,0.3,0.39,0,-90];
-Viewer(6,:)=[0.6525,0.15,0.2925,0.4,-90,0];
+Viewer(6,:)=[0.6525,0.17,0.25,0.33,0,0];
 
 function Viewer=GenerateView4
 % YAN Chao-Gan 111023 Added. For Medium View (4 views)
@@ -1178,13 +1178,12 @@ set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
 eval(['material ',EC.glb.material,';']);
 % material([0.1 0.9 0.2 23,0.1]);
 eval(['shading ',EC.glb.shading,';']);axis off
+
+
 set(Brain,'FaceColor',EC.msh.color);
 set(Brain,'FaceAlpha',EC.msh.alpha);
 
-if EC.msh.color_type == 2
-    Brain.FaceColor = 'flat';
-    Brain.FaceVertexCData = EC.msh.color_table;
-end
+
 
 if EC.msh.boundary == 4
     Brain.FaceColor = 'flat';
@@ -1203,6 +1202,19 @@ if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in 
         Brain2.FaceColor = 'flat';
         Brain2.FaceVertexCData = repmat(EC.msh.color,surf.vertex_number,1);
         Brain2.FaceVertexCData(surf.boundary_value == 1,:) = repmat(EC.msh.boundary_color,sum(surf.boundary_value),1);
+    end
+end
+
+%Edited by Mingrui, 20220616, load color for double brain
+if EC.msh.color_type == 2
+    if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in one figure
+        Brain.FaceColor = 'flat';
+        Brain.FaceVertexCData = EC.msh.color_table(1:end/2,:);
+        Brain2.FaceColor = 'flat';
+        Brain2.FaceVertexCData = EC.msh.color_table(end/2+1:end,:);
+    else
+        Brain.FaceColor = 'flat';
+        Brain.FaceVertexCData = EC.msh.color_table;
     end
 end
 daspect([1 1 1])
