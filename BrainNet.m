@@ -1,13 +1,13 @@
 function varargout = BrainNet(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %-----------------------------------------------------------
-%	Copyright(c) 2019
+%	Copyright(c) 2025
 %	Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
 %   Version 1.63;
 %   Create Date 20110906;
-%   Last edited 20190329
+%   Last edited 20250914
 %-----------------------------------------------------------
 %
 % BrainNet MATLAB code for BrainNet.fig
@@ -1001,7 +1001,7 @@ for i=1:4
     Brain=trisurf(Surfmatrix.tri{i},Surfmatrix.coord{i}(:,1),Surfmatrix.coord{i}(:,2),Surfmatrix.coord{i}(:,3),'EdgeColor','none');
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']);eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
@@ -1046,7 +1046,7 @@ for i=1:6
     Brain=trisurf(Surfmatrix.tri{i},Surfmatrix.coord{i}(:,1),Surfmatrix.coord{i}(:,2),Surfmatrix.coord{i}(:,3),'EdgeColor','none');
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']);eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
@@ -1090,7 +1090,7 @@ for i=1:8
     Brain=trisurf(Surfmatrix.tri{i},Surfmatrix.coord{i}(:,1),Surfmatrix.coord{i}(:,2),Surfmatrix.coord{i}(:,3),'EdgeColor','none');
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
@@ -1134,7 +1134,7 @@ for i=1:6
     Brain=trisurf(surf.tri,surf.coord(1,:),surf.coord(2,:),surf.coord(3,:),'EdgeColor','none');
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']);eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
@@ -1173,7 +1173,7 @@ if EC.msh.doublebrain == 1 % Added by Mingrui Xia, 20120717, show two brains in 
     Brain2 = trisurf(surf.tri,surf.coord2(1,:),surf.coord2(2,:),surf.coord2(3,:),'EdgeColor','none');
     hold off
 end
-whitebg(gcf,EC.bak.color);
+% whitebg(gcf,EC.bak.color);
 set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
 eval(['material ',EC.glb.material,';']);
 % material([0.1 0.9 0.2 23,0.1]);
@@ -1245,7 +1245,7 @@ for i = 1:5
     Brain = trisurf(Surfmatrix.tri{i},Surfmatrix.coord{i}(:,1),Surfmatrix.coord{i}(:,2),Surfmatrix.coord{i}(:,3),'EdgeColor','none');
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     set(Brain,'FaceColor',EC.msh.color);
@@ -1278,7 +1278,7 @@ hold on
 for i = 1:length(fv)
     roi =  trisurf(fv{i,1}.faces,fv{i,1}.vertices(:,1),fv{i,1}.vertices(:,2),fv{i,1}.vertices(:,3),'EdgeColor','none');
     set(roi,'FaceColor',EC.vol.roi.color(i,:));
-    %     set(roi,'FaceAlpha',20);
+%     set(roi,'FaceAlpha',0.5);
 end
 hold off
 if alpha ~= 1
@@ -1356,6 +1356,7 @@ for j = 1:4
                 if fv{i,1}.side == 1
                     roi =  trisurf(fv{i,1}.faces,fv{i,1}.vertices(:,1),fv{i,1}.vertices(:,2),fv{i,1}.vertices(:,3),'EdgeColor','none');
                     set(roi,'FaceColor',EC.vol.roi.color(i,:));
+%                     set(roi,'FaceAlpha',0.5);
                 end
             end
             hold off
@@ -1365,6 +1366,7 @@ for j = 1:4
                 if fv{i,1}.side == 2
                     roi =  trisurf(fv{i,1}.faces,fv{i,1}.vertices(:,1),fv{i,1}.vertices(:,2),fv{i,1}.vertices(:,3),'EdgeColor','none');
                     set(roi,'FaceColor',EC.vol.roi.color(i,:));
+%                     set(roi,'FaceAlpha',0.5);
                 end
             end
             hold off
@@ -1473,7 +1475,7 @@ switch EC.lot.view_direction
         view(EC.lot.view_az,EC.lot.view_el);
 end
 daspect([1 1 1]);
-whitebg(gcf,EC.bak.color);
+% whitebg(gcf,EC.bak.color);
 set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
 eval(['material ',EC.glb.material,';']);
 eval(['shading ',EC.glb.shading,';']);axis off
@@ -1514,7 +1516,7 @@ for i=1:8
     end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     if alpha~=1
@@ -1564,7 +1566,7 @@ for i=1:4
     end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
 %     eval(['lighting ',EC.glb.lighting,';']); 
     eval(['material ',EC.glb.material,';']); 
@@ -1616,7 +1618,7 @@ for i=1:6
     end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     if alpha~=1
@@ -1656,7 +1658,7 @@ for i=1:6
     set(Brain,'FaceAlpha',EC.msh.alpha);
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     colormap(EC.vol.CM);
@@ -1704,7 +1706,7 @@ for i = 1:5
     end
     view(Viewer(i,5:6));
     daspect([1 1 1]);
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']); eval(['material ',EC.glb.material,';']); eval(['shading ',EC.glb.shading,';']);axis off
     if alpha~=1
@@ -1807,7 +1809,7 @@ else
         hold on
         view(Viewer(i,5:6));
         daspect([1 1 1]);
-        whitebg(gcf,EC.bak.color);
+        % whitebg(gcf,EC.bak.color);
         set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
         eval(['lighting ',EC.glb.lighting,';']);
         for j=1:surf.nsph
@@ -2245,7 +2247,7 @@ else
             view(EC.lot.view_az,EC.lot.view_el);
     end
     
-    whitebg(gcf,EC.bak.color);
+    % whitebg(gcf,EC.bak.color);
     set(gcf,'Color',EC.bak.color,'InvertHardcopy','off');
     eval(['lighting ',EC.glb.lighting,';']);
     for j=1:surf.nsph

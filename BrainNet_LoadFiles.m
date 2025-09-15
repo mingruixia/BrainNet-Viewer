@@ -2,13 +2,13 @@ function varargout = BrainNet_LoadFiles(varargin)
 %BrainNet Viewer, a graph-based brain network mapping tool, by Mingrui Xia
 %Function to load files for graph drawing
 %-----------------------------------------------------------
-%	Copyright(c) 2017
+%	Copyright(c) 2025
 %	State Key Laboratory of Cognitive Neuroscience and Learning, Beijing Normal University
 %	Written by Mingrui Xia
 %	Mail to Author:  <a href="mingruixia@gmail.com">Mingrui Xia</a>
 %   Version 1.6;
 %   Date 20110531;
-%   Last edited 20170330
+%   Last edited 20250914
 %-----------------------------------------------------------
 %
 
@@ -459,18 +459,29 @@ EC.vol.color_map = 25;
 function [hdr,vol]=VF_load(filename)
 % YAN Chao-Gan 111028. Add the path of BrainNet SPM files every time.
 % [BrainNetPath, fileN, extn] = fileparts(which('BrainNet.m'));
-[BrainNetPath] = fileparts(which('BrainNet.m')); %%% Edited by Mingrui Xia, 20111112, remove two unused var.
-BrainNet_SPMPath = fullfile(BrainNetPath, 'BrainNet_spm12_files'); % Edited by Mingrui Xia 20181020, use updated spm12 files
+if ~exist('spm.m','file') % Edited by Mingrui 20250914 using SPM25 files to support Mac ARM SoC
+    [BrainNetPath] = fileparts(which('BrainNet.m')); %%% Edited by Mingrui Xia, 20111112, remove two unused var.
+    BrainNet_SPMPath = fullfile(BrainNetPath, 'BrainNet_spm_files'); % Edited by Mingrui Xia 20181020, use updated spm12 files
+    addpath(BrainNet_SPMPath);
+else
+    if string(spm('ver')) ~= 'SPM25'
+        [BrainNetPath] = fileparts(which('BrainNet.m')); %%% Edited by Mingrui Xia, 20111112, remove two unused var.
+        BrainNet_SPMPath = fullfile(BrainNetPath, 'BrainNet_spm_files'); % Edited by Mingrui Xia 20181020, use updated spm12 files
+        addpath(BrainNet_SPMPath);
+    end
+end
 % rmpath(BrainNet_SPMPath); %%% Edited by Mingrui Xia, 20111116, clear
 % warning
-if ~exist('BrainNet_spm_file.m','file') %%% Edited by Mingrui Xia, 111103, check if SPM is installed.
-    %    hdr=spm_vol(filename); %%% Edited by Mingrui Xia, 111026, integrated SPM NIFTI into BrainNet Viewer.
-    %    vol=spm_read_vols(hdr);
-    %else
-    addpath(BrainNet_SPMPath);
-end
-hdr=BrainNet_spm_vol(filename); %%% Edited by Mingrui Xia, 111026, integrated SPM NIFTI into BrainNet Viewer.
-vol=BrainNet_spm_read_vols(hdr);
+% if ~exist('BrainNet_spm_file.m','file') %%% Edited by Mingrui Xia, 111103, check if SPM is installed.
+%     %    hdr=spm_vol(filename); %%% Edited by Mingrui Xia, 111026, integrated SPM NIFTI into BrainNet Viewer.
+%     %    vol=spm_read_vols(hdr);
+%     %else
+%     addpath(BrainNet_SPMPath);
+% end
+% hdr=BrainNet_spm_vol(filename); %%% Edited by Mingrui Xia, 20111026, integrated SPM NIFTI into BrainNet Viewer.
+% vol=BrainNet_spm_read_vols(hdr);
+hdr=spm_vol(filename); %%% Edited by Mingrui Xia, 20250911, integrated SPM NIFTI into BrainNet Viewer.
+vol=spm_read_vols(hdr);
 %    rmpath(BrainNet_SPMPath);
 %end
 vol(isnan(vol)) = 0; % Added by Mingrui, 20170605, replace NaN to 0;
@@ -501,6 +512,9 @@ if ispc % Edited by Mingrui, 20170321, fix the bug that couldn't locate the surf
         '*.mz3','Surf Ice Files (*.mz3)';...
         '*.*','All Files (*.*)'},...
         'Select brain template',[BrainSurfPath,'\BrainMesh_ICBM152_smoothed.nv']);
+elseif ismac % Edited by Mingrui, 20200729, fix a bug that file fileter doesn't work in mac
+    [filename,pathname]=uigetfile({'*.*','All Files (*.*)'},...
+        'Select brain template',[BrainSurfPath,'/BrainMesh_ICBM152_smoothed.nv']);
 else
     [filename,pathname]=uigetfile({'*.nv','NetViewer Files (*.nv)';'*.mesh',...
         'BrainVISA Mesh (*.mesh)';'*.pial','FreeSurfer Mesh (*.pial)';...
@@ -721,12 +735,12 @@ switch ext
         fis.close;
         data = baos.toByteArray;
         %mz3 ALWAYS little endian
-        machine = 'ieee-le';
+%         machine = 'ieee-le';
         magic = typecast(data(1:2),'uint16');
-        if magic ~= 23117, fprintf('Signature is not MZ3\n'); return; end;
+        if magic ~= 23117, fprintf('Signature is not MZ3\n'); return; end
         %attr reports attributes and version
         attr = typecast(data(3:4),'uint16');
-        if (attr == 0) || (attr > 7), fprintf('This file uses unsupported features\n'); end;
+        if (attr == 0) || (attr > 7), fprintf('This file uses unsupported features\n'); end
         isFace = bitand(attr,1);
         isVert = bitand(attr,2);
         isRGBA = bitand(attr,4);
@@ -744,7 +758,7 @@ switch ext
             %faces = reshape(faces,3,nFace)';
             faces = reshape(faces,3, nFace)';
             hdrSz = hdrSz + facebytes;
-        end;
+        end
         %read vertices
         if isVert
             vertbytes = nVert * 3 * 4; %each vertex has 3 values (x,y,z), each 4 byte float
@@ -877,7 +891,11 @@ function NT_button_Callback(hObject, eventdata, handles)
 % hObject    handle to NT_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uigetfile({'*.edge','Edge files (*.edge)';'*.*','All Files (*.*)'});
+if ismac
+    [filename,pathname]=uigetfile({'*.*','All Files (*.*)'});
+else
+    [filename,pathname]=uigetfile({'*.edge','Edge files (*.edge)';'*.*','All Files (*.*)'});
+end
 if isequal(filename,0)||isequal(pathname,0)
     return;
 else
@@ -896,44 +914,44 @@ set(handles.NI_edit,'string','');
 set(handles.NT_edit,'string','');
 set(handles.VF_edit,'string','');
 
-
-
-function NL_edit_Callback(hObject, eventdata, handles)
-% hObject    handle to NL_edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of NL_edit as text
-%        str2double(get(hObject,'String')) returns contents of NL_edit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function NL_edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to NL_edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in NL_button.
-function NL_button_Callback(hObject, eventdata, handles)
-% hObject    handle to NL_button (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uigetfile({'*.txt','Text files (*.txt)';'*.*','All Files (*.*)'});
-if isequal(filename,0)||isequal(pathname,0)
-    return;
-else
-    fpath=fullfile(pathname,filename);
-    set(handles.NL_edit,'string',fpath);
-end
-
-
+% 
+% 
+% function NL_edit_Callback(hObject, eventdata, handles)
+% % hObject    handle to NL_edit (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Hints: get(hObject,'String') returns contents of NL_edit as text
+% %        str2double(get(hObject,'String')) returns contents of NL_edit as a double
+% 
+% 
+% % --- Executes during object creation, after setting all properties.
+% function NL_edit_CreateFcn(hObject, eventdata, handles)
+% % hObject    handle to NL_edit (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    empty - handles not created until after all CreateFcns called
+% 
+% % Hint: edit controls usually have a white background on Windows.
+% %       See ISPC and COMPUTER.
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
+% 
+% 
+% % --- Executes on button press in NL_button.
+% function NL_button_Callback(hObject, eventdata, handles)
+% % hObject    handle to NL_button (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% [filename,pathname]=uigetfile({'*.txt','Text files (*.txt)';'*.*','All Files (*.*)'});
+% if isequal(filename,0)||isequal(pathname,0)
+%     return;
+% else
+%     fpath=fullfile(pathname,filename);
+%     set(handles.NL_edit,'string',fpath);
+% end
+% 
+% 
 
 function VF_edit_Callback(hObject, eventdata, handles)
 % hObject    handle to VF_edit (see GCBO)
