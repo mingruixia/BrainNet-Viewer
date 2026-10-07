@@ -24,7 +24,7 @@ Extract the Python archive and open PowerShell in that folder. These commands
 create an independent environment without changing system Python:
     py -3.10 -m venv .venv-bnv-test3
     $bnvPython = (Resolve-Path .venv-bnv-test3/Scripts/python.exe).Path
-    $bnvWheel = (Resolve-Path brainnet_viewer-2.0.0.dev24-py3-none-any.whl).Path
+    $bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
     $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).as_uri())" $bnvWheel
     & $bnvPython -m pip install "brainnet-viewer[desktop] @ $bnvWheelUrl"
     & $bnvPython -m pip check
@@ -39,7 +39,7 @@ PYTHON INSTALLATION — macOS
 Use Python 3.10 or 3.11. In a terminal in the extracted Python folder:
     python3 -m venv .venv-bnv-test3
     source .venv-bnv-test3/bin/activate
-    BNV_WHEEL_URL="$(python -c 'from pathlib import Path; print(Path("brainnet_viewer-2.0.0.dev24-py3-none-any.whl").resolve().as_uri())')"
+    BNV_WHEEL_URL="$(python -c 'from pathlib import Path; print(Path("brainnet_viewer-2.0.0b1-py3-none-any.whl").resolve().as_uri())')"
     python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
     python -m pip check
     brainnet-viewer
