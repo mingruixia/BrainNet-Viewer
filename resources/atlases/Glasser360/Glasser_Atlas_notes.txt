@@ -1,0 +1,281 @@
+— Start with new version of Glasser atlas in fsaverage space. Downloaded from here: 
+https://osf.io/rne5b/
+filenames ?h.Glasser2016.mgz
+
+— convert to nii
+mri_convert ?h.Glasser2016.mgz ?h.Glasser2016.nii
+
+— get a surface reconstruction of the MNI Atlas
+3dZeropad -prefix ./MNI_Atlas_zp.nii -RL 256 -AP 256 -IS 256 /Applications/AFNI/MNI152_T1_2009c+tlrc
+recon-all -all -sid MNI_Atlas -i MNI_Atlas_zp.nii
+@SUMA_Make_Spec_FS -NIFTI -sid MNI_Atlas
+
+— use Freesurfer to move from fsaverage to MNI
+mri_surf2surf —srcsubject fsaverage —trgsubject MNI_Atlas —sval atlasmgz/?h.Glasser2016.nii —tval MNI_Atlas/SUMA/?h.Glasser_HCP.gii —mapmethod nnf —hemi ?h
+cd MNI_Atlas/SUMA
+
+— use SUMA to resample the surface to std.141
+SurfToSurf -i_gii std.141.?h.smoothwm.gii -i_gii ?h.smoothwm.gii -prefix res.141.lh -mapfile std.141.MNI_Atlas_?h.niml.M2M -dset ?h.Glasser_HCP.gii -output_params NearestNode
+
+mv res.141.?h.?h.Glasser_HCP.niml.dset res.141.?h.Glasser_HCP.niml.dset <- $hemi is in both prefix and dset from above, otherwise it will protest to overwriting the 1D file. Rename now so it doesn’t look silly, and so SUMA will load this later. 
+
+— make a fatter ribbon so that all of the grey voxels get a label (I guess that’s a judgement call.  The method for *not* doing that should be obvious)
+3dcalc -a ?h.ribbon.nii -datum float -prefix ?h.fl.ribbon.nii -expr 'a'
+3dmerge -1blur_fwhm 2 -doall -datum float -prefix ?h.blur.ribbon.nii ?h.fl.ribbon.nii
+
+— Use the new fat-ribbon
+@surf_to_vol_spackle -spec std.141.MNI_Atlas_?h.spec -surfA smoothwm -surfB pial -maskset ?h.blur.ribbon.nii’<0.25..2>’ -surfset res.141.?h.Glasser_HCP.niml.dset -mode -prefix ?h.Glasser_HCP.fill
+
+- Pad numbers so that left and right are separable
+3dcalc -a lh.Glasser_HCP.fill.nii.gz -expr 'a' -prefix lh.MNI_Glasser_HCP.nii
+3dcalc -a rh.Glasser_HCP.fill.nii.gz -expr 'a+(step(a)*1000)' -prefix rh.MNI_Glasser_HCP.nii
+
+- Combine into a single volume
+3dcalc -a lh.MNI_Glasser_HCP+orig. -b rh.MNI_Glasser_HCP+orig. -expr 'max(a,b)' -prefix MNI_Glasser_HCP.nii
+
+- smooth
+3dLocalstat -stat mode -nbhd 'SPHERE(2)' -prefix hcp_mode2 Glasser_HCP_labels.nii
+3dcalc -a mode.MNI_Glasser_HCP.nii -b MNI_Glasser_HCP.nii \
+   -expr '(step(b)-step(a))*b + a' -prefix smooth.MNI_Glasser_HCP.nii \
+   -datum short
+
+
+- Add Atlas-y things
+3drefit -space MNI smooth.MNI_Glasser_HCP.nii
+3dcopy smooth.MNI_Glasser_HCP.nii MNI_Glasser_HCP_v1.0.nii.gz
+3drefit -labeltable label_tables.txt MNI_Glasser_HCP_v1.0.nii.gz
+
+(open .HEAD file in a text editor)
+* atlas points were generated separately (see below)
+* copy paste Atlas points, adjusted to new numbers, fix character count
+* fixed a few stragglers
+* erased history
+
+
+=============
+=============
+*** making atlas locations ***
+=============
+=============
+
+(rh.HCP-MNI.annot is taken from here: https://figshare.com/articles/HCP-MMP1_0_projected_on_fsaverage/3498446)
+mris_divide_parcellation MNI_Atlas rh ./rh.HCP-MNI.annot 75 rh.75_div.annot
+mris_divide_parcellation MNI_Atlas lh ./lh.HCP-MNI.annot 75 lh.75_div.annot
+ this gives us a new annotation with each of the original parcellations divided up into equal pieces about 75 mm^2 in area
+
+mri_annotation2label --subject MNI_Atlas --hemi ?h --ctab ./?h.75_ctab.txt --annotation 75_div
+  export the annotation information into a text file
+
+(in matlab) 
+[lh_temp.vol, lh_temp.M, lh_temp.mr_parms, lh_temp.volsz] = load_mgh('lh.w-g.pct.mgh');
+[rh_temp.vol, rh_temp.M, rh_temp.mr_parms, rh_temp.volsz] = load_mgh('rh.w-g.pct.mgh');
+% get template .mgz information from another dataset from this same subject
+ 
+[vertices lh_temp.vol ctab] = read_annotation('../label/lh.75_div.annot');
+[vertices rh_temp.vol ctab] = read_annotation('../label/rh.75_div.annot');
+% read in the annotation created above
+ 
+save_mgh(lh_temp.vol, 'lh.75_div.mgh', lh_temp.M, lh_temp.mr_parms);
+save_mgh(rh_temp.vol, 'rh.75_div.mgh', rh_temp.M, rh_temp.mr_parms);
+% save the annotation as a .mgh file
+
+!mri_convert lh.75_div.mgh lh.75_div.nii
+!mri_convert rh.75_div.mgh rh.75_div.nii
+% convert to .nii
+
+still_to_do = [1:180];
+
+for n = 1:180
+    a=num2str(n);
+    while length(a) < 3
+        a=['0' a];
+    end
+    
+    [~,roi_name] = system(['n=' a '; cat rh.75_ctab.txt | awk -v N=$n ''$1==N{print $2}'' ']);
+    roi_name = roi_name(1:end-1);
+
+	% for each ROI, find the right lines in the annotation output file
+    
+    [~,num_divs] = system(['n=' a '; cat rh.75_ctab.txt | grep ' roi_name ' | tail -n 1 | awk -F _div ''{print $2}'' | awk ''{print $1}'' ']);
+    num_divs = str2num(num_divs);
+
+	% figure out how many divisions this ROI was split into
+    
+    if num_divs/2 == round(num_divs/2)
+        % even
+        div1 = (num_divs/2);
+        [~,div_label1] = system(['cat rh.75_ctab.txt | grep ' roi_name '_div' num2str(div1) ' | awk ''{print $1}'' ']);
+        div_label1 = div_label1(1:end-1);
+        
+        div2 = (num_divs/2)+1;
+        [~,div_label2] = system(['cat rh.75_ctab.txt | grep ' roi_name '_div' num2str(div2) ' | awk ''{print $1}'' ']);
+        div_label2 = div_label2(1:end-1);
+        
+        if div_label1 + 1 ~= div_label2
+            continue
+        end
+        
+		% find the middle two divisions, check that they make sense
+
+        system(['mri_surfcluster --in rh.75_div.nii --subject MNI_Atlas2 --hemi rh --surf pial  --centroid --thmin ' div_label1 ' --thmax ' div_label2 ' --sum surfclust_output_div/rh.p.' a '.txt --nofixmni'])
+        system(['mri_surfcluster --in rh.75_div.nii --subject MNI_Atlas2 --hemi rh --surf white --centroid --thmin ' div_label1 ' --thmax ' div_label2 ' --sum surfclust_output_div/rh.w.' a '.txt --nofixmni'])
+	
+		% on both the pial surface and the white surface, find the location of the centroid voxel within the two central divisions 
+        
+        still_to_do(n) = 0;
+		% note that this ROI completed successfully
+
+    else
+        % odd
+        div = (num_divs/2)+.5;
+        [~,div_label] = system(['cat rh.75_ctab.txt | grep ' roi_name '_div' num2str(div) ' | awk ''{print $1}'' ']);
+        div_label = div_label(1:end-1);
+        system(['mri_surfcluster --in rh.75_div.nii --subject MNI_Atlas2 --hemi rh --surf pial  --centroid --thmin ' div_label ' --thmax ' div_label ' --sum surfclust_output_div/rh.p.' a '.txt --nofixmni'])
+        system(['mri_surfcluster --in rh.75_div.nii --subject MNI_Atlas2 --hemi rh --surf white --centroid --thmin ' div_label ' --thmax ' div_label ' --sum surfclust_output_div/rh.w.' a '.txt --nofixmni'])
+    
+        still_to_do(n) = 0;
+
+		% same as above, but slightly simpler when there's an odd number of divisions
+    end
+end
+
+
+
+for n = 1:180
+    a=num2str(n);
+    while length(a) < 3
+        a=['0' a];
+    end
+    		% read in the output files created above, parsing for the centroid location
+
+    [A,B] = system(['head -n 36 surfclust_output_div/lh.p.' a '.txt | tail -n 1 | awk ''{print $4}'' ']);
+     disp(B)
+    		% I think this might be here to make sure there are the right number of lines in the file.
+
+    [A,B] = system(['head -n 35 surfclust_output_div/lh.p.' a '.txt | tail -n 1 | awk ''{print $5}'' ']);
+    [A,C] = system(['head -n 35 surfclust_output_div/lh.w.' a '.txt | tail -n 1 | awk ''{print $5}'' ']);
+    Coords_lh(n,1) = -mean([str2num(B) str2num(C)]);
+    
+    [A,B] = system(['head -n 35 surfclust_output_div/lh.p.' a '.txt | tail -n 1 | awk ''{print $7}'' ']);
+    [A,C] = system(['head -n 35 surfclust_output_div/lh.w.' a '.txt | tail -n 1 | awk ''{print $7}'' ']);
+    Coords_lh(n,2) = mean([str2num(B) str2num(C)]);
+    
+    [A,B] = system(['head -n 35 surfclust_output_div/lh.p.' a '.txt | tail -n 1 | awk ''{print $6}'' ']);
+    [A,C] = system(['head -n 35 surfclust_output_div/lh.w.' a '.txt | tail -n 1 | awk ''{print $6}'' ']);
+    Coords_lh(n,3) = -mean([str2num(B) str2num(C)]);
+    
+		% find each coordinate as the average of the x, y, and z locations between calculating the centroid vertex
+		% on the pial and the grey matter.  It should (ideally) be the same vertex, so this should end up 
+		% giving us the mid-cortical location of that vertex. 
+	
+    expr=['step(4-(x-' num2str(Coords_lh(n,1)) ')*(x-' num2str(Coords_lh(n,1)) ')-(y-' num2str(Coords_lh(n,2)) ')*(y-' num2str(Coords_lh(n,2)) ')-(z-' num2str(Coords_lh(n,3)) ')*(z-' num2str(Coords_lh(n,3)) '))'];
+    pref = ['coord_sph/out.lh.' a '.nii'];
+    p_list = findstr(expr, '--');
+    
+    for p = length(p_list):-1:1
+        expr = [expr(1:p_list(p)-1) '+' expr(p_list(p)+2:end)];
+    end
+    
+		% build the pieces of the 3dcalc command to make a sphere centered around the coordinate location I found    
+
+    system(['3dcalc -a MNI_Glasser_HCP+tlrc -expr "' expr '" -prefix ' pref ' -overwrite'])
+    		% and execute that 3dcalc command
+		
+    clear expr pref p_list Coords_lh
+    
+    [A,B] = system(['head -n 35 surfclust_output_div/rh.p.' a '.txt | tail -n 1 | awk ''{print $5}'' ']);
+    [A,C] = system(['head -n 35 surfclust_output_div/rh.w.' a '.txt | tail -n 1 | awk ''{print $5}'' ']);
+    Coords_rh(n,1) = -mean([str2num(B) str2num(C)]);
+    
+    [A,B] = system(['head -n 35 surfclust_output_div/rh.p.' a '.txt | tail -n 1 | awk ''{print $7}'' ']);
+    [A,C] = system(['head -n 35 surfclust_output_div/rh.w.' a '.txt | tail -n 1 | awk ''{print $7}'' ']);
+    Coords_rh(n,2) = mean([str2num(B) str2num(C)]);
+    
+    [A,B] = system(['head -n 35 surfclust_output_div/rh.p.' a '.txt | tail -n 1 | awk ''{print $6}'' ']);
+    [A,C] = system(['head -n 35 surfclust_output_div/rh.w.' a '.txt | tail -n 1 | awk ''{print $6}'' ']);
+    Coords_rh(n,3) = -mean([str2num(B) str2num(C)]);
+    
+    expr=['step(4-(x-' num2str(Coords_rh(n,1)) ')*(x-' num2str(Coords_rh(n,1)) ')-(y-' num2str(Coords_rh(n,2)) ')*(y-' num2str(Coords_rh(n,2)) ')-(z-' num2str(Coords_rh(n,3)) ')*(z-' num2str(Coords_rh(n,3)) '))'];
+    pref = ['coord_sph/out.rh.' a '.nii'];
+    p_list = findstr(expr, '--');
+    
+    for p = length(p_list):-1:1
+        expr = [expr(1:p_list(p)-1) '+' expr(p_list(p)+2:end)];
+    end
+        
+    system(['3dcalc -a MNI_Glasser_HCP+tlrc -expr "' expr '" -prefix ' pref ' -overwrite']);
+    
+    clear expr pref p_list Coords_lh
+    		% same thing for the other hemisphere
+end
+
+
+(back in bash)
+for n in `count -dig 3 1 180`; do for hemi in 'lh' 'rh'; do
+	coord=`3dCM -mask MNI_Glasser_HCP+tlrc out.$hemi.$n.nii`
+	echo $hemi $n $coord >> coord_list.txt
+done
+done
+
+(aaaaaand back to matlab) 
+
+fid=fopen('atlas_points.txt', 'w');
+fid_c = fopen('coord_sph/coord_list.txt', 'r'); 
+
+%for n = 1:180
+
+while 1
+    L = fgetl(fid_c)
+    if L == -1
+        break
+    end
+
+    
+    if strcmp(L(1:2), 'lh')
+        hemi_add=0;
+        H='L_';
+    else % rh
+        hemi_add=1000;
+        H='R_';
+    end
+       
+    L_nums = str2num(L(3:end));
+    
+    n=L_nums(1);
+    line = find(cell2mat(Names(:,1)) == n);
+		% I think I copied and pasted these into the workspace by hand
+
+    long_parcel_name = Names{line, 2};
+    parcel_name = Names{line, 2};
+    parcel_num = n+hemi_add;
+    
+    a=num2str(n);
+    while length(a) < 3
+        a=['0' a];
+    end
+    
+    fprintf(fid, ['<ATLAS_POINT\n  data_type="atlas_point" \n  STRUCT="%s%s"\n  VAL="%d"\n  OKEY="%d"\n ' ...
+        ' GYoAR="0"\n  COG = "%f %f %f"\n  SB_LABEL="%s%s" />\n'], ...
+        H, parcel_name, parcel_num, parcel_num, L_nums(2), L_nums(3), L_nums(4), H, long_parcel_name)
+    
+end
+
+fclose(fid)
+fclose(fid_c)
+
+=============
+=============
+*** done making atlas locations ***
+=============
+Yeah, I know. This was probably more work than it was worth, and probably not worth the wait. Oh, well. It's done now.
+=============
+
+
+# make some pretty surfaces
+mkdir surfs_mode2
+cd surfs_mode2
+IsoSurface -isorois+dsets -o hcp_mode2.gii -input ../hcp_mode2_ribbon+tlrc. -Tsmooth 0.3 30
+ 
+# show these surfaces
+echo "Use this command to see surfaces"
+echo "suma -onestate -i surfs_mode2/hcp_mode2*.gii &"

@@ -1,0 +1,8 @@
+*
+!Dockerfile.web
+!pyproject.toml
+!README.md
+!brainnet_viewer/
+!brainnet_viewer/**
+**/__pycache__
+**/*.pyc

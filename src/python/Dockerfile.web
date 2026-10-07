@@ -1,0 +1,22 @@
+FROM python:3.10-slim-bookworm AS builder
+WORKDIR /build
+COPY pyproject.toml README.md ./
+COPY brainnet_viewer ./brainnet_viewer
+RUN pip wheel --no-deps --wheel-dir /wheels .
+
+FROM python:3.10-slim-bookworm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libopengl0 libgl1 libegl1 libxrender1 libgl1-mesa-dri libfontconfig1 fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /opt/brainnet
+COPY --from=builder /wheels /wheels
+RUN pip install --no-cache-dir "brainnet-viewer[web] @ file://$(find /wheels -name '*.whl')" \
+    && useradd --uid 10001 --create-home brainnet
+ENV PYVISTA_OFF_SCREEN=true \
+    MPLCONFIGDIR=/tmp/matplotlib \
+    XDG_CACHE_HOME=/tmp/cache \
+    VTK_DEFAULT_OPENGL_WINDOW=vtkEGLRenderWindow
+USER brainnet
+EXPOSE 1031
+ENTRYPOINT ["python", "-m", "brainnet_viewer.web_app"]
+CMD ["--host", "0.0.0.0", "--port", "1031", "--container"]

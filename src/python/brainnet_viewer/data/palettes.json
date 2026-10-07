@@ -1,0 +1,37 @@
+{
+  "content": "Numerical RGB outputs only; no MATLAB implementation source",
+  "reference_release": "2025a",
+  "names": [
+    "bwr",
+    "viridis",
+    "plasma",
+    "inferno",
+    "magma",
+    "cividis",
+    "parula",
+    "jet",
+    "turbo",
+    "hsv",
+    "hot",
+    "cool",
+    "spring",
+    "summer",
+    "autumn",
+    "winter",
+    "gray",
+    "bone",
+    "copper",
+    "pink",
+    "lines",
+    "colorcube",
+    "prism",
+    "flag"
+  ],
+  "exact_sizes": [
+    1,
+    256
+  ],
+  "larger_sizes": "Linear resampling of the 256-color table; not exact MATLAB matching",
+  "reference_sha256": "7f8bac84e0de23c3551bac83012e396a9bd24407911df201c9dadedc7358b115",
+  "tables_sha256": "9144b7ced0a9b678c436e3e364b034a0353120844da332f472ab14f64aaaa211"
+}

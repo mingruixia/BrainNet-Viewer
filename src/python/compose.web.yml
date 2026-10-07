@@ -1,0 +1,18 @@
+services:
+  brainnet-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "127.0.0.1:1031:1031"
+    read_only: true
+    environment:
+      LIBGL_ALWAYS_SOFTWARE: "1"
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    mem_limit: 8g
+    cpus: 8
+    pids_limit: 256
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true

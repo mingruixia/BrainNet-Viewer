@@ -1,0 +1,244 @@
+{
+  "kind": "brainnet-visualization-preset",
+  "schema_version": "1.0",
+  "name": "PCC signed diverging",
+  "settings": {
+    "schema_version": "1.22.0",
+    "layout": {
+      "preset": 3,
+      "view_direction": 8,
+      "custom_azimuth": [],
+      "custom_elevation": []
+    },
+    "global": {
+      "background_color": [
+        1,
+        1,
+        1
+      ],
+      "shading": "interp",
+      "lighting": "phong",
+      "light_direction": "right",
+      "show_orientation_labels": false,
+      "render_detail": "adaptive",
+      "material_profile": "dull",
+      "material_coefficients": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "surface": {
+      "double_brain": false,
+      "color_mode": "scalar",
+      "color": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "opacity": 1,
+      "colormap": "parula",
+      "color_limits": [],
+      "show_colorbar": true,
+      "boundary_mode": "none",
+      "boundary_color": [
+        0,
+        0,
+        0
+      ],
+      "boundary_threshold": 0,
+      "boundary_mask": [],
+      "boundary_mesh_sha256": "",
+      "boundary_mask_source": "",
+      "vertex_colors": [],
+      "vertex_colors_mesh_sha256": "",
+      "vertex_colors_source": ""
+    },
+    "node": {
+      "selection_mode": "all",
+      "selection_basis": "value",
+      "threshold": 0,
+      "label_mode": "none",
+      "label_basis": "value",
+      "label_threshold": 0,
+      "label_font_name": "Arial",
+      "label_font_size": 10,
+      "label_font_weight": "normal",
+      "label_font_angle": "normal",
+      "label_font_units": "points",
+      "label_color": [
+        0,
+        0,
+        0
+      ],
+      "label_in_front": false,
+      "size_mode": "mapped",
+      "size_basis": "value",
+      "size": 3,
+      "size_scale": 1,
+      "size_threshold": 0,
+      "color_mode": "uniform",
+      "color": [
+        0.14509803921568629,
+        0.34901960784313724,
+        0.596078431372549
+      ],
+      "colormap": "jet",
+      "color_limits": [],
+      "color_threshold": 0,
+      "color_low": [
+        0.14509803921568629,
+        0.34901960784313724,
+        0.596078431372549
+      ],
+      "color_high": [
+        1,
+        0,
+        0
+      ],
+      "size_threshold_basis": "mapped"
+    },
+    "edge": {
+      "selection_mode": "all",
+      "threshold": 0,
+      "sparsity": 0.1,
+      "value_mode": "absolute",
+      "inter_hemisphere_only": false,
+      "directed": false,
+      "arrow_length_scale": 1,
+      "arrow_width_scale": 0.7,
+      "size_mode": "mapped",
+      "size": 1,
+      "size_scale": 1,
+      "size_threshold": 0,
+      "size_threshold_basis": "mapped",
+      "size_value_mode": "absolute",
+      "color_mode": "uniform",
+      "color": [
+        1,
+        0.9,
+        0.73
+      ],
+      "colormap": "jet",
+      "color_limits": [],
+      "color_threshold": 0,
+      "length_threshold": 0,
+      "color_low": [
+        0.38,
+        0.38,
+        0.38
+      ],
+      "color_high": [
+        1,
+        0.9,
+        0.73
+      ],
+      "threshold_value_mode": "absolute",
+      "mapped_value_mode": "absolute",
+      "inter_module_color": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "custom_color": {
+        "matrix": [],
+        "indices": [],
+        "node_sha256": "",
+        "source": ""
+      },
+      "opacity_mode": "uniform",
+      "opacity": 0.7,
+      "opacity_value_mode": "absolute",
+      "opacity_range": [
+        0.1,
+        0.9
+      ]
+    },
+    "volume": {
+      "display": true,
+      "type": "surface-map",
+      "map_algorithm": 5,
+      "threshold_mode": "p-value",
+      "statistical_threshold": 0,
+      "p_value": 0.001,
+      "cluster_size": 0,
+      "voxel_connectivity": 18,
+      "positive_minimum": [],
+      "positive_maximum": [],
+      "negative_minimum": [],
+      "negative_maximum": [],
+      "display_mode": "both",
+      "adjust_null": true,
+      "null_color": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "colormap": [
+        [
+          0.1725,
+          0.4824,
+          0.7137
+        ],
+        [
+          0.6706,
+          0.851,
+          0.9137
+        ],
+        [
+          0.9686,
+          0.9686,
+          0.9686
+        ],
+        [
+          0.9922,
+          0.6824,
+          0.3804
+        ],
+        [
+          0.8431,
+          0.098,
+          0.1098
+        ]
+      ]
+    },
+    "roi": {
+      "draw_all": true,
+      "selection": [],
+      "color_mode": "index",
+      "color": [
+        0.8,
+        0.2,
+        0.2
+      ],
+      "custom_colors": [],
+      "palette": "hsv",
+      "show_legend": false,
+      "smoothing": "gaussian",
+      "smoothing_kernel": 3
+    },
+    "image": {
+      "width": 2000,
+      "height": 1500,
+      "dpi": 300,
+      "show_colorbar": false,
+      "colorbar_location": "eastoutside",
+      "colorbar_label": "",
+      "title": ""
+    },
+    "fiber": {
+      "visible": false,
+      "color_mode": "direction",
+      "color": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colormap": "turbo",
+      "opacity": 0.8,
+      "radius": 0.25,
+      "sampling_stride": 1,
+      "tube_sides": 6
+    }
+  }
+}
