@@ -144,7 +144,7 @@ def build_shell(server, workspace, initial, actions):
                                                    still_ratio=1,still_quality=100,style='height:100%;width:100%')
                         with html.Div(classes='bnv-welcome',v_if='!rendered'):
                             html.Img(src=('brand_image',),alt='BrainNet Viewer startup brain')
-                            html.Div(f'Version {__version__} · Development build · Developer: Mingrui Xia',classes='bnv-welcome-info')
+                            html.Div(f'Version {__version__} · Public Beta 1 · Developer: Mingrui Xia',classes='bnv-welcome-info')
                             html.Div('Project: https://github.com/mingruixia/BrainNet-Viewer',classes='bnv-welcome-info')
                             html.Div('Xia M, Wang J, He Y (2013). BrainNet Viewer: A Network Visualization Tool for Human Brain Connectomics. PLoS ONE 8: e68910.',classes='bnv-citation')
                     html.Div('{{ inspect_text }}',v_if='inspect_on',classes='bnv-inspect')

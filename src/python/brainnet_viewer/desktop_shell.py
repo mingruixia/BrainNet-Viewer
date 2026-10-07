@@ -95,7 +95,7 @@ def build_shell(app,library):
     center_layout.addLayout(toolbar)
     app.startup_content=W.QWidget(); app.startup_content.setObjectName("PanelContent"); app.canvas_layout=W.QVBoxLayout(app.startup_content); app.canvas_layout.setContentsMargins(24,16,24,16)
     app.startup=FitImage(library/"assets/branding/BrainNet_Viewer_2_Startup_PSD-v1.png"); app.canvas_layout.addWidget(app.startup,1)
-    info=W.QLabel(f"Version {__version__} · Development build · Developer: Mingrui Xia\nProject: https://github.com/mingruixia/BrainNet-Viewer")
+    info=W.QLabel(f"Version {__version__} · Public Beta 1 · Developer: Mingrui Xia\nProject: https://github.com/mingruixia/BrainNet-Viewer")
     info.setObjectName("StartupInfo"); info.setWordWrap(True); info.setAlignment(QtCore.Qt.AlignCenter); app.canvas_layout.addWidget(info)
     citation=W.QLabel("Xia M, Wang J, He Y (2013). BrainNet Viewer: A Network Visualization Tool for Human Brain Connectomics. PLoS ONE 8: e68910.")
     citation.setObjectName("Citation"); citation.setWordWrap(True); citation.setAlignment(QtCore.Qt.AlignCenter); app.canvas_layout.addWidget(citation)
