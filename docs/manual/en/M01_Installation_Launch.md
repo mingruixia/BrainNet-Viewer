@@ -1,4 +1,4 @@
-# M01 · Installation, launch and version scope
+# Installation, launch and version scope
 
 [中文](../zh-CN/M01_Installation_Launch.md) · [Manual index](index.md) · [First-launch tutorial](../../tutorials/en/00_First_Launch.md) · [Requirements](../../../README.md#requirements-and-scope)
 
@@ -20,8 +20,8 @@ The launcher adds `src/matlab/BrainNetViewer` itself. From elsewhere, add **only
 
 The English main window opens with its startup image/build information. Its three working areas support the intended sequence: **Data Sources → Visualization Settings → render in the main canvas → interact/export**. Use **Add Files** or role-specific slots, **Validate and Load**, change settings, then the shared **Apply**; Apply commits and renders. **Render Scene** is an explicit redraw.
 
-Start with the authorized real [ICBM152 surface exercise](../../tutorials/en/00_First_Launch.md), not an arbitrary template found in a data directory. For file roles, coordinate cautions and data-root behavior, continue to [M02](M02_Data_Formats_Coordinates.md). For saving an analysis, use [M03](M03_Scenes_Presets_Legacy.md).
+Start with the real [ICBM152 surface exercise](../../tutorials/en/00_First_Launch.md), not an arbitrary template found in a data directory. For file roles, coordinate cautions and data-root behavior, continue to [M02](M02_Data_Formats_Coordinates.md). For saving an analysis, use [M03](M03_Scenes_Presets_Legacy.md).
 
 ## Before sharing an image or package
 
-The UI version/build date identifies this development build, not a public release date. A figure's provenance may contain local file paths. **Directory membership is not redistribution permission**; check source credits and package notices before sharing teaching data. The internal Beta 1 ZIP and the current workspace may differ. Review the [changelog](../../../CHANGELOG.md) and the actual package contents before asserting version or compatibility claims.
+ A figure's provenance may contain local file paths. **Directory membership is not redistribution permission**; check source credits and package notices before sharing teaching data. Review the [changelog](../../../CHANGELOG.md) and the actual package contents before asserting version or compatibility claims.

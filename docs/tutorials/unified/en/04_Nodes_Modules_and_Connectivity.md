@@ -51,7 +51,7 @@ Try **All Labels** briefly and Apply. If labels overlap, choose a smaller subset
 
 ![Schaefer100 group network displayed in eight views](../../../python/en/assets/network-eight-views.png)
 
-*Existing Python Desktop real-data illustration, reused from the Python tutorial collection. It shows the Schaefer100 example, not AAL90 and not a newly captured dev20 or MATLAB result. Exact camera framing, colors and thickness depend on the applied settings and renderer.*
+*Python Desktop Schaefer100 network. Camera framing, colors and thickness depend on the applied settings and renderer.*
 
 Sparsity is a fraction: `0.03` requests a sparse top-count display, not a value of `3` entered as a percentage. It ranks eligible nonzero candidates and does not rewrite the matrix. Additional selection filters, direction and ties affect the final number of visible connections, so this lesson does not prescribe an identical edge count across configurations. **Threshold** is a different mode using a weight cutoff; it is not a P-value test.
 
@@ -72,8 +72,8 @@ For a separate exercise, clear the Schaefer node and edge roles and load:
 | Role | Resource file |
 | --- | --- |
 | Surface Mesh | `Data/SurfTemplate/BrainMesh_ICBM152.nv` |
-| Nodes | `Data/ExampleFiles/AAL90/Node_AAL90.node` |
-| Edges | `Data/ExampleFiles/AAL90/Edge_AAL90_Weighted.edge` |
+| Nodes | `Data/ExampleFiles/AtlasNetworks/AAL90.node` |
+| Edges | `Data/ExampleFiles/AtlasNetworks/AAL90_Weighted.edge` |
 
 This historical node table has **90 rows** and its matrix is **90 × 90**. It is not the current AAL3v2 example and its module field must not automatically be interpreted as Schaefer/Yeo assignments. Its size values remain the supplied column-5 quantities; do not transfer the Schaefer strength interpretation without source information.
 
@@ -87,7 +87,7 @@ Add its paired edge file and set **Threshold `0.5`**, **Selection Values → Abs
 
 ![Historical AAL90 weighted network in four views](../../assets/captures/manual-revision/06-aal90-edges.png)
 
-*MATLAB Desktop illustration of the historical AAL90 network at the documented weight threshold. Its density is not the Schaefer `0.03` sparsity example; the image is not a current Python acceptance result.*
+*MATLAB Desktop illustration of the historical AAL90 network at the documented weight threshold. Its density is not the Schaefer `0.03` sparsity example.*
 
 ## Save export and report
 

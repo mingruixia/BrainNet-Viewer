@@ -1,8 +1,8 @@
-# M12 · 图像与相机动画导出
+# 图像与相机动画导出
 
 [English](../en/M12_Export.md) · [手册目录](index.md) · [真实数据图文导出](../../tutorials/zh-CN/07_Layout_and_Publication_Export.md) · [真实曲面动画教程](../../tutorials/zh-CN/12_Camera_Animation.md) · [动画专题](../../documentation/Movies.zh-CN.md) · [背景限制](../../documentation/Backgrounds.zh-CN.md)
 
-开发版首批正文；2026年9月23日对照当前导出面板与动画对话框核对。必须先用 **Modern Batch Renderer** 完成当前场景渲染；仅加载而未渲染的Scene无法导出。导出不会改变科学数据或已应用设置。
+必须先用 **Modern Batch Renderer** 完成当前场景渲染；仅加载而未渲染的Scene无法导出。导出不会改变科学数据或已应用设置。
 
 ## 导出静态图
 
@@ -25,4 +25,4 @@
 
 新文件夹包含`movie.mp4`或`movie.avi`，或`frame-000001.png`等帧文件，以及`preview.png`、`provenance.json`。后者可能包含Scene引用、输入元数据、相机及逐帧记录；**不会**复制原始输入。限制：单维128–3840像素、1–60 fps、2–1800帧、请求时长不超过120秒、总帧像素不超过十亿、非零旋转且不超过360°；视频长宽须为偶数。不提供透明电影或音轨，也不保证各平台编解码器可用或像素完全一致。
 
-接口、取消和输出校验细节见[动画专题](../../documentation/Movies.zh-CN.md)。发行截图及分平台导出复核尚待完成；本章不等于发行验收验收。
+接口、取消和输出校验细节见[动画专题](../../documentation/Movies.zh-CN.md)。

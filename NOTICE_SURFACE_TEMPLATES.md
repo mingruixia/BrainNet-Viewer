@@ -1,8 +1,8 @@
-# BrainNet Viewer 2.0 historical surface templates / 历史曲面模板
+# BrainNet Viewer 2.0 surface templates / 曲面模板
 
-The project owner has directed inclusion of the 12 exact original `.nv` surface templates listed below in the public BrainNet Viewer 2.0 distribution. Keep this notice with any package containing them. This is a project release decision and source attribution record; it does not claim that third-party atlas data have the software's GPL-3.0 licence or that precise anatomical registration has been independently verified.
+The 12 bundled NV surface templates are listed below with their source credits. Keep this attribution with the files. Check coordinate alignment before combining templates with subject data.
 
-项目负责人确认下列原版 12 份确切 `.nv` 曲面可随 BrainNet Viewer 2.0 公开发行。发行包应保留本说明。此为项目发行决定及来源署名记录，不代表第三方数据适用软件代码的 GPL-3.0 许可，也不代表已独立验证精确解剖配准。
+附带的12份NV曲面及来源署名列于下表，分发时保留署名。与个体数据叠加前应核对坐标与配准。
 
 All paths in the table start with `src/matlab/BrainNetViewer/Data/SurfTemplate/`.
 

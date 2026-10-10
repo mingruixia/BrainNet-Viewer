@@ -8,4 +8,10 @@ if string(role) == "surface"
         folder = library;
     end
 end
+if any(string(role) == ["node", "edge"])
+    library = fullfile(string(rootPath), "Data", "ExampleFiles", "AtlasNetworks");
+    if isfolder(library)
+        folder = library;
+    end
+end
 end

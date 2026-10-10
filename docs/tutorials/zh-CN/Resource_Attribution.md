@@ -22,7 +22,7 @@
 
 ## 教学节点与连边
 
-教程02–03现使用原配AAL90文件，而非八节点教学数据：[`Node_AAL90.node`](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AAL90/Node_AAL90.node)，SHA-256 `2ff2562b55d91f502ee8f3bf86716ea268956391729e502584ca156c2ccdd4ba`；[`Edge_AAL90_Weighted.edge`](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AAL90/Edge_AAL90_Weighted.edge)，SHA-256 `90c7c6a536ca1131e5645d1bde15a347938a96eb9d5f9a3f41a2e17e6504e3d0`。两文件为90行节点和对称90 × 90加权矩阵；颜色使用第4列已有模块值，映射大小使用第5列。不要将这些既有显示值解释为Yeo标签或新计算的连接强度。AAL引用Tzourio-Mazoyer等（2002），ICBM152曲面署名Prof. Alan C. Evans。
+教程02–03现使用原配AAL90文件，而非八节点教学数据：[`Node_AAL90.node`](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90.node)，SHA-256 `2ff2562b55d91f502ee8f3bf86716ea268956391729e502584ca156c2ccdd4ba`；[`Edge_AAL90_Weighted.edge`](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90_Weighted.edge)，SHA-256 `90c7c6a536ca1131e5645d1bde15a347938a96eb9d5f9a3f41a2e17e6504e3d0`。两文件为90行节点和对称90 × 90加权矩阵；颜色使用第4列已有模块值，映射大小使用第5列。不要将这些既有显示值解释为Yeo标签或新计算的连接强度。AAL引用Tzourio-Mazoyer等（2002），ICBM152曲面署名Prof. Alan C. Evans。
 
 八个节点 XYZ 是原版教学曲面的确切顶点，**并非**经验证的脑区中心。节点第 4–5 列是自拟显示数值，第 6 列是教学标签。连边矩阵含 10 个非零、非对称的自拟权重，行列顺序必须与八节点表一致。它**不是**测得的脑连接、白质纤维、效应图或轴突方向证据。Prof. Evans 的署名针对来源曲面，不针对自拟网络。
 

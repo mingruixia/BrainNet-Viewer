@@ -33,4 +33,3 @@ draw为空时用drawt；启用ROI且携带色表、但编号缺失或无效时�
 未提交的colort修改不导入。导出EC需关闭Draw All并提供非空明确选择，
 颜色行按该选择重排。自定义ROI须使用Modern Batch，不通过旧GUI适配器渲染。
 后续现支持[边界及小ROI处理](ROI_Geometry.zh-CN.md)，不承诺旧网格完全对等。
-

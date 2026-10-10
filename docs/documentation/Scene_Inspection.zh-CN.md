@@ -2,8 +2,6 @@
 
 [English](Scene_Inspection.en.md) · [手册ROI与Inspect章节](../manual/zh-CN/M10_ROI_Inspection.md) · [真实AAL顶点图教程](../tutorials/zh-CN/04_Vertex_Maps_and_Boundaries.md)
 
-状态：MATLAB桌面开发版操作说明；不是空间配准或图谱准确性的独立验证。
-
 ## 在画布内查询
 
 1. 加载并渲染Scene，在主画布工具栏点击 **Inspect**。

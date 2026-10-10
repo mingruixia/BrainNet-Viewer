@@ -1,4 +1,4 @@
-# M05 · Global appearance and rendering detail
+# Global appearance and rendering detail
 
 [中文](../zh-CN/M05_Global_Appearance.md) · [Manual index](index.md) · [Background policy](../../documentation/Backgrounds.en.md)
 

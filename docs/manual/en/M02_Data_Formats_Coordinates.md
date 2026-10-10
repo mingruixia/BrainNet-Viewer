@@ -1,4 +1,4 @@
-# M02 · Data roles, formats and coordinates
+# Data roles, formats and coordinates
 
 [中文](../zh-CN/M02_Data_Formats_Coordinates.md) · [Manual index](index.md) · [Surface format matrix](../../compatibility/Surface_Format_Support.md) · [Data-root workflow](../../documentation/Getting_Started.en.md)
 

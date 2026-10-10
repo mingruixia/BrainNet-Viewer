@@ -11,9 +11,8 @@ links open externally only after selection; images are not embedded in the previ
 Fragments currently open the containing page, not a particular heading.
 
 **User Manual (PDF)** opens the illustrated BrainNet Viewer 2.0 English manual.
-The Markdown chapters provide searchable topic guidance; the original manual
-PDF is not distributed with the modern application. Final release-build review
-of all documentation remains pending.
+The Markdown chapters provide searchable topic guidance alongside the unified
+illustrated manual.
 
 For the current launch → select/load → Apply/render → interact/export path, use
 the [getting-started guide](Getting_Started.en.md). Its paired Chinese page is

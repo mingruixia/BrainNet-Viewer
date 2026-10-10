@@ -1,8 +1,8 @@
-# M04 · 布局与相机控件
+# 布局与相机控件
 
 [English](../en/M04_Layout_Camera.md) · [手册目录](index.md) · [Layout 2细节](../../documentation/Layout_2.zh-CN.md)
 
-开发版首批正文，2026年9月23日对照当前App与Settings默认值核查。控件位于 **Visualization Settings → Layout**。统一 **Apply** 提交并渲染；**Revert** 撤销待提交编辑。Scene和预设保留已生效布局，但预设不带当前相机。
+控件位于 **Visualization Settings → Layout**。统一 **Apply** 提交并渲染；**Revert** 撤销待提交编辑。Scene和预设保留已生效布局，但预设不带当前相机。
 
 | 控件 | 新设置默认值 | 作用及使用条件 |
 |---|---|---|
@@ -20,5 +20,3 @@
 渲染后可用画布的 **Rotate**、**Pan**、**Zoom**、**Fit**、**Reset**。Fit按可见几何重新居中取景，不改变输入坐标；Reset恢复当前布局的初始相机。缩放窗体不会暗中Fit。**Pop Out** 打开独立观察副本，其后续操作不覆盖主画布相机。**Save Scene** 可记录有效的现代主画布相机，**Save Preset** 不记录相机；详见[相机与重放](../../documentation/Scene_Workflows.zh-CN.md)和[窗体大小](../../documentation/Window_Layout.zh-CN.md)。
 
 **Double Brain**（见M06）是单视图的另一种显示方式，不是第六种布局。它只适用于带曲面的Left、Superior或Anterior方向，不支持标量映射/体输入。**Show Orientation Labels** 的视图标签见M05；未经绑定输入的解剖方向确认时，只表示坐标半区。
-
-仍待验收：当前构建多视图截图、密集标签、其他DPI/显示环境和发行验收正式图形评审；本章不声称与旧GUI逐像素一致。

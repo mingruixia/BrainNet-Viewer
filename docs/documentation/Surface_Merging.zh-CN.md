@@ -1,7 +1,5 @@
 # 曲面合并
 
-BrainNet Viewer 2.0 开发版 · 开发版
-
 单个输入请使用[单曲面转换NV](Surface_Conversion.zh-CN.md)。Merge要求2–64个输入；空间、单位及备注为可选元数据。
 
 ## 桌面操作

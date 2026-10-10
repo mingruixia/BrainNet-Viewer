@@ -2,8 +2,6 @@
 
 [中文](Migration.zh-CN.md) · [Manual M15](../manual/en/M15_Migration_Troubleshooting.md)
 
-Development guidance, reconciled 23 September 2026. This is **not** a lossless-conversion or release-readiness claim. The older 1.7 manual is a historical feature source; its dated findings should not be read as current defects. Use the current release acceptance reconciliation for remaining gates and user decisions.
-
 ## Practical migration route
 
 1. Preserve the old data and EC MAT configuration. Start the modern project-root `BrainNetViewer` launcher without recursively adding the old program to the MATLAB path. Use Data Sources → **Validate and Load** for input roles, or **Open Scene JSON** for a modern Scene. Outside-root files need approved staging or an appropriate data root.
@@ -17,8 +15,8 @@ Development guidance, reconciled 23 September 2026. This is **not** a lossless-c
 ## Differences requiring explicit review
 
 - The independent NIfTI reader accepts NIfTI-1/2 and paired NIfTI header/image forms, not pure Analyze 7.5. MNI/BIC `.obj` is not Wavefront OBJ. BrainVISA `.mesh` preserves stored XYZ rather than negating all axes. FreeSurfer/MNI filenames and Inspect's AAL/Brodmann labels do **not** establish registration; Inspect does not apply an affine transform.
-- Layout 2 uses the split overview when hemispheres can be identified, with a conservative whole-surface fallback for an inseparable mesh. The modern layout numbers and camera controls are described in [M04](../manual/en/M04_Layout_Camera.md); do not infer them from mislabeled historical audit rows.
+- Layout 2 uses the split overview when hemispheres can be identified, with a conservative whole-surface fallback for an inseparable mesh. The modern layout numbers and camera controls are described in [M04](../manual/en/M04_Layout_Camera.md).
 - Node/edge coloring, sizes, filtering and threshold endpoints, signed volume colormaps and ROI generation have received targeted corrections. Old development Scenes may render differently. Use the [Nodes](../manual/en/M07_Nodes.md), [Edges](../manual/en/M08_Edges.md), [Volume](../manual/en/M09_Volume_Mapping.md) and [ROI](../manual/en/M10_ROI_Inspection.md) chapters and independent boundary-value examples before treating a migration as equivalent.
-- Surface Map and statistical ROI P Value now convert supported NIfTI statistic metadata, but automatic atlas/statistic classification, multiple-comparison correction and cluster-level significance inference remain unavailable. Fiber rendering, arbitrary Plot Edit, GIF/EPS/EMF output and native print are not current capabilities. Standalone Runtime/Docker/browser deployment is not validated. Scope choices for several historical differences remain **unapproved**, not silently retired. release acceptance is open.
+- Surface Map and statistical ROI P Value now convert supported NIfTI statistic metadata, but automatic atlas/statistic classification, multiple-comparison correction and cluster-level significance inference remain unavailable. Fiber rendering, arbitrary Plot Edit, GIF/EPS/EMF output and native print are not current capabilities. A standalone MATLAB Runtime package is not supplied. Docker/Web deployment is described in its installation guide.
 
 Scene, image and movie provenance may include local paths and metadata. A hash establishes file identity, not anatomical alignment, statistical validity or sharing rights. For symptom-specific first checks see [M15 troubleshooting](../manual/en/M15_Migration_Troubleshooting.md#if-something-goes-wrong).

@@ -1,6 +1,5 @@
 # ROI boundaries and small-ROI smoothing
 
-development build adds a virtual zero-background halo outside each ROI bounding box,
 including outside the input volume. This closes surfaces at volume faces, edges
 and corners. World positions retain the original one-based voxel affine; no
 translation or resampling is applied to the input.
@@ -38,4 +37,3 @@ merge components, split them, or remove thin branches within a component even
 when the guard passes. This is not complete topology or volume preservation.
 Old scenes may show newly closed boundaries or previously missing small ROIs;
 review their geometry after updating/restarting the app. Settings remain 1.16.
-

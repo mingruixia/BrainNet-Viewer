@@ -20,8 +20,8 @@ wheel 包含原有曲面库、图谱/网络示例、真实教程数据、双图�
 PYTHON 安装 — WINDOWS
 解压 Python 压缩包，在解压目录打开 PowerShell。以下命令创建独立环境，
 不改变系统 Python：
-    py -3.10 -m venv .venv-bnv-test3
-    $bnvPython = (Resolve-Path .venv-bnv-test3/Scripts/python.exe).Path
+    py -3.10 -m venv .venv-bnv
+    $bnvPython = (Resolve-Path .venv-bnv/Scripts/python.exe).Path
     $bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
     $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).as_uri())" $bnvWheel
     & $bnvPython -m pip install "brainnet-viewer[desktop] @ $bnvWheelUrl"
@@ -29,13 +29,13 @@ PYTHON 安装 — WINDOWS
     & $bnvPython -m brainnet_viewer
 若随包 wheel 名称变化，请替换成实际文件名。若系统没有 py 启动器，将
 py -3.10 替换为本机 Python 3.10 可执行文件的完整路径。
-安装完成后，双击 .venv-bnv-test3/Scripts/brainnet-viewer.exe 即可启动，
+安装完成后，双击 .venv-bnv/Scripts/brainnet-viewer.exe 即可启动，
 无需保留命令窗口。需要查看报错时，用该环境的 python -m brainnet_viewer 启动。
 
 PYTHON 安装 — macOS
 使用 Python 3.10 或 3.11，在 Python 解压目录的终端中运行：
-    python3 -m venv .venv-bnv-test3
-    source .venv-bnv-test3/bin/activate
+    python3 -m venv .venv-bnv
+    source .venv-bnv/bin/activate
     BNV_WHEEL_URL="$(python -c 'from pathlib import Path; print(Path("brainnet_viewer-2.0.0b1-py3-none-any.whl").resolve().as_uri())')"
     python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
     python -m pip check
@@ -64,3 +64,10 @@ documentation/docs/manual/en。保留随附 GPL、资源署名和第三方许可
 该参数只覆盖本条命令的代理，不修改 Windows 代理设置或固定依赖。
 若实际 HTTP 代理端口不同，请替换成实际端口；不要把纯 SOCKS 端口当作 HTTP。
 若随后提示连接被拒绝或超时，请先检查代理程序及 HTTP 监听端口。
+
+DOCKER / WEB安装
+安装并启动Docker，使用Linux容器。解压Web软件包，在包含compose.web.release.yml的目录打开终端，执行：
+    docker compose -f compose.web.release.yml pull
+    docker compose -f compose.web.release.yml up -d
+浏览器打开http://127.0.0.1:1031/index.html，无需MATLAB或本机Python。
+平台设置及故障排查见docs/web/zh-CN/INSTALLATION.md。停止Docker前保存Scene，上传数据和未保存场景仅暂存于容器。

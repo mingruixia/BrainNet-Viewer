@@ -1,8 +1,8 @@
-# M05 · 全局外观与渲染细节
+# 全局外观与渲染细节
 
 [English](../en/M05_Global_Appearance.md) · [手册目录](index.md) · [背景规则](../../documentation/Backgrounds.zh-CN.md)
 
-开发版首批正文，2026年9月23日对照当前 **Visualization Settings → Global** 控件和Settings 1.22.0默认值核查。**Apply** 提交并渲染。已保存的Scene或预设可能带有不同显式值；下表描述新设置，不会覆盖已载入配置。
+**Apply** 提交并渲染。已保存的Scene或预设可能带有不同显式值；下表描述新设置，不会覆盖已载入配置。
 
 | 控件 | 新设置默认值 | 含义与限制 |
 |---|---|---|
@@ -17,4 +17,4 @@
 
 顶部 **Theme** 仅改变界面颜色。导出背景选 **current** 时保留实际科研画布色；无法可靠透明导出的栅格格式可能被拒绝，而非静默压白。详见[背景规则](../../documentation/Backgrounds.zh-CN.md)。材质和旧细节数值见[材质设置](../../documentation/Material_Settings.zh-CN.md)、[渲染细节](../../documentation/Render_Detail.zh-CN.md)。
 
-App不会从文件名或物种推断解剖方向。显示解剖L/R前须核实坐标单位、共同配准、X=0中线与X正方向，再用[Scene/API流程](../../documentation/Orientation_Labels.zh-CN.md)将声明绑定到输入哈希。未声明时，勾选 **Show Orientation Labels** 仍只显示坐标半区。其他DPI下的对比度和RC最终截图仍待验收。
+App不会从文件名或物种推断解剖方向。显示解剖L/R前须核实坐标单位、共同配准、X=0中线与X正方向，再用[Scene/API流程](../../documentation/Orientation_Labels.zh-CN.md)将声明绑定到输入哈希。未声明时，勾选 **Show Orientation Labels** 仍只显示坐标半区。导出后检查方向标签清晰度。

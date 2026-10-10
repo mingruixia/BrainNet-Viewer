@@ -1,7 +1,5 @@
 # 连边半径：Uniform、Mapped、Raw与Threshold
 
-开发版 · 开发版说明 · 2026-09-16
-
 [English](Edge_Sizes.en.md) · [连边配色](Edge_Colors.zh-CN.md) · [迁移说明](Migration.zh-CN.md)
 
 这里的大小是**输入坐标单位下的半径**，不是像素线宽或直径。输入为已选连边的原始权重；Selection Values、Size Values和配色的Threshold Values分别独立，改变粗细符号模式不会增加被选中的边，也不会重新分配配色组。
@@ -38,15 +36,13 @@ Raw Threshold可能产生零半径，此时不生成管线及箭头几何，但�
 
 ![当前 Threshold 连边大小设置，使用已获授权的示例数据](../tutorials/assets/captures/topic-guides/edge-size-threshold.png)
 
-GS05内部截图使用Scale 1.5、Signed粗细取值；第二张采用阈值0.65及Mapped基准。这是验证样例，不是任意数据的推荐参数，也不是已清权的公开教程资源，图中含本地输入路径。设置区可滚动，深色对比度及窄窗文字仍属UI后续工作。
-
-## EC与旧开发版文件
+## EC与旧配置文件
 
 旧`EC.edg.size=1/2/3`分别为Uniform/加权/Threshold，`size_value=1/2`为Mapped/Raw；加权+Raw导入现代Raw。`size_abs=0/1`独立映射Signed/Absolute，不与draw_abs或color_abs混用。size_size、size_ratio、size_threshold保留各自数值。缺少size_value/size_abs时采用旧默认Mapped/Absolute；已提供但非法的编码会拒绝。导出写回这些字段，Uniform不生效的size_value会规范化。
 
 Settings **1.7.0**增加`edge.size_threshold_basis`、`edge.size_value_mode`及Raw大小模式。Scene v0.1与预设v1.0外壳不变；当前版本缺少必填字段会拒绝。
 
-Settings 1.0–1.6升级默认采用Mapped阈值基准与Absolute粗细取值。**这不能恢复此前被忽略的EC Raw/Signed意图，也不保留旧开发版错误的Threshold外观。** Uniform现乘Scale，Threshold改为原始权重/达标子集规则，不再是两档固定半径。请复核旧文件或重新导入未修改的原EC。Scene元数据记录edge_size_upgrade；仅旧输入/设置签名有效时重绑相机，过期绑定保持过期；预设不含相机。
+Settings 1.0–1.6升级默认采用Mapped阈值基准与Absolute粗细取值。**这不能恢复此前被忽略的EC Raw/Signed意图，也不保留旧配置错误的Threshold外观。** Uniform现乘Scale，Threshold改为原始权重/达标子集规则，不再是两档固定半径。请复核旧文件或重新导入未修改的原EC。Scene元数据记录edge_size_upgrade；仅旧输入/设置签名有效时重绑相机，过期绑定保持过期；预设不含相机。
 
 ## 范围
 

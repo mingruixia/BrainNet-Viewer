@@ -2,11 +2,9 @@
 
 The current version supports [Clear Figure](Clear_Figure.en.md): release rendered views without removing inputs or applied settings; the main camera can be replayed by Render Scene.
 
-development build: optional, input-bound [coordinate and atlas inspection](Scene_Inspection.en.md) is preserved by Save Scene; it is not a visualization preset or an inferred registration.
+Optional, input-bound [coordinate and atlas inspection](Scene_Inspection.en.md) is preserved by Save Scene; it is not a visualization preset or an inferred registration.
 
 MOVIE.BYU `.g` triangle surfaces now use the shared App/Scene/CLI route; see [BYU geometry and multipart boundaries](BYU_Surfaces.en.md).
-
-Development guide · BrainNet Viewer 2.0 · development build · 2026-09-06
 
 ## Desktop workflow
 

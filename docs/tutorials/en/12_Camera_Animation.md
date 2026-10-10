@@ -43,4 +43,4 @@ For a smoother result, reopen **Export Animation...** after reviewing the four-f
 - **Unexpected framing:** Safe Fit uses an orthographic, rotation-safe fit on the export copy. Turning it off can crop some angles; check every frame.
 - **Angle interpretation:** Z is the world axis. A positive orbit follows the right-hand rule relative to the current camera; it does not prove anatomical orientation or spatial registration.
 - **No overwrite:** choose a new folder; cancellation and failure should not publish a partial bundle.
-- **Data meaning:** this is a camera movie of one static surface. It does not show dynamic functional connectivity, time-varying statistics, surface morphing, or fiber tracking. The focused test does not establish cross-platform codec or full-suite acceptance.
+- **Data meaning:** this is a camera movie of one static surface. It does not show dynamic functional connectivity, time-varying statistics, surface morphing, or fiber tracking.

@@ -1,7 +1,5 @@
 # Merge surfaces
 
-BrainNet Viewer 2.0 development build · development build
-
 For one input, use [Convert Surface to NV](Surface_Conversion.en.md). Merge requires 2–64 inputs; space, units and note are optional metadata.
 
 ## Desktop workflow

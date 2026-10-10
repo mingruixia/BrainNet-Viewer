@@ -1,4 +1,4 @@
-# M14 · Command-line rendering, batches and provenance
+# Command-line rendering, batches and provenance
 
 [中文](../zh-CN/M14_Batch_Provenance.md) · [Manual index](index.md) · [Illustrated real-data CLI tutorial](../../tutorials/en/08_Command_Line_and_Scene_Replay.md) · [Real-data performance tutorial](../../tutorials/en/13_Performance_and_Reproducibility.md) · [Scene workflow details](../../documentation/Scene_Workflows.en.md)
 

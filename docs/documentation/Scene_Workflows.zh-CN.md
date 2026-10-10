@@ -2,11 +2,9 @@
 
 专项验证新增[Clear Figure](Clear_Figure.zh-CN.md)：释放绘图而不删除输入或已应用配置，可通过Render Scene恢复主相机视图。
 
-开发版新增可选且绑定输入的[坐标与图谱查询](Scene_Inspection.zh-CN.md)配置，随Save Scene保存；不属于显示预设，也不自动推断配准。
+可选且绑定输入的[坐标与图谱查询](Scene_Inspection.zh-CN.md)配置，随Save Scene保存；不属于显示预设，也不自动推断配准。
 
 MOVIE.BYU `.g`三角曲面已接入共享App/Scene/CLI流程，参见[BYU几何与多部件边界](BYU_Surfaces.zh-CN.md)。
-
-开发版使用说明 · BrainNet Viewer 2.0 · 开发版 · 2026-09-06
 
 ## 主界面操作
 
@@ -80,7 +78,7 @@ record = BrainNetRender("my-scene.json", "figure.png", ...
 | `Overwrite` | 默认 false，保护已有图像和溯源文件。 |
 | `Planner` | 同一 MATLAB 进程可复用 `brainnet.render.RenderPlanner` 准备缓存。 |
 
-论文出图建议明确使用 `PerformanceMode="quality"` 与 `ComputeBackend="cpu"`。不保证不同 MATLAB、驱动或操作系统的像素逐一一致；验收比较数值指纹、缓存标识、配置和场景结构，而不是图片文件哈希。
+论文出图建议明确使用 `PerformanceMode="quality"` 与 `ComputeBackend="cpu"`。不保证不同 MATLAB、驱动或操作系统的像素逐一一致；比较数值指纹、缓存标识、配置和场景结构，而不是图片文件哈希。
 
 ```matlab
 scene = brainnet.io.readScene("my-scene.json");

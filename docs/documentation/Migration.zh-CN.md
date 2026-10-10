@@ -2,8 +2,6 @@
 
 [English](Migration.en.md) · [手册M15](../manual/zh-CN/M15_Migration_Troubleshooting.md)
 
-开发版说明，2026年9月23日对账；**不**承诺无损转换或发行就绪。旧1.7手册属于历史功能依据；旧版功能清单属于历史记录，不能直接当作当前缺陷列表。具体限制须以实际发行包及其验证范围为准。
-
 ## 实际迁移路径
 
 1. 保留旧数据及EC MAT配置原件。从当前项目根目录运行现代`BrainNetViewer`启动器，不把旧程序递归加入MATLAB路径。通过Data Sources → **Validate and Load**读取各输入角色，或用 **Open Scene JSON**打开现代Scene。根目录外文件需获准暂存或选择适当数据根目录。
@@ -19,6 +17,6 @@
 - 独立NIfTI读取器支持NIfTI-1/2与成对NIfTI头/图像，不支持纯Analyze 7.5。MNI/BIC `.obj`不是Wavefront OBJ。BrainVISA `.mesh`保留原XYZ，不再整体取反。FreeSurfer/MNI文件名及Inspect显示的AAL/Brodmann脑区**不**证明配准；Inspect不做仿射变换。
 - Layout 2在可识别半球时使用分半总览，不可分网格有保守整体曲面回退。现代布局编号和相机控件见[M04](../manual/zh-CN/M04_Layout_Camera.md)；勿依据旧审计误标的行标题推断。
 - 节点/连边配色、大小、筛选和阈值端点，带符号体色图及ROI生成已做专项修正。旧开发Scene外观可能变化；判定迁移等价前，用[节点](../manual/zh-CN/M07_Nodes.md)、[连边](../manual/zh-CN/M08_Edges.md)、[体映射](../manual/zh-CN/M09_Volume_Mapping.md)、[ROI](../manual/zh-CN/M10_ROI_Inspection.md)章节及独立边界值样例复核。
-- Surface Map及统计ROI的P值模式现可换算受支持的NIfTI统计元数据；图谱/统计自动分类、多重比较校正和簇水平显著性推断仍未提供。纤维绘制、任意Plot Edit、GIF/EPS/EMF输出和内置打印不是本版能力。仅Runtime/Docker/浏览器部署尚未验证。若干旧功能差异的范围决定仍**未获批准**，不能当成默认废弃。发行验收仍开放。
+- Surface Map及统计ROI的P值模式现可换算受支持的NIfTI统计元数据；图谱/统计自动分类、多重比较校正和簇水平显著性推断仍未提供。纤维绘制、任意Plot Edit、GIF/EPS/EMF输出和内置打印不是本版能力。本公测不提供MATLAB Runtime-only程序。Docker/Web部署见安装指南。
 
 Scene、图像和电影溯源可能含本地路径和元数据。哈希证明文件身份，不证明解剖配准、统计有效性或共享许可。按现象排查见[手册M15](../manual/zh-CN/M15_Migration_Troubleshooting.md#出现问题时)。

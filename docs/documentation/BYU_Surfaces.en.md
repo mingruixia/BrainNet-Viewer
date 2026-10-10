@@ -1,7 +1,5 @@
 # MOVIE.BYU surfaces
 
-Development guide · development build · 2026-09-06
-
 Use **Surface Mesh → Add** or **Add Files** to select an ASCII MOVIE.BYU `.g` file, adjust **Visualization Settings**, then select **Render Scene**. `.g` also works through Scene JSON and `BrainNetRender`; Python/SPM/VTK are not runtime requirements.
 
 The modern reader supports **triangular geometry**, including multiple parts. The part ranges must be ordered, nonempty and disjoint, covering polygons 1 through the declared last polygon. All parts are kept in file order in one surface; part boundaries are recorded in metadata, not exposed as independently styled layers. Stored vertex order, coordinates and triangle winding are retained. The negative last index of each triangle is a terminator, not a coordinate reflection.

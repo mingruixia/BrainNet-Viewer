@@ -19,7 +19,7 @@ Use the installed library's `Data/SurfTemplate/BrainMesh_ICBM152Left_smoothed.nv
 
 ![Historical MATLAB review of the matching ICBM152 hemispheres](../../assets/captures/tutorial11-merge-boundary/11-merge-review.png)
 
-Existing MATLAB illustration with source paths displayed as basenames. It predates automatic review and removal of the verification checkbox; do not reproduce its old confirmation steps. It is not a Python screenshot or a new candidate acceptance result. Actual review/output metadata can retain full source paths.
+MATLAB Merge illustration. Add automatically reviews the inputs; no verification checkbox is required. Review/output metadata may contain full source paths.
 
 The merged vertices have the same coordinates as this pair's original full smoothed mesh, but their order differs. Do not attach `icbm_vertex_AAL_label.txt` to the merged mesh merely because its length matches. Merge concatenates coordinates and offsets face indices; it does not weld coincident vertices, register anatomy or transfer scalar/RGB attributes.
 

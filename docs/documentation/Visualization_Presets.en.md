@@ -1,6 +1,6 @@
 # Reusing visualization presets
 
-focused check historical note: P-value presets were formerly blocked. Surface Map and
+ Surface Map and
 statistical ROI P-value presets now apply when the selected NIfTI has supported
 statistic metadata; ROI mode also uses Cluster Size. Custom
 ROI palettes are supported by Modern Batch Renderer; preset review reports ID
@@ -9,9 +9,7 @@ ROIs are selected; rendering rejects any selected ID without a color. Recheck ID
 when switching atlases or statistical thresholds. The current writer uses Settings
 schema 1.22.0; the older version notes below are historical migration context.
 
-BrainNet Viewer 2.0 development build · development build
-
-Historical development build update: **Colors...** beside the preset buttons edits custom RGB palettes. Palettes are embedded in applied settings and presets; see [Custom colormaps](Colormaps.en.md). That milestone wrote v1.2.0; the current writer uses 1.22.0 and older colors remain readable. Custom boundary masks are geometry-specific, not generic presets; see [Surface boundaries](Surface_Boundaries.en.md) for migration and binding rules.
+**Colors...** beside the preset buttons edits custom RGB palettes. Palettes are embedded in applied settings and presets; see [Custom colormaps](Colormaps.en.md). Current settings use schema 1.22.0; older color tables remain readable. Custom boundary masks are geometry-specific, not generic presets; see [Surface boundaries](Surface_Boundaries.en.md) for migration and binding rules.
 
 ## Desktop workflow
 

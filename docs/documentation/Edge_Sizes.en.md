@@ -1,7 +1,5 @@
 # Edge radii: Uniform, Mapped, Raw and Threshold
 
-development build · Development guidance · 16 September 2026
-
 [中文](Edge_Sizes.zh-CN.md) · [Edge colors](Edge_Colors.en.md) · [Migration](Migration.en.md)
 
 Sizes are **radii in input coordinate units**, not pixel line widths or diameters. The selected edge list supplies original weights. **Selection Values**, **Size Values** and color **Threshold Values** are separate controls; changing the size sign does not select additional edges or redefine their colors.
@@ -34,11 +32,9 @@ Raw Threshold may produce zero; zero-radius tubes and arrowheads are omitted fro
 
 The existing directed-arrow shape rules are unchanged; tubes and arrowheads both consume the updated radius. Changing the size mode, sign, threshold basis or scale changes the geometry-cache key.
 
-![Current raw edge-size settings with owner-cleared example data](../tutorials/assets/captures/topic-guides/edge-size-raw.png)
+![Current raw edge-size settings with example data](../tutorials/assets/captures/topic-guides/edge-size-raw.png)
 
-![Current threshold edge-size settings with owner-cleared example data](../tutorials/assets/captures/topic-guides/edge-size-threshold.png)
-
-Internal GS05 captures with Scale 1.5 and Signed size values; the second uses Threshold 0.65 and Mapped basis. These are validation examples, not recommended settings for arbitrary data or cleared public tutorial assets. Local input paths are visible. The settings area scrolls; dark-theme contrast and narrow-window text remain separate UI work.
+![Current threshold edge-size settings with example data](../tutorials/assets/captures/topic-guides/edge-size-threshold.png)
 
 ## EC and older development files
 

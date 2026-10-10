@@ -1,7 +1,5 @@
 # Surface boundaries and binary masks
 
-BrainNet Viewer 2.0 development build · development build
-
 ## Workflow
 
 1. Load **Surface Mesh** and, for automatic/threshold modes, **Surface Map** or a volume mapped to the surface.
@@ -10,7 +8,7 @@ BrainNet Viewer 2.0 development build · development build
 
 For **Custom Mask**, select **Load Mask...**, choose a binary text file and explicitly confirm its correspondence to the loaded surface's original vertex order. **Bind to Surface** binds an imported legacy EC mask after the same confirmation. Loading/binding only stages the edit: **Revert** discards it and **Apply** submits it. Cancel leaves the settings unchanged.
 
-![Current Automatic boundary on the owner-cleared ICBM152 AAL vertex map](../tutorials/assets/captures/tutorial04-aal/04-aal-map-full-window.png)
+![Current Automatic boundary on the ICBM152 AAL vertex map](../tutorials/assets/captures/tutorial04-aal/04-aal-map-full-window.png)
 
 ## Mode semantics
 
@@ -25,7 +23,7 @@ Legacy Automatic deliberately preserves signed fractional cancellation: opposite
 
 Classification and masks use complete original geometry; all views use the same vertex selection. Vertex colors preserve the selected shading mode, and numerical mask compatibility does not imply pixel-identical old lighting or rasterization. Custom masks force full-resolution surface geometry even in interactive mode; node/edge acceleration remains available.
 
-![Current Custom Mask controls with the owner-cleared AAL-derived mask bound to the ICBM152 smoothed surface](../tutorials/assets/captures/topic-guides/surface-custom-mask-panel.png)
+![Current Custom Mask controls with the AAL-derived mask bound to the ICBM152 smoothed surface](../tutorials/assets/captures/topic-guides/surface-custom-mask-panel.png)
 
 ## Custom mask safety and portability
 

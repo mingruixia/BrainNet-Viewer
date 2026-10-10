@@ -9,7 +9,7 @@ and resources** 列表中选择，再点 **Open Selected**；**Back** 返回上�
 目前打开整页，不跳到具体标题。
 
 **User Manual (PDF)** 打开图文完整的BrainNet Viewer 2.0英文手册；Markdown章节
-提供便于检索的专题说明。旧版PDF不随现代版发行，全部文档仍待正式包验收。
+提供便于检索的专题说明。旧版PDF不随现代版发行，
 
 当前“启动→选择/读取→Apply渲染→交互/导出”的流程见[入门指南](Getting_Started.zh-CN.md)，
 可从中切换英文页。已提交的显示设置会立即绘图；旧PDF描述的是旧界面。

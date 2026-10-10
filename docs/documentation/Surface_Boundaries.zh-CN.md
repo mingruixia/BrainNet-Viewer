@@ -1,7 +1,5 @@
 # 曲面边界与二进制掩码
 
-BrainNet Viewer 2.0 开发版 · 开发版
-
 ## 操作流程
 
 1. 读取 **Surface Mesh**；自动/阈值模式还需读取 **Surface Map** 或映射到曲面的体数据。

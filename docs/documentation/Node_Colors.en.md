@@ -1,8 +1,5 @@
 # Node colors: column 4 and threshold colors
 
-Subsequent update: [development build / Settings 1.6 edge colors](Edge_Colors.en.md) retains these node rules and adds edge-specific migration review. Version references below describe this node task.
-
-BrainNet Viewer 2.0 development build · development build · Settings 1.3
 [中文](Node_Colors.zh-CN.md)
 
 ## Scientific meaning
@@ -36,5 +33,3 @@ For `EC.nod.color=4`, import requires a finite RGB `EC.nod.CM` containing at lea
 Settings 1.0–1.2 upgrade to 1.3. When the new colors are absent, Low starts from the saved uniform node color and High from the last saved colormap color. This is a documented migration choice, not recovery of an old two-color intent: the earlier modern Threshold mode had a continuous high group and read the wrong column. **Review old mapped and threshold figures after upgrading; colors intentionally change.**
 
 Old Scene metadata records a node-color upgrade notice. Valid saved cameras are rebound only after the original canonical settings/input signature is checked; stale cameras remain stale. Presets upgrade settings without importing a camera. These color fields were introduced in Settings 1.3 and are retained in current Settings 1.5 files; earlier builds are not promised to read them.
-
-Subsequent updates: [Raw node sizes](Node_Sizes.en.md) and [selection/label thresholds](Node_Selection.en.md) are repaired; current files use Settings 1.5, retaining the 1.3 color contract. Edge-color defects and label layout remain open. See [Migration](Migration.en.md). development build itself did not change underlying data, coordinates, sizes, edges or registration.

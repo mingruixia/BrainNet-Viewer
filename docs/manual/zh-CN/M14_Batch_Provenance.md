@@ -1,8 +1,8 @@
-# M14 · 命令行渲染、批处理与溯源
+# 命令行渲染、批处理与溯源
 
 [English](../en/M14_Batch_Provenance.md) · [手册目录](index.md) · [真实数据CLI图文教程](../../tutorials/zh-CN/08_Command_Line_and_Scene_Replay.md) · [真实数据性能教程](../../tutorials/zh-CN/13_Performance_and_Reproducibility.md) · [Scene流程专题](../../documentation/Scene_Workflows.zh-CN.md)
 
-开发版首批正文；2026年9月23日对照`BrainNetRender`与`renderSceneFile`核对。命令行入口无需打开桌面App，使用**现代**Scene/渲染器；它不取代旧`BrainNet_MapCfg`调用签名。仍需MATLAB许可证和可用图形环境；这不是规划中的浏览器/Docker版。
+命令行入口无需打开桌面App，使用**现代**Scene/渲染器；它不取代旧`BrainNet_MapCfg`调用签名。仍需MATLAB许可证和可用图形环境；Docker/Web使用浏览器访问，无需此命令行入口。
 
 ## 准备可重放Scene
 
@@ -33,4 +33,4 @@ record = BrainNetRender("D:/results/scene.json", "D:/results/figure.png", ...
 
 Scene加载核对输入身份/哈希；文件缺失或改变应停止，不能静默替换数据。可选相机仅在内容签名仍兼容时恢复，否则使用布局默认视角。跨机器/版本比较时，检查溯源JSON中的设置、数值指纹、渲染器/版本和相机记录，不要求不同驱动下的图片哈希完全一致。**侧车可能包含本地路径、标题及敏感元数据**；发表前审核它和输入资源许可。软件不会自动上传。若只复用外观而不带输入路径，应使用显示预设而非Scene JSON，见[M11](M11_Colormaps_Presets.md)。
 
-[当前构建真实数据CLI教程](../../tutorials/zh-CN/08_Command_Line_and_Scene_Replay.md)现展示一个可迁移Scene和两种输出格式；更广泛的多Scene批量验收、侧车隐私审核及跨平台/驱动验收仍开放。本章不是Docker部署指南，也不表示发行验收完成。
+[当前构建真实数据CLI教程](../../tutorials/zh-CN/08_Command_Line_and_Scene_Replay.md)现展示一个可迁移Scene和两种输出格式。批量使用时检查每个输出及侧车中的隐私信息。

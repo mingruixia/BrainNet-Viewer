@@ -1,7 +1,5 @@
 # Export a rotating brain scene
 
-BrainNet Viewer 2.0 development build · development build
-
 ## Desktop workflow
 
 1. Load data and press **Apply** to commit visualization settings and render with **Modern Batch Renderer**; **Render Scene** can explicitly redraw.

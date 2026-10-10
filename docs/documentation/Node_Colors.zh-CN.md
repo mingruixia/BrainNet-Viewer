@@ -1,8 +1,5 @@
 # 节点配色：第4列与阈值双色
 
-后续更新：[开发版 / Settings 1.6连边配色](Edge_Colors.zh-CN.md)保留本页节点规则，并增加连边迁移复核要求；下文版本号描述本节点专题对应阶段。
-
-BrainNet Viewer 2.0开发版 · 开发版 · Settings 1.3
 [English](Node_Colors.en.md)
 
 ## 科学含义
@@ -23,18 +20,14 @@ BrainNet Viewer 2.0开发版 · 开发版 · Settings 1.3
 
 ![当前节点Threshold配色控件](../tutorials/assets/captures/topic-guides/node-color-threshold-panel.png)
 
-此图聚焦当前设置控件，不代表渲染网络的外观验收。
-
 ## 旧EC设置
 
 `EC.nod.color=4`的导入要求 `EC.nod.CM` 为至少64行的有限RGB表：**第1行为高值色，第64行为低值色**。缺失或行数不足明确拒绝，不猜测配色；阈值来自 `EC.nod.color_threshold`。Mapped（2）模式保留可用的数值CM，不执行MATLAB表达式。Uniform取CM首行。
 
 `color_map_type=1`表示自动范围，即使残留low/high也不采用；2表示固定范围且必须提供两端。若类型字段缺失，则两端齐全时沿用此前导入约定。导出EC将阈值双色写回第1/64行，并写入范围类型。本轮不认证其他旧字段，仍须检查导入报告。
 
-## 旧开发版Scene与预设
+## 旧配置Scene与预设
 
 Settings 1.0–1.2升级到1.3。缺少新增颜色时，Low取原保存的统一节点色，High取原保存色图的末色。这是明确的迁移约定，不是恢复旧双色意图：此前现代Threshold高组是连续色，且取错数据列。**升级后须重新检查旧Mapped/Threshold图像，颜色变化是本次纠正的预期结果。**
 
 旧Scene元数据记录配色升级提示；仅在核对旧规范化设置/输入签名有效后迁移相机绑定，过期相机不重新绑定。Preset只升级设置，不导入相机。双色字段始于Settings 1.3，并保留在当前1.5文件中，不保证旧构建可读取。
-
-后续更新：[Raw节点大小](Node_Sizes.zh-CN.md)及[选择/标签阈值](Node_Selection.zh-CN.md)已修复；当前文件使用Settings 1.5并保留1.3配色规范。连边配色和标签布局仍开放，见[迁移说明](Migration.zh-CN.md)。开发版本身未改变原始数据、坐标、大小、连边或配准。

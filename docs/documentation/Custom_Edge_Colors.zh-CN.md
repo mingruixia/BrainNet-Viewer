@@ -1,4 +1,4 @@
-# 自定义连边配色：开发版
+# 自定义连边配色
 
 [English](Custom_Edge_Colors.en.md)
 

@@ -1,7 +1,5 @@
 # MZ3 曲面
 
-开发版指南 · 开发版 · 2026-09-06
-
 通过 **Surface Mesh → Add** 或 **Add Files** 选择 `.mz3` / `.mz3.gz`，
 调整 **Visualization Settings** 后点击 **Render Scene**。Scene JSON 与
 `BrainNetRender` 使用同一读取器；新文件校验失败不替换当前输入和数据。
@@ -45,4 +43,4 @@ GZip 分块解压到唯一临时文件，检查字节上限、CRC/大小，成�
 不承诺嵌套或多成员容器兼容。结构验证不等于流形、无自交、图谱标签或配准质量认证。
 
 参见[Scene工作流](Scene_Workflows.zh-CN.md)与
-[格式矩阵](../compatibility/Surface_Format_Support.md)。研发验证使用固定版本的 Surfice 格式样例、项目自建边界用例及由 FreeSurfer 转换的皮层文件；这些测试文件**不随本文分发**。若另行分发，须分别保留 Surfice/BSD-2-Clause 及 FreeSurfer 的来源、NOTICE 和许可。
+[格式矩阵](../compatibility/Surface_Format_Support.md)。

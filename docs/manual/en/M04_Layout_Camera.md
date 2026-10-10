@@ -1,4 +1,4 @@
-# M04 · Layout and camera controls
+# Layout and camera controls
 
 [中文](../zh-CN/M04_Layout_Camera.md) · [Manual index](index.md) · [Layout 2 details](../../documentation/Layout_2.en.md)
 

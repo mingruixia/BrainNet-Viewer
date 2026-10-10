@@ -16,7 +16,8 @@ Docker-hosted Web edition. Developer: Mingrui Xia.
   MATLAB is not required.
 - Web: follow [Docker installation](docs/web/en/INSTALLATION.md). The service
   runs in the background and opens at http://127.0.0.1:1031/index.html.
-  The public-beta Docker Hub repository is mingruixia/brainnet-viewer.
+  Download the Web package and run its Compose pull/start commands; no source
+  build is required. Image: [mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer).
 
 ## Workflow
 

@@ -34,7 +34,7 @@ Use `Data/SurfTemplate/BrainMesh_ICBM152.nv` from your edition's resource librar
 
 ![Opaque gray original ICBM152 surface and Surface controls](../../assets/captures/manual-revision/02-gray-surface.png)
 
-*MATLAB Desktop illustration. It shows the real original surface and the shared exercise values, not a Python-rendering acceptance result. Lighting and exact pixels may differ by edition and graphics environment.*
+*MATLAB Desktop illustration. It shows the real original surface and the shared exercise values, Lighting and exact pixels may differ by edition and graphics environment.*
 
 Expect one complete opaque gray brain. A Uniform surface has no statistical scalar colorbar; enabling the surface colorbar does not invent mapped values. To try transparency, change Opacity to `0.3`, Apply, inspect the result, then restore `1` and Apply before the next lesson.
 

@@ -1,7 +1,5 @@
 # Per-vertex RGB and independent Double Brain colors
 
-development build · Development build · 22 September 2026
-
 Select a surface in Data Sources. In **Surface**, set **Double Brain** first if needed, then choose **Load RGB...**. Confirm that rows follow the loaded surface's original vertex order. This stages **Vertex RGB** color mode; use the single global **Apply** to commit and render. **Revert** discards uncommitted changes. **Bind RGB** confirms a previously loaded/imported table against the current surface; it cannot detect an initially incorrect correspondence.
 
 ## Text format
@@ -27,5 +25,3 @@ For a surface with N vertices, single-brain mode requires N rows. Double Brain r
 - EC import/export preserves `msh.color_table` and `doublebrain`. Imported EC tables require explicit binding; their original correspondence is not assumed. A nonempty color table with custom surface coloring and no map context becomes Vertex RGB. Modern Batch Renderer is required for bound RGB; the legacy adapter rejects it explicitly. EC export does not certify the historical GUI's rendering.
 
 Old configurations migrate with an empty table. A previously stored `vertex-rgb` mode no longer silently becomes Uniform: load and bind colors or explicitly choose another mode. RGB is not enabled automatically in old Scenes.
-
- Full regression and release visual acceptance remain pending.

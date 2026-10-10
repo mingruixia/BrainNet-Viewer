@@ -27,7 +27,7 @@ A full turn omits the duplicate endpoint, so these four frames correspond to off
 
 ![Historical MATLAB animation controls for the four-frame exercise](../../assets/captures/tutorial12-animation/12-animation-controls.png)
 
-Existing MATLAB illustration at 640 × 480, 1 second and 4 fps. Python has corresponding controls but different labels, including World Axis and Start/End Angle. This image is not a Python screenshot or acceptance of the current candidate.
+Existing MATLAB illustration at 640 × 480, 1 second and 4 fps. Python has corresponding controls but different labels, including World Axis and Start/End Angle.
 
 Select MATLAB **Export...** or Python **Export to New Folder...**. Under an existing writable parent directory, enter a new folder name such as `icbm-orbit-check`. The destination is a bundle directory, not a single PNG filename. Existing destinations cannot be overwritten; choose another name for subsequent runs.
 
@@ -39,7 +39,7 @@ The PNG bundle contains `frame-000001.png` through `frame-000004.png`, `preview.
 
 ![Historical orbit frame 3](../../assets/captures/tutorial12-animation/12-orbit-3.png)
 
-Existing MATLAB outputs from the smoothed ICBM152 exercise, showing two opposite points in the four-frame orbit. They are historical illustrations, not newly exported Python or cross-platform comparison results. Starting views, shading and output pixels may differ between graphics environments.
+Existing MATLAB outputs from the smoothed ICBM152 exercise, showing two opposite points in the four-frame orbit. Starting views, shading and output pixels may differ between graphics environments.
 
 Compare the main canvas with its pre-export view. The export uses an isolated rendering copy and must not move its cameras. Safe Fit changes the export copy's framing, so the exported brain can be smaller than the interactive brain. Turning it off retains the starting framing but can crop other angles; review every frame before using the result.
 
@@ -64,6 +64,6 @@ Use the export's cancel control if necessary. MATLAB offers **Cancel Export**; P
 
 If export is disabled, Apply and render first. If the brain is cropped, enable Safe Fit and inspect the full orbit; labels can extend beyond the fitted geometry. If an encoder is unavailable, use PNG rather than changing the scientific inputs. If the result differs from the starting display, check applied settings and export framing, not the interface's Light/Dark theme.
 
-These steps teach the workflow, not a new codec or installed-package acceptance test. Preserve the actual error and environment when reporting a failure; successful PNG export does not establish MP4/AVI support on another system.
+Preserve the actual error and environment when reporting a failure; successful PNG export does not establish MP4/AVI support on another system.
 
 Next: [performance and reproducible figures](13_Performance_and_Reproducibility.md).

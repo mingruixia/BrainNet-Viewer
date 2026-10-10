@@ -36,4 +36,4 @@ App默认数据根目录为`src/matlab/BrainNetViewer`。选择根目录以外�
 
 只想在不同数据集复用外观时使用 **Save Preset**。预设不含输入路径、相机状态或导出面板偏好。**Load Preset** 先核查兼容性，确认后替换全部显示设置、放弃待提交编辑并重置相机；随后需要再次渲染。每换数据都要复核阈值、色图范围和ROI编号。**Import Settings** 则通过另一条转换路径读取*可信*的旧EC `.mat`配置，保存现代Scene前应阅读迁移警告。详见[Scene工作流](Scene_Workflows.zh-CN.md)、[预设](Visualization_Presets.zh-CN.md)及[迁移说明](Migration.zh-CN.md)。
 
-目前的文档和开发版样例不是已清权的发行包；尤其不能因为样例被用于测试就直接公开。
+附带资源的来源与引文见随包说明。

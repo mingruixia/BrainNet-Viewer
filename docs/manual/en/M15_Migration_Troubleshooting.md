@@ -1,4 +1,4 @@
-# M15 · Migration, limitations and troubleshooting
+# Migration, limitations and troubleshooting
 
 [中文](../zh-CN/M15_Migration_Troubleshooting.md) · [Manual index](index.md) · [Migration notes](../../documentation/Migration.en.md)
 

@@ -6,7 +6,7 @@ Display the bundled AAL90 regional nodes on ICBM152 in four views, using the ori
 
 ## Inputs
 
-Use [BrainMesh_ICBM152.nv](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv) and [Node_AAL90.node](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AAL90/Node_AAL90.node), with 90 rows. Each row is `X Y Z module value label`: columns 1–3 give coordinates, column 4 supplies module/color IDs, column 5 supplies mapped-size values, and column 6 is the region label. The two numeric columns are independent. Module IDs are not automatically Yeo assignments; a node marker does not prove registration.
+Use [BrainMesh_ICBM152.nv](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv) and [Node_AAL90.node](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90.node), with 90 rows. Each row is `X Y Z module value label`: columns 1–3 give coordinates, column 4 supplies module/color IDs, column 5 supplies mapped-size values, and column 6 is the region label. The two numeric columns are independent. Module IDs are not automatically Yeo assignments; a node marker does not prove registration.
 
 ## Steps
 

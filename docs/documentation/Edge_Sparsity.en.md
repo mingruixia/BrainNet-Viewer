@@ -1,4 +1,4 @@
-# Edge sparsity and ties — development build
+# Edge sparsity and ties
 
 Choose a mode in **Visualization Settings → Edges → Selection**, enter a fraction from 0 to 1, then use global **Apply** to commit and render. Both sparsity modes require **Modern Batch Renderer**.
 

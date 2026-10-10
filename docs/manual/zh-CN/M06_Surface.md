@@ -1,8 +1,8 @@
-# M06 · 曲面外观、映射与边界
+# 曲面外观、映射与边界
 
 [English](../en/M06_Surface.md) · [手册目录](index.md) · [边界细节](../../documentation/Surface_Boundaries.zh-CN.md)
 
-开发版首批正文，2026年9月23日对照当前 **Visualization Settings → Surface** 控件和Settings 1.22.0默认值核查。Apply提交并渲染；已载入的Scene或预设保留自身显式值，除非用户修改。
+Apply提交并渲染；已载入的Scene或预设保留自身显式值，除非用户修改。
 
 | 控件 | 新设置默认值 | 含义与启用条件 |
 |---|---|---|
@@ -21,6 +21,6 @@
 
 当前面板的 **Automatic** 是现代线条式边界；旧Legacy Automatic设置可为兼容读取，但不再作为独立面板选项。Threshold和Custom Mask采用顶点着色，并非几何等值线。详见[边界算法与掩码安全](../../documentation/Surface_Boundaries.zh-CN.md)。**Vertex RGB**启用时保留原始曲面网格，大曲面可能较耗时；它不是标量图或统计阈值。见[RGB格式/绑定](../../documentation/Vertex_RGB.zh-CN.md)和[Double Brain行序](../../documentation/Double_Brain.zh-CN.md)。
 
-体映射算法、正负值/阈值及ROI绘制位于 **Volume** 分类，区别于Surface标量色图，将在M09说明。图像看起来合理并不证明网格与体数据已配准；解剖解释前须核对空间。当前构建集成测试、发行截图和逐控件完整交互验收仍待完成。
+体映射算法、正负值/阈值及ROI绘制位于 **Volume** 分类，区别于Surface标量色图，将在M09说明。图像看起来合理并不证明网格与体数据已配准；解剖解释前须核对空间。
 
 使用真实历史AAL衍生顶点标签、**Automatic**边界及二值掩码导出，可参见[教程04](../../tutorials/zh-CN/04_Vertex_Maps_and_Boundaries.md)。图谱ID是类别，不是效应量。使用该标签表时须保持与原配平滑曲面的顶点顺序一致；图谱确切版本、投影方法和空间配准仍须核对。

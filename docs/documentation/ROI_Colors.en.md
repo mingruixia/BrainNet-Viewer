@@ -38,4 +38,3 @@ rejected for displayed ROI configurations with colors. Unapplied `colort` edits
 are not imported. EC export requires Draw All off and a nonempty explicit selection;
 rows are reordered to that selection. Custom ROI rendering requires Modern Batch,
 not the legacy GUI adapter. The current version supports [boundary and small-ROI handling](ROI_Geometry.en.md), without claiming legacy mesh equivalence.
-

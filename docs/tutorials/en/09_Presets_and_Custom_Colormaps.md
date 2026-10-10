@@ -29,7 +29,7 @@ Click **Colors...** in Visualization Settings. In the editor choose **Target →
 
 ![Four-view real T map after Apply with the custom signed palette](../assets/captures/tutorial09-preset/09-pcc-diverging-full-window.png)
 
-*Current-build R2025a English App capture with local paths hidden on screen. The focused check found exactly one colorbar and the imported RGB table on every rendered view. The NIfTI, `P = 0.001` and mapping algorithm were not changed by the color edit.*
+*Current-build R2025a English App capture with local paths hidden on screen. The NIfTI, `P = 0.001` and mapping algorithm were not changed by the color edit.*
 
 ### Step 03 · Save, perturb and replay a preset
 

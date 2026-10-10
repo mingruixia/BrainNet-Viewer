@@ -42,4 +42,3 @@ Settings **1.22** uses one saved colormap; older two-palette Scenes are migrated
 composite custom map. This is **not legacy pixel equivalence**: the old 1000-bin map,
 orientation, interpolation and auto ranges can differ. Surface Map P-value conversion
 is now available for supported NIfTI statistic metadata; it does not correct for multiple comparisons.
-

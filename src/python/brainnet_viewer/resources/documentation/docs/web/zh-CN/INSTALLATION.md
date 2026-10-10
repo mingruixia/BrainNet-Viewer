@@ -1,101 +1,121 @@
-# BrainNet Viewer Web — 本机 Docker 安装
+# BrainNet Viewer Web 安装指南
 
-Web 应用在 Docker 后台运行，通过浏览器使用，默认主机端口为 **1031**。
-浏览器所在电脑无需安装 MATLAB 或桌面 Python 环境。
+[English](../en/INSTALLATION.md)
 
-当前候选仅支持**本机单用户、一个共享会话**，不要发布到局域网、互联网或隧道。
-认证、用户隔离、TLS 和远程服务器验收需要另行开发。容器目前采用软件渲染；
-主机有显卡不代表 Docker 已使用 GPU 加速。
+BrainNet Viewer Web 在 Docker 后台运行，通过浏览器
+**http://127.0.0.1:1031/index.html** 使用，无需安装 MATLAB 或本机 Python。
+公测镜像为
+[mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer)。
 
-## 前提
+## 1. 安装并启动 Docker
 
-- 已正常运行、配置为 Linux 容器的 Docker 引擎。
-- 下述源码构建方式需要 Docker Compose v2。
-- 完整项目源码，包括 `src/python`、Dockerfile 和随附资源。
-- 首次构建需要联网。已构建镜像可以传输后直接加载，不必重建；镜像分发另行安排。
+- **Windows：**安装 [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)，
+  使用 WSL 2 后端和 Linux 容器，然后启动 Docker Desktop。
+  配置 WSL 时如要求重启 Windows，请重启后继续。
+- **macOS：**根据处理器选择 Apple Silicon 或 Intel 的
+  [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)，安装后打开。
+- **Linux：**安装 [Docker Engine](https://docs.docker.com/engine/install/) 和
+  [Compose 插件](https://docs.docker.com/compose/install/linux/)。
 
-先执行 `docker version`。如无法连接引擎，请启动引擎并解决访问权限问题，
-不要修改应用依赖的固定版本。
-
-## 从源码构建并启动
-
-在 Windows、macOS 或 Linux 的项目根目录执行：
+等待 Docker 显示引擎运行。Windows 打开 PowerShell，macOS/Linux 打开终端，运行：
 
 ```sh
-docker compose -f src/python/compose.web.yml config
+docker version
+docker compose version
+docker info --format '{{.OSType}}/{{.Architecture}}'
+```
+
+第一条必须同时显示 Client 和 Server；最后一条应显示 Linux。
+Docker 会自动选择适合引擎的 amd64 或 arm64 镜像，Apple Silicon 不需强制选择 amd64。
+
+## 2. 下载 Web 安装包并启动
+
+从 [GitHub 公测发行页](https://github.com/mingruixia/BrainNet-Viewer/releases/tag/v2.0.0-beta.1)
+或 [NITRC](https://www.nitrc.org/projects/bnv/) 下载
+**BrainNet-Viewer-Web-2.0.0-beta.1.zip** 并解压。
+在包含 `compose.web.release.yml` 的解压文件夹打开终端。
+以下命令适用于 Windows PowerShell 和 macOS/Linux 终端：
+
+```sh
+docker compose -f compose.web.release.yml pull
+docker compose -f compose.web.release.yml up -d
+docker compose -f compose.web.release.yml ps
+```
+
+第一条从 Docker Hub 下载软件及依赖，首次可能需要数分钟。
+第二条启动后台服务，第三条应显示正在运行的容器。
+
+浏览器打开 **http://127.0.0.1:1031/index.html**，首次启动请等待初始化。
+Docker Desktop 需要保持运行，终端可以关闭。如果暂时打不开页面，请先按下文查看日志，
+不要重复启动另一个容器。
+
+若下载的是完整源码仓库，在仓库根目录使用：
+
+```sh
+docker compose -f src/python/compose.web.release.yml pull
+docker compose -f src/python/compose.web.release.yml up -d
+```
+
+后续操作请始终使用与所选目录布局对应的命令。
+
+## 3. 停止、重新打开与更新
+
+停止、重启或更新前，先点击 **Save Scene**，并确认浏览器下载目录中已有 Scene ZIP。
+
+在 Web 安装包的解压目录执行：
+
+```sh
+docker compose -f compose.web.release.yml logs --tail 80
+docker compose -f compose.web.release.yml stop
+docker compose -f compose.web.release.yml start
+```
+
+重启正在运行的服务时，将 `start` 改为 `restart`。启动后刷新浏览器。
+除非手动停止，容器会随 Docker 重新启动；软件不会自动恢复未保存的会话。
+
+更新时先保存 Scene，取得目标版本的 Compose 文件，再执行 `pull` 和 `up -d`。
+随后打开已保存的 Scene 并点击 Apply。需要回退时，请保留对应版本的安装包。
+
+## 4. 文件与资源
+
+**Add Files** 将选择的本机文件上传到软件中，随附的曲面和图谱网络库可直接选用。
+**Export Figure** 分别下载图片和溯源 JSON；若只出现一个文件，请检查浏览器的多文件下载权限。
+**Save Scene** 下载便携 ZIP，使用 **Open Scene** 打开后点击 **Apply** 恢复。
+
+容器中的上传文件和工作数据是临时数据，请将导出文件与 Scene 保存到本机。
+容器停止不会删除已下载的文件。另开浏览器标签页仍连接同一个软件会话，不会创建独立用户。
+
+## 5. 常见问题
+
+| 现象 | 处理方法 |
+| --- | --- |
+| 找不到 `docker` 命令 | 完成 Docker Desktop 安装，然后重新打开终端。 |
+| 无法连接 Docker，或只有 Client 信息 | 启动 Docker Desktop，等待引擎运行，再检查 `docker version`；Windows 确认使用 WSL 2 和 Linux 容器。 |
+| `pull access denied` 或 `manifest unknown` | 对照发行页面，检查 Compose 文件中的镜像名与版本是否完全正确。 |
+| 下载超时，或代理、DNS、证书错误 | 检查 Docker Desktop 的网络/代理设置及所在网络访问 Docker Hub 的条件。浏览器能上网不代表 Docker 引擎能下载。求助时保留完整错误。 |
+| `no matching manifest` | 检查引擎系统与架构，镜像适用于 Linux amd64 或 arm64。 |
+| 1031 端口已被占用 | 先确认占用服务。如需换端口，在 Compose 文件旁新建 `.env`，内容为 `BNV_PORT=1035`，执行 `up -d`，访问 http://127.0.0.1:1035/index.html。 |
+| 容器运行但网页打不开 | 检查 `ps` 与 `logs --tail 80`，等待初始化，并核对地址及端口。 |
+| 容器退出，或大文件上传/导出失败 | 查看日志以及 Docker 可用内存和磁盘空间。配置将内存限制为 8 GiB、CPU 用量限制为 2 核、临时存储限制为 512 MiB；可缩小输入/输出，或明确调整这些限制。 |
+| 重启后 Scene 消失 | 打开之前下载的 Scene ZIP，点击 Apply；未保存的工作状态不会自动恢复。 |
+
+下载 ZIP 后可用发行目录中的校验文件核对。镜像已包含运行依赖，正常安装不需要本机
+科学计算 Python 环境，也不需要从源码重新构建。
+
+## 部署范围
+
+随附配置仅允许本机访问，使用一个共享会话并由 CPU 渲染。
+CPU 配额不是主机总核数；拥有显卡不会自动开启容器 GPU 渲染。
+共享服务器部署需要身份认证、用户隔离及 HTTPS，不属于本安装配置的适用范围。
+
+## 可选的源码构建
+
+已取得完整仓库的开发者可以本机构建：
+
+```sh
 docker compose -f src/python/compose.web.yml up -d --build
 ```
 
-浏览器打开 **http://127.0.0.1:1031/index.html**。Docker 引擎需保持运行；
-关闭终端不会停止后台容器。
-当前开发源码构建在容器模式关闭浏览器空闲退出计时，后台服务保持可用，直至明确停止。
-此前构建的镜像可能仍保留依赖库默认的五分钟空闲退出行为。
+构建依赖需要联网下载。在 1031 端口上选择源码构建服务或下载镜像中的一种，避免同时启动。
 
-```sh
-docker compose -f src/python/compose.web.yml ps
-docker compose -f src/python/compose.web.yml logs --tail 60
-docker compose -f src/python/compose.web.yml stop
-docker compose -f src/python/compose.web.yml start
-docker compose -f src/python/compose.web.yml restart
-```
-
-始终使用同一项目及 Compose 文件。`start` 只启动已创建、已停止的容器，不会新建或构建。
-启动/重启后刷新浏览器。更新源码前先保存会话，再执行 `up -d --build`。
-不要与另一个占用 1031 端口的服务同时运行。
-
-## 可选 Windows 管理脚本
-
-在项目根目录先构建一次指定名称的镜像：
-
-```powershell
-docker build -f src/python/Dockerfile.web -t brainnet-viewer:web-local src/python
-```
-
-随后可用脚本替代 Compose，同一服务不要混用两种管理方式：
-
-```powershell
-.\tools\manage_brainnet_web.ps1 -Action Start
-.\tools\manage_brainnet_web.ps1 -Action Status
-.\tools\manage_brainnet_web.ps1 -Action Logs
-.\tools\manage_brainnet_web.ps1 -Action Stop
-.\tools\manage_brainnet_web.ps1 -Action Start
-.\tools\manage_brainnet_web.ps1 -Action Restart
-```
-
-默认镜像为 `brainnet-viewer:web-local`，容器为 `brainnet-web`，主机端口为 1031。
-可通过 `-Image`、`-ContainerName`、`-Port` 指定其他候选或空闲的本机端口；
-容器内部端口仍为 1031。脚本操作已有容器前核对准确镜像身份和回环端口绑定，
-不会自动替换或删除容器。重复 Start 不会创建第二份，启动/重启最多等待 30 秒检查 HTTP 就绪。
-如 PowerShell 阻止执行脚本，请遵循单位脚本策略，或直接使用上方 Docker 命令，
-不要降低系统安全策略。
-
-## 会话与文件保存
-
-**停止、重启、更新或删除容器前，先 Save Scene 并确认浏览器已下载文件。**
-设置、相机、上传及工具生成文件属于 `/tmp` 中的临时会话，不是持久项目文件。
-重建或重启进程不会自动恢复场景；关闭/刷新浏览器也不是建立独立会话的可靠方式。
-
-- Add Files 将本机输入上传至容器；输入路径文字不等于访问服务器文件系统。
-- Export Figure 分别下载图片与 `.provenance.json`，不打包 ZIP。
-  保存位置、多文件下载许可和重名处理由浏览器控制。
-- Save Scene 下载可移植 Scene ZIP；通过 Open Scene、Apply 恢复，
-  不会恢复另一个用户正在使用的浏览器会话。
-- 已下载到本机的文件不会因容器停止/重启而被删除。
-
-## 限额、排错与验证范围
-
-配套配置采用非 root、只读根目录、512 MiB 临时文件系统、8 GiB 内存、
-8 CPU 配额及 256 PID 限额。显示的主机逻辑 CPU 数不代表容器 CPU 配额；
-内存显示支持 cgroup v1/v2。软件渲染属预期行为，GPU 库存与实际渲染设备分别报告。
-
-如 1031 被占用，请先识别占用者，不要停止无关进程。
-可用脚本选择空闲的回环主机端口，或明确修改 Compose 端口映射，同时保留 `127.0.0.1`。
-页面打不开时检查状态、日志、引擎和端口，再刷新浏览器；就绪超时不应再启动竞争服务。
-
-上传/导出超限或临时空间不足时，先保存可用结果，再使用更小输入或输出尺寸。
-保存可移植 Scene 后再重启，不要悄悄放宽依赖或配额。
-
-当前候选已做 Windows 主机上的 Linux 容器生命周期、渲染和导出专项；
-不代表 macOS Docker、硬件 GPU、多人服务或三版本全功能验收。
-共享科学操作见[统一教程](../../tutorials/unified/en/index.md)和
-[手册](../../manual/en/index.md)，Web 差异见开发说明 (repository reference)。
+使用方法见[统一教程](../../tutorials/unified/en/index.md)和[用户手册](../../manual/en/index.md)。

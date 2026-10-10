@@ -1,7 +1,5 @@
 # Inspect nodes and surface vertices
 
-BrainNet Viewer 2.0 MATLAB desktop development build
-
 ## Desktop workflow
 
 1. Load a Scene and click **Render Scene**.

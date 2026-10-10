@@ -1,7 +1,5 @@
 # BrainVISA surfaces (.mesh)
 
-BrainNet Viewer 2.0 development build · development build · 2026-09-06
-
 Select a `.mesh` under **Data Sources → Surface Mesh**, or use **Add Files**. The candidate geometry is validated before replacing the current input. Configure the right-hand sections and click the single **Apply** button at their bottom to commit **and render**; **Render Scene** can explicitly redraw. **Save Scene** and **BrainNetRender** use the same independent reader.
 
 ## Supported scope
@@ -22,7 +20,7 @@ reference = brainnet.core.InputReference("surface", "subject/cortex.mesh");
 % Coordinates: 3-by-N, Faces: F-by-3, one-based.
 ```
 
-The MATLAB runtime requires no AIMS, SPM, Python or MEX reader. Development validation used a four-vertex example from AIMS/CEA documentation and a larger cortex fixture independently converted from FreeSurfer; the latter is **not** native AIMS output. These test files are not included with this guide. Redistribution would require separate AIMS/CeCILL-B and FreeSurfer notice and license review.
+The MATLAB reader requires no AIMS, SPM, Python or MEX dependency. Files retain their stored coordinates; loading does not establish anatomical alignment.
 
 ## Shared settings controls
 

@@ -14,7 +14,8 @@ BrainNet Viewer 2.0.0-beta.1用于曲面、节点、连边、曲面映射与图�
   desktop附加依赖，运行 `python -m brainnet_viewer`，不需要MATLAB。
 - Web版：按[Docker说明](docs/web/zh-CN/INSTALLATION.md)后台启动容器，
   浏览器打开 http://127.0.0.1:1031/index.html。
-  公测Docker Hub仓库为mingruixia/brainnet-viewer。
+  下载Web安装包，按指南拉取并启动镜像即可，无需源码构建。
+  镜像：[mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer)。
 
 ## 操作流程
 

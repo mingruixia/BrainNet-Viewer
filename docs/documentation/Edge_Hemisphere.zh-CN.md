@@ -1,4 +1,4 @@
-# 跨半球连边筛选：开发版
+# 跨半球连边筛选
 
 在 **Visualization Settings → Edges** 勾选 **Inter Hemi Only**，点击全局 **Apply** 提交并渲染。Revert放弃未提交修改。默认关闭表示不限制半球；Directed Edges独立控制方向。
 
@@ -6,6 +6,6 @@
 
 在All/Threshold/Sparsity筛选**之后**删除同侧边，保持原边顺序、方向和权重；不重新补足稀疏度对应的边数。Connected节点显示使用最终剩余连边；各视图原有半球裁切不变。现支持明确区分的[稀疏度/并列值模式](Edge_Sparsity.zh-CN.md)。
 
-Settings **1.12.0**新增逻辑字段`edge.inter_hemisphere_only`，保存到Scene/预设并纳入渲染缓存键。EC的`edg.interhemiedges`严格接受标量0/1并支持往返。旧配置迁移默认关闭；先前开发版EC导入忽略过此字段，须重新导入原EC才能恢复意图。Scene记录复核提示；仅有效旧相机签名可重绑，无需新数据文件。
+Settings **1.12.0**新增逻辑字段`edge.inter_hemisphere_only`，保存到Scene/预设并纳入渲染缓存键。EC的`edg.interhemiedges`严格接受标量0/1并支持往返。旧配置迁移默认关闭；旧配置EC导入忽略过此字段，须重新导入原EC才能恢复意图。Scene记录复核提示；仅有效旧相机签名可重绑，无需新数据文件。
 
 本轮不认证全部旧功能对等、全界面布局或坐标配准正确性。

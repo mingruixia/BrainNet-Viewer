@@ -1,4 +1,4 @@
-# M12 · Figure and camera-movie export
+# Figure and camera-movie export
 
 [中文](../zh-CN/M12_Export.md) · [Manual index](index.md) · [Illustrated figure export](../../tutorials/en/07_Layout_and_Publication_Export.md) · [Real-surface animation tutorial](../../tutorials/en/12_Camera_Animation.md) · [Animation details](../../documentation/Movies.en.md) · [Background limitations](../../documentation/Backgrounds.en.md)
 

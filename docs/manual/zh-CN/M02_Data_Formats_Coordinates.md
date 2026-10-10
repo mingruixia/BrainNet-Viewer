@@ -1,4 +1,4 @@
-# M02 · 数据角色、文件格式与坐标
+# 数据角色、文件格式与坐标
 
 [English](../en/M02_Data_Formats_Coordinates.md) · [手册目录](index.md) · [曲面格式矩阵](../../compatibility/Surface_Format_Support.md) · [数据根目录流程](../../documentation/Getting_Started.zh-CN.md)
 

@@ -1,7 +1,5 @@
 # Tutorial resource attribution and limits
 
-中文 (repository reference) · Tutorial index (repository reference)
-
 This page describes the tutorial materials, exact file hashes, source credits and interpretation. Resource links identify the files used by the exercises; a documentation-only download may not include the data.
 
 | Exact file in `src/matlab/BrainNetViewer/` | SHA-256 | Source and required credit |
@@ -21,8 +19,6 @@ This page describes the tutorial materials, exact file hashes, source credits an
 Both surfaces contain 81,924 vertices and 163,840 triangles. The smoothed and unsmoothed files share face indexing but differ in coordinates. The source template is MNI ICBM152; this note does not independently verify coordinate units, transform, registration accuracy or anatomical labels. Neither file is a participant scan. Match the exact mesh and version used in each exercise.
 
 ## Teaching nodes and edges
-
-Tutorials 02–03 now use the original bundled AAL90 pair rather than the eight-node teaching fixture: `Node_AAL90.node` (repository reference), SHA-256 `2ff2562b55d91f502ee8f3bf86716ea268956391729e502584ca156c2ccdd4ba`, and `Edge_AAL90_Weighted.edge` (repository reference), SHA-256 `90c7c6a536ca1131e5645d1bde15a347938a96eb9d5f9a3f41a2e17e6504e3d0`. The pair has 90 node rows and a symmetric 90 × 90 weighted matrix. Colors use the supplied column-4 module values; mapped sizes use column 5. Do not assume these stored display values are Yeo assignments or recomputed strengths. Cite Tzourio-Mazoyer et al. (2002) for AAL, and Prof. Alan C. Evans for the displayed ICBM152 surface. 
 
 The eight node XYZ rows are exact vertices of the unsmoothed teaching surface, **not** verified atlas centroids. Node columns 4–5 are invented display values and column 6 contains teaching labels. The edge matrix has 10 nonzero, asymmetric invented weights; row/column order must match the eight-node table. It is **not** measured connectivity, fiber-tract data, an effect map or evidence of axonal direction. Prof. Evans is credited for the source geometry, not for the invented network.
 

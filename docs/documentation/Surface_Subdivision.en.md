@@ -15,4 +15,3 @@ Choose **Tools → Subdivide Surface to NV...** to make a new, denser ASCII `.nv
 This is a modern, explicitly defined linear subdivision utility. The old capability audit rendering-detail requirements concerns rendering-detail controls and their persistence; no original saved-subdivision algorithm was found. Accordingly, this tool is not claimed to recreate an old rendering quality mode or to preserve scalar/attribute correspondence. Existing mesh nodes/edges/volume maps can become misaligned with the new geometry unless you establish correspondence separately.
 
 The second `#` line contains JSON provenance: source/dependency hashes, input/output counts, level-by-level counts, method, optional declarations and timestamp. Review absolute paths before sharing. Final source fingerprint checks cannot make a filesystem snapshot. No GPU/multicore speed claim, settings/Scene-schema change, full regression or cross-platform certification is made.
-

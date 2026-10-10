@@ -1,8 +1,8 @@
-# M10 · 图谱/统计ROI与画布点位查询
+# 图谱/统计ROI与画布点位查询
 
 [English](../en/M10_ROI_Inspection.md) · [手册目录](index.md) · [统计ROI规则](../../documentation/Statistical_ROI.zh-CN.md) · [AAL双侧岛叶教程](../../tutorials/zh-CN/06_AAL_Insula_ROIs_and_Inspection.md) · [AAL顶点图Inspect练习](../../tutorials/zh-CN/04_Vertex_Maps_and_Boundaries.md)
 
-开发版首批正文，2026年9月23日对照当前 **Visualization Settings → Volume** ROI控件、渲染器及Inspect流程核查。开启 **Display Volume** 并选择 **Volume Type → ROIs (Atlas / Statistical)** 才会绘制ROI。**Apply** 提交并渲染；**Revert** 撤销待提交编辑。ROI编号是标签，不是连续定量值。
+开启 **Display Volume** 并选择 **Volume Type → ROIs (Atlas / Statistical)** 才会绘制ROI。**Apply** 提交并渲染；**Revert** 撤销待提交编辑。ROI编号是标签，不是连续定量值。
 
 共用阈值控件位于Volume面板的 **Surface Mapping** 分组上方，而不是曲面专属分组内。ROI模式选择P Value时，P Value及Cluster Size同时可用；Value/Cluster模式则使用Statistical Threshold。
 

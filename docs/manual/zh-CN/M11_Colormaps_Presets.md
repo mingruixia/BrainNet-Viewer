@@ -1,8 +1,8 @@
-# M11 · 自定义色图与显示预设
+# 自定义色图与显示预设
 
 [English](../en/M11_Colormaps_Presets.md) · [手册目录](index.md) · [真实数据图文练习](../../tutorials/zh-CN/09_Presets_and_Custom_Colormaps.md) · [色图专题](../../documentation/Colormaps.zh-CN.md) · [预设专题](../../documentation/Visualization_Presets.zh-CN.md)
 
-开发版首批正文；2026年9月23日对照当前桌面控件与Settings 1.22.0核对。色图只改变外观，不改变数值、阈值或空间配准；预设只复用显示设置，不打包数据文件。
+色图只改变外观，不改变数值、阈值或空间配准；预设只复用显示设置，不打包数据文件。
 
 ## 自定义RGB色图
 
@@ -23,4 +23,4 @@ RGB TXT每行三个数值通道，不执行表达式；JSON采用`kind: brainnet
 
 **Save Scene** 不同：记录一次Scene的输入引用、设置以及现代App保存时的相机/导出偏好；输入文件仅引用，不打包。格式无效、未知版本或夹带输入/相机字段的预设会被拒绝。取消或校验失败不会替换当前设置。本版不提供纤维绘制；Surface Map和统计ROI的P值预设都须依赖所选NIfTI中有效的统计元数据。预设名称/标题可能含私人信息，共享前须核查。
 
-[真实数据图文练习](../../tutorials/zh-CN/09_Presets_and_Custom_Colormaps.md)现覆盖自定义Volume RGB暂存、Apply及预设重放，并有R2025a专项截图。人工UI验收、可及性复核与发行验收集成仍待进行；本章不代表发行验收完成。
+[真实数据图文练习](../../tutorials/zh-CN/09_Presets_and_Custom_Colormaps.md)现覆盖自定义Volume RGB暂存、Apply及预设重放，并有R2025a专项截图。

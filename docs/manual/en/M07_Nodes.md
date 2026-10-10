@@ -1,4 +1,4 @@
-# M07 · Nodes: visibility, labels, size and color
+# Nodes: visibility, labels, size and color
 
 [中文](../zh-CN/M07_Nodes.md) · [Manual index](index.md) · [Node data rules](../../documentation/Node_Selection.en.md)
 

@@ -1,4 +1,4 @@
-# M13 · Surface formats and mesh tools
+# Surface formats and mesh tools
 
 [中文](../zh-CN/M13_Surface_Tools.md) · [Manual index](index.md) · [Format matrix](../../compatibility/Surface_Format_Support.md)
 

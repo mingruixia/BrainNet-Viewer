@@ -1,7 +1,5 @@
 # 自定义色图
 
-BrainNet Viewer 2.0开发版 · 2026年9月23日按Settings 1.22.0核对。桌面流程和科学解读注意事项见[手册M11](../manual/zh-CN/M11_Colormaps_Presets.md)。
-
 **Colors...** 编辑器只有四个独立目标：Surface、Nodes、Edges、Volume。Volume用**一张**带符号色图；Positive & Negative显示模式从中点分成正负两侧，不再存两张。ROI Label Index的类别色板及可选ROI ID图例在Volume设置中选择，不是编辑器目标。
 
 新增Viridis、Plasma、Inferno、Magma、Cividis，采用Matplotlib固定256色参考表；Surface、Nodes、Edges、Volume及ROI Palette下拉框均可选择。Fiber设置数据模型也接受这些名称，但当前尚不提供纤维绘制。顺序色图适合有序数值，相邻ROI类别却可能难以区分；带正负号体数据会从色图中点分割，零点具有实际含义时宜选Blue-White-Red等发散色图。来源署名及许可见`NOTICE_CODE.md`与`LICENSE_MATPLOTLIB_COLORMAPS.txt`。

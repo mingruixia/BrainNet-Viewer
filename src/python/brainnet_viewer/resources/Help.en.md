@@ -32,7 +32,7 @@
 
 The installed package includes the 12 BrainNet surface templates and the AAL/Brodmann lookup tables. Their source credits and scope notes are in **resources/notices** within the installation. Software code is GPL-3.0-or-later; the resource notices describe separate data provenance.
 
-For current installation details, compatibility notes and the full illustrated user manual, consult the BrainNet Viewer project distribution. The full manual is being finalized separately from this quick guide.
+The full illustrated manual, shared tutorials and bilingual installation instructions are bundled under resources/documentation/docs. Open User Manual PDF or User Manual Chapters in Help for the common workflow and edition-specific details.
 ## Bundled real-data tutorials
 
 Select **Real-data Tutorials** in this Help window for AAL vertex mapping and

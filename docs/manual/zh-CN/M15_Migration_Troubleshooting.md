@@ -1,8 +1,8 @@
-# M15 · 迁移、限制与故障排查
+# 迁移、限制与故障排查
 
 [English](../en/M15_Migration_Troubleshooting.md) · [手册目录](index.md) · [迁移专题](../../documentation/Migration.zh-CN.md)
 
-开发版首批正文，已对照当前流程。BrainNet Viewer 2.0仍是MATLAB内部开发版，**不是**已认证的独立程序、Docker/浏览器或跨平台发行版。旧审计表保留各自日期的历史观察，不能把旧“missing”行直接当成本版未解决清单；专项测试与首批手册也不等于完成发行验收。
+BrainNet Viewer 2.0提供MATLAB、Python桌面和Docker/Web三版。本章介绍MATLAB配置迁移、限制与故障排查。
 
 ## 从BrainNet Viewer 1.7/1.8迁移
 
@@ -22,8 +22,8 @@
 ## 当前边界，不作默认承诺
 
 - 独立NIfTI读取器支持NIfTI-1/2单文件及成对头/图像（含已支持的gzip变体）；缺少NIfTI magic的**纯Analyze 7.5**会被拒绝。MNI/BIC `.obj`不是Wavefront OBJ；FreeSurfer `.pial`、BrainVISA `.mesh`、MZ3和GIfTI各有更窄限制。几何读取成功不证明坐标配准。
-- ROI **P Value**现可换算受支持的统计NIfTI元数据，但不自动判断输入是图谱还是统计图、不做多重比较校正，也不能证明簇水平显著性。纤维束绘制、任意 **Plot Edit**、GIF/EPS/EMF导出和内置打印仍未提供；仅Runtime部署也未验证。部分旧功能差异仍需用户明确决定范围，不能把缺失当成已同意废弃。规划中的Python桌面版和Docker版均不是当前功能。
-- 当前桌面目标为Windows MATLAB R2025a Update 1。其他MATLAB版本、平台、全部显卡驱动/显示器DPI组合及工具箱矩阵未完全认证。启动页构建日期是开发元数据，不是发行日期。
+- ROI **P Value**现可换算受支持的统计NIfTI元数据，但不自动判断输入是图谱还是统计图、不做多重比较校正，也不能证明簇水平显著性。纤维束绘制、任意 **Plot Edit**、GIF/EPS/EMF导出和内置打印仍未提供；仅Runtime部署也未验证。Python桌面版和Docker/Web版各有独立安装指南。
+- 当前桌面目标为Windows MATLAB R2025a Update 1。其他MATLAB版本、平台、全部显卡驱动/显示器DPI组合及工具箱矩阵未完全认证。
 - GPU只覆盖具体支持的运算，不代表所有渲染或视频编码均走GPU。复杂PDF/SVG可能栅格化；JPEG/BMP不透明；PNG/TIFF透明性取决于真实alpha输出。哈希和溯源证明数据/配置身份，不证明解剖有效性、发表权利或跨系统逐像素一致。
 
 ## 出现问题时

@@ -43,5 +43,3 @@ For publication-quality rerendering of this same Scene, use [Tutorial 08's `Brai
 - **GPU unavailable:** use CPU and record the reason. `ComputeBackend="gpu"` is operation-specific, not a guarantee of GPU rendering.
 - **Unexpected timings:** repeat under controlled load, record warm-up and cache state, and distinguish numeric preparation, drawing and export instead of reducing everything to one “render time.”
 - **Different image:** compare Scene/input hashes, settings, camera, quality/backend and numeric fingerprints before comparing raster pixels.
-
-This targeted tutorial check is not the project's full release acceptance regression, a cross-platform performance study, or a Nature Methods validation dataset.

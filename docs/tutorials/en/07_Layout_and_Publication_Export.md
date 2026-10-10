@@ -2,7 +2,7 @@
 
 [中文](../zh-CN/07_Layout_and_Publication_Export.md) · [Tutorial index](index.md) · [Layout manual](../../manual/en/M04_Layout_Camera.md) · [Export manual](../../manual/en/M12_Export.md)
 
-This lesson reuses the real, **PCC-subregion one-sample connectivity T map** from [Tutorial 05](05_Volume_to_Surface_Mapping.md), on the smoothed ICBM152 mesh. It is not an Alzheimer's-versus-control comparison. The four-view image illustrates page composition and export controls; scientific interpretation and the source and interpretation limits remain those of Tutorial 05. 
+This lesson reuses the real, **PCC-subregion one-sample connectivity T map** from [Tutorial 05](05_Volume_to_Surface_Mapping.md), on the smoothed ICBM152 mesh. It is not an Alzheimer's-versus-control comparison. The four-view image illustrates page composition and export controls; scientific interpretation and the source and interpretation limits remain those of Tutorial 05.
 
 | Control | Exercise value | Purpose |
 |---|---|---|

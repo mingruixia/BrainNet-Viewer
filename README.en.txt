@@ -1,4 +1,4 @@
-BrainNet Viewer 2.0 — Desktop Installation
+BrainNet Viewer 2.0 — Installation
 Developer: Mingrui Xia
 Contact: mxia@bnu.edu.cn; mingruixia@gmail.com
 
@@ -22,8 +22,8 @@ real tutorial data, dual-atlas Inspect tables and resource notices.
 PYTHON INSTALLATION — WINDOWS
 Extract the Python archive and open PowerShell in that folder. These commands
 create an independent environment without changing system Python:
-    py -3.10 -m venv .venv-bnv-test3
-    $bnvPython = (Resolve-Path .venv-bnv-test3/Scripts/python.exe).Path
+    py -3.10 -m venv .venv-bnv
+    $bnvPython = (Resolve-Path .venv-bnv/Scripts/python.exe).Path
     $bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
     $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).as_uri())" $bnvWheel
     & $bnvPython -m pip install "brainnet-viewer[desktop] @ $bnvWheelUrl"
@@ -31,14 +31,14 @@ create an independent environment without changing system Python:
     & $bnvPython -m brainnet_viewer
 Use the supplied wheel's actual filename if it changes. If py is unavailable,
 replace py -3.10 with the full path to your Python 3.10 executable.
-After installation, double-click .venv-bnv-test3/Scripts/brainnet-viewer.exe
+After installation, double-click .venv-bnv/Scripts/brainnet-viewer.exe
 to launch without retaining a command window. For error output, launch with
 the environment's python -m brainnet_viewer instead.
 
 PYTHON INSTALLATION — macOS
 Use Python 3.10 or 3.11. In a terminal in the extracted Python folder:
-    python3 -m venv .venv-bnv-test3
-    source .venv-bnv-test3/bin/activate
+    python3 -m venv .venv-bnv
+    source .venv-bnv/bin/activate
     BNV_WHEEL_URL="$(python -c 'from pathlib import Path; print(Path("brainnet_viewer-2.0.0b1-py3-none-any.whl").resolve().as_uri())')"
     python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
     python -m pip check
@@ -56,7 +56,7 @@ Data/Tutorials. File pickers default to the relevant bundled library. Copy
 examples into your own writable folder before editing them.
 
 GUIDES
-Both editions provide the unified English Word/PDF manual and shared
+All three editions provide the unified English Word/PDF manual and shared
 illustrated tutorials. Open Help in the application. The MATLAB unified PDF
 is under docs/manual/en; the Python manual is in the installed resource folder
 under documentation/docs/manual/en. Retain GPL and resource/third-party notices.
@@ -72,3 +72,12 @@ This overrides the proxy for that command only; it does not change Windows
 proxy settings or fixed dependencies. Substitute your actual HTTP proxy port
 if different. Do not label a SOCKS-only port as HTTP. If this reports a refused
 connection or timeout, check the proxy service and HTTP listener first.
+
+DOCKER / WEB INSTALLATION
+Install and start Docker with Linux containers. Extract the Web package and
+open a terminal in the folder containing compose.web.release.yml, then run:
+    docker compose -f compose.web.release.yml pull
+    docker compose -f compose.web.release.yml up -d
+Open http://127.0.0.1:1031/index.html. MATLAB and local Python are not needed.
+Read docs/web/en/INSTALLATION.md for platform setup and troubleshooting.
+Save Scene before stopping Docker; uploads and unsaved sessions are temporary.

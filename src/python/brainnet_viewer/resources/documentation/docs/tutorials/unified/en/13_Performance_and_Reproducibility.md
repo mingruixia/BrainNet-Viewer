@@ -58,4 +58,4 @@ Review provenance for private paths, filenames, titles and metadata before shari
 
 If an input hash changes, find the changed file rather than bypassing validation. If timing varies, check competing machine load, first-run effects, cache state, canvas/output dimensions and which stages were included. Reducing selected edges or using a simpler layout can help exploration, but changes the displayed workload and is not an equivalent benchmark.
 
-A mapping algorithm change is a display-method change, not merely a performance switch. Keep the scientific inputs intact and report exactly what changed. This tutorial supplies a measurement checklist and historical context; no new execution, codec support or platform acceptance is established by reading it.
+A mapping algorithm change is a display-method change, not merely a performance switch. Keep the scientific inputs intact and report exactly what changed. Use the checklist to record the data, parameters and environment for each measurement.

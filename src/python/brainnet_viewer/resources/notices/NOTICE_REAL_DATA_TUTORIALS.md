@@ -4,7 +4,7 @@ The original surface and template resources retain their original coordinates
 and contents. The MNI ICBM152 surface and its smoothed derivative were supplied
 with permission from Prof. Alan C. Evans and are authorized for redistribution.
 The AAL volume, derived vertex labels and bundled AAL/Brodmann Inspect lookup
-files are authorized for redistribution by the project owner. Attribution to
+files are included with their source credits. Attribution to
 the atlas authors is retained in the original Reference.txt files and notices.
 
 OneSample_ROI11_NC.nii is supplied and authorized for redistribution by Mingrui

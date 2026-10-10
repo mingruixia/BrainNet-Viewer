@@ -1,7 +1,5 @@
 # MZ3 surfaces
 
-Development guide · development build · 2026-09-06
-
 Select **Surface Mesh → Add** or **Add Files**, choose `.mz3` or `.mz3.gz`, adjust
 **Visualization Settings**, then select **Render Scene**. Scene JSON and
 `BrainNetRender` use the same reader. Invalid replacement files leave the previous

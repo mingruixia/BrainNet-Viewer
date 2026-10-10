@@ -1,4 +1,4 @@
-# 连边透明度：开发版
+# 连边透明度
 
 [English](Edge_Opacity.en.md) · [配色](Edge_Colors.zh-CN.md)
 
@@ -7,5 +7,3 @@
 Mapped将经过符号处理的已选权重最小/最大值线性映射到输出范围，并截限浮点误差。常量权重取上限，避免旧版除零；相同输出上下限产生固定透明度。极小但非零的权重差异正常映射，不再按eps当作常量。拒绝非有限/复数权重及范围溢出。透明度为0不等于删除连边，不改变Connected语义；实际视觉仍受光照、遮挡和图形后端影响。
 
 EC的`opacity=1/2`、`opacity_abs=0/1`、`opacity_same`、`opacity_min/max`支持往返；缺少符号/范围时采用旧默认Absolute/[0.1,0.9]。非法编码和空/倒置/越界范围会拒绝。Settings **1.9.0** 新增`edge.opacity_value_mode`，旧1.0–1.8配置迁移默认Absolute；此前忽略的原EC Signed意图需重新导入原EC。Scene附复核提示，仅重绑有效旧相机签名；Scene/预设外层版本不变。
-
-本次仅做数值、几何、迁移与控件专项，不代表完整回归或全界面视觉验收。模块配色后续已在[专项验证](Edge_Colors.zh-CN.md)处理（最多20模块），自定义矩阵配色由[专项验证](Custom_Edge_Colors.zh-CN.md)补齐。现支持[半球筛选](Edge_Hemisphere.zh-CN.md)；现支持[稀疏度规则](Edge_Sparsity.zh-CN.md)，标签/UI仍待完成。

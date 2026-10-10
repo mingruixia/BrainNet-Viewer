@@ -1,7 +1,5 @@
 # FreeSurfer 表面（.pial）
 
-BrainNet Viewer 2.0 开发版 · 开发版 · 2026-09-06
-
 ## 主界面操作
 
 1. 启动软件，在 **Data Sources → Surface Mesh** 选择 `.pial`；**Add Files** 也能识别这一扩展名。

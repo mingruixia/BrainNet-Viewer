@@ -1,4 +1,4 @@
-# M11 · Custom colormaps and visualization presets
+# Custom colormaps and visualization presets
 
 [中文](../zh-CN/M11_Colormaps_Presets.md) · [Manual index](index.md) · [Illustrated real-data exercise](../../tutorials/en/09_Presets_and_Custom_Colormaps.md) · [Colormap details](../../documentation/Colormaps.en.md) · [Preset details](../../documentation/Visualization_Presets.en.md)
 

@@ -1,8 +1,8 @@
-# M09 · 体到曲面映射与统计控件
+# 体到曲面映射与统计控件
 
 [English](../en/M09_Volume_Mapping.md) · [手册目录](index.md) · [正负色轴规则](../../documentation/Volume_Display.zh-CN.md) · [真实T图教程](../../tutorials/zh-CN/05_Volume_to_Surface_Mapping.md)
 
-开发版首批正文，2026年9月23日对照 **Visualization Settings → Volume** 和Settings 1.22.0核查。NIfTI可读取并不等于与另一份曲面已配准。映射通过体数据仿射矩阵把曲面坐标换算为体素位置取样，**不会**执行图像配准。解释空间位置前须核实曲面/体坐标空间和单位。**Apply** 提交并渲染；**Revert** 撤销待提交设置。
+NIfTI可读取并不等于与另一份曲面已配准。映射通过体数据仿射矩阵把曲面坐标换算为体素位置取样，**不会**执行图像配准。解释空间位置前须核实曲面/体坐标空间和单位。**Apply** 提交并渲染；**Revert** 撤销待提交设置。
 
 Volume面板把 **Threshold Mode**、**Statistical Threshold**、**P Value**、**Cluster Size** 和 **Voxel Connectivity** 放在 **Surface Mapping** 分组上方，因为它们也控制统计ROI。控件按Volume Type及Threshold Mode启用；ROI的P Value使用Cluster Size，Surface Map的P Value不使用。
 

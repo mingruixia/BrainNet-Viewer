@@ -1,9 +1,5 @@
 # 节点选择、标签与Connected
 
-后续更新：[开发版 / Settings 1.6连边配色](Edge_Colors.zh-CN.md)保留本页节点规则，并增加连边迁移复核要求；下文版本号描述本节点专题对应阶段。
-
-BrainNet Viewer 2.0开发版 · 开发版 · Settings 1.5
-
 [English](Node_Selection.en.md) · [节点大小](Node_Sizes.zh-CN.md) · [节点配色](Node_Colors.zh-CN.md)
 
 ## 显示规则
@@ -23,7 +19,7 @@ BrainNet Viewer 2.0开发版 · 开发版 · Settings 1.5
 
 ## Connected的含义
 
-旧版在Nettrans筛选连边之后检查`surf.cylinder(:,1:2)`中的节点编号。现代EdgePairs已有这个含义；开发版保留该实现并增加反例验证，不改成按原始矩阵判断。
+Connected按显示的筛选后连边端点判断，不按原始矩阵判断。
 
 - 无向模式使用非零上三角元素，有向模式使用非零非对角元素；节点既可为起点，也可为终点，不自动对称化原矩阵。
 - 对角线不使节点成为Connected；没有保留下来的边时，不显示Connected节点。
@@ -41,8 +37,6 @@ Connected是显示规则，不表示被隐藏节点在原始网络中的度数�
 4. 用底部唯一 **Apply** 提交并渲染；**Revert**恢复上次提交。Save Scene/Save Preset保存已应用的值。
 
 ![节点选择和标签控件](../tutorials/assets/captures/tutorial02-nodes/02-nodes-threshold-full-window.png)
-
-GS05内部验收截图，不是已清权公开教程，可能包含本机路径。控件保持英文；本轮不保证标签无碰撞、强制前置、字重/字形支持或原生鼠标对话框体验。
 
 ## EC与迁移
 

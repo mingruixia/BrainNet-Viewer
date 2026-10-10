@@ -1,7 +1,5 @@
 # 导出脑图旋转动画
 
-BrainNet Viewer 2.0 开发版 · 开发版
-
 ## 桌面操作
 
 1. 读取数据，按 **Apply** 提交显示设置并通过 **Modern Batch Renderer** 渲染；**Render Scene** 可显式重绘。

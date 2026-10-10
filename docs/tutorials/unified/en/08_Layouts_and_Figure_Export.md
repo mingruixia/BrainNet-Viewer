@@ -83,7 +83,7 @@ The compact panels use **Transparent**, not separate Content/Background selector
 
 **Python Desktop:** opaque PDF/SVG combines raster brain geometry with vector annotations; SVG glyphs can be outlines rather than editable text. Transparent PDF/SVG embeds the complete RGBA scene, including annotations, as an image. Its physical page dimensions follow pixels divided by DPI. **MATLAB Desktop:** content follows the supported MATLAB export route; complex 3-D graphics can be rasterized. Inspect the actual file in your downstream tool before claiming vector editability.
 
-For a simple transparent exercise, choose PNG, **800×600 Pixels**, **200 DPI** and Transparent on. Save to a new path and inspect real alpha in a viewer that supports it; a white viewer background alone cannot establish absence of transparency. JPEG/BMP cannot carry transparent output. This is an exercise instruction, not a claim that every format/platform has passed acceptance.
+For a simple transparent exercise, choose PNG, **800×600 Pixels**, **200 DPI** and Transparent on. Save to a new path and inspect real alpha in a viewer that supports it; a white viewer background alone cannot establish absence of transparency. JPEG/BMP cannot carry transparent output.
 
 ## Review the result and preserve provenance
 

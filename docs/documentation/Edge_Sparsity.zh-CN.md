@@ -1,4 +1,4 @@
-# 连边稀疏度与并列权重：开发版
+# 连边稀疏度与并列权重
 
 在 **Visualization Settings → Edges → Selection** 选择模式、输入0–1比例，再点击全局 **Apply** 提交并渲染。两种稀疏度模式均要求 **Modern Batch Renderer**。
 
@@ -11,6 +11,4 @@ Selection Values控制Signed/Absolute排序，原始边权不变。无向模式�
 
 Settings **1.13.0**新增`selection_mode="legacy-sparsity"`；原`sparsity`仍为Top Count。Scene/预设保存模式和比例，仅有效旧相机绑定可迁移。
 
-旧EC存的是阈值，**不是稀疏度比例**，因此导入为Threshold是正确行为，不能反推原比例。需要针对具体数据转换时，`settings.toLegacy(edgeMatrix)`用准确矩阵换算Legacy Threshold，并提示丢失自适应比例；重导入在该矩阵上保留相同边集，但换矩阵后阈值不会自动变化。未提供矩阵明确拒绝。Top Count在边界并列时通常无法用单阈值表示，因此拒绝EC转换，请用Scene/预设或明确设置阈值。先前开发版若将无关Threshold字段静默写入EC，缺少源设置/数据时不能修复。
-
-全界面视觉及完整旧功能验收仍为独立工作。
+旧EC存的是阈值，**不是稀疏度比例**，因此导入为Threshold是正确行为，不能反推原比例。需要针对具体数据转换时，`settings.toLegacy(edgeMatrix)`用准确矩阵换算Legacy Threshold，并提示丢失自适应比例；重导入在该矩阵上保留相同边集，但换矩阵后阈值不会自动变化。未提供矩阵明确拒绝。Top Count在边界并列时通常无法用单阈值表示，因此拒绝EC转换，请用Scene/预设或明确设置阈值。旧配置若将无关Threshold字段静默写入EC，缺少源设置/数据时不能修复。

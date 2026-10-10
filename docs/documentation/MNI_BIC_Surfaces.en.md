@@ -1,7 +1,5 @@
 # MNI/BIC OBJ surfaces
 
-Development guide · development build · 2026-09-06
-
 Choose **Surface Mesh → Add** or **Add Files**, select an MNI/BIC `.obj`, adjust
 **Visualization Settings**, and select **Render Scene**. The same reader is used
 by Scene JSON and `BrainNetRender`. SPM, BICPL, VTK and Python are not runtime

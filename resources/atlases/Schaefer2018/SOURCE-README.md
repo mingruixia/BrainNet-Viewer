@@ -13,9 +13,9 @@ Resting state fMRI data from 1489 subjects were registered using surface-based a
 
 Information about Downloads
 ===========================
-For each parcel resolution there are two nifti files corresponding to different versions of MNI space. `FSLMNI152_1mm` and `FSLMNI152_2mm` contain parcellations which are aligned with 2mm and 1mm MNI templates coming FSL. These two FSL MNI templates can be found under `${CBIG_CODE_DIR}/data/templates/volume/`. 
+For each parcel resolution there are two nifti files corresponding to different versions of MNI space. `FSLMNI152_1mm` and `FSLMNI152_2mm` contain parcellations which are aligned with 2mm and 1mm MNI templates coming FSL. These two FSL MNI templates can be found under `${CBIG_CODE_DIR}/data/templates/volume/`.
 
-The parcellations were computed in fsaverage6 space and sampled to the volumetric MNI space. Each parcel was matched to a corresponding network in the 7 and 17 network parcellation by Yeo et al. 
+The parcellations were computed in fsaverage6 space and sampled to the volumetric MNI space. Each parcel was matched to a corresponding network in the 7 and 17 network parcellation by Yeo et al.
 
 ----
 
@@ -23,8 +23,8 @@ Example Usage
 =============
 ### Freeview
 1) Make sure freesurfer has been set up and configured as usual (http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration).  
- 
-2) In terminal: 
+
+2) In terminal:
 
    a) `cd` to unzipped folder containing this README file, Schaefer2018_400Parcels_7Networks_order_FSLMNI152_2mm.nii.gz  
    
@@ -39,8 +39,8 @@ Example Usage
 
 ### fsleyes
 1) Make sure FSL has been set up and configured as usual (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/ShellSetup)
- 
-2) In terminal: 
+
+2) In terminal:
 
    a) `cd` to unzipped folder containing this README file, Schaefer2018_400Parcels_17Networks_order_FSLMNI152_2mm.nii.gz
   
@@ -53,7 +53,7 @@ Example Usage
    e) In the lookup tabels panel, select `Load LUT`, choose `fsleyes_lut/Schaefer2018_400Parcels_17Networks_order.lut`. Wait for a few seconds then you will see the colored parcellation.
 
 Check for more details in the screenshot:
-![Schaefer_fsleyes](https://user-images.githubusercontent.com/20438248/118851796-ba356000-b904-11eb-8f33-33d05cd7fa8a.png) 
+![Schaefer_fsleyes](https://user-images.githubusercontent.com/20438248/118851796-ba356000-b904-11eb-8f33-33d05cd7fa8a.png)
 
 ----
 

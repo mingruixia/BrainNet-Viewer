@@ -1,7 +1,5 @@
 # BrainVISA 表面（.mesh）
 
-BrainNet Viewer 2.0 开发版 · 开发版 · 2026-09-06
-
 通过 **Data Sources → Surface Mesh** 或 **Add Files** 选择 `.mesh`。候选几何验证通过后才替换当前输入。在右侧分类中调整参数，点击底部统一 **Apply** 即提交**并渲染**；**Render Scene** 可显式重绘。**Save Scene** 与 **BrainNetRender** 使用同一独立读取器。
 
 ## 支持范围
@@ -22,7 +20,7 @@ reference = brainnet.core.InputReference("surface", "subject/cortex.mesh");
 % Coordinates为3×N；Faces为F×3，索引从1开始。
 ```
 
-运行时不需要AIMS、SPM、Python或MEX。研发验证使用AIMS/CEA文档中的四顶点格式样例，以及从FreeSurfer独立转换的大型皮层测试文件；后者**不是**原生AIMS输出。这些测试文件不随本指南分发；如需另行分发，须分别复核AIMS/CeCILL-B与FreeSurfer的署名、NOTICE及许可条件。
+运行时不需要AIMS、SPM、Python或MEX。
 
 ## 统一设置操作
 

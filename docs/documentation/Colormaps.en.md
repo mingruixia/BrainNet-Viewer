@@ -1,6 +1,6 @@
 # Custom colormaps
 
-BrainNet Viewer 2.0 development build · checked 23 September 2026 against Settings 1.22.0. See [manual M11](../manual/en/M11_Colormaps_Presets.md) for the desktop workflow and scientific cautions.
+See [manual M11](../manual/en/M11_Colormaps_Presets.md) for the desktop workflow and scientific cautions.
 
 The **Colors...** editor has four independent targets: Surface, Nodes, Edges and Volume. Volume has **one** signed colormap; Positive & Negative display splits it at the midpoint, rather than storing two palettes. The separate ROI Label Index categorical palette and optional ROI ID legend are chosen in Volume settings, not in this editor.
 

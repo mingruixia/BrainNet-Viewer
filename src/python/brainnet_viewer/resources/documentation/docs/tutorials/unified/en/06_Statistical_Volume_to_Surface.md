@@ -20,7 +20,7 @@ The volume is a one-sample functional-connectivity T map in standard MNI space f
 
 ![Real PCC T map displayed in four views in Python](../../../python/en/assets/volume-four-views.png)
 
-*Existing Python Desktop illustration using the original ICBM152 surface, algorithm 2 and P=0.05. It is not a new dev20 capture or numerical-equivalence test. Its pale regions reflect the sampling/color configuration, not proof of an absent effect.*
+*Python Desktop ICBM152 mapping with algorithm 2 and P=0.05. Pale regions reflect sampling and color configuration, not proof of an absent effect.*
 
 P must lie strictly between 0 and 1. Recognized SPM/REST/DPABI descriptions or supported statistical intents provide the statistic and required degrees of freedom. Missing, contradictory or invalid metadata must be resolved; the filename or range of values cannot establish the test. Review the inferred statistic, df, cutoff and tail rather than substituting an assumed df.
 

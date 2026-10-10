@@ -8,5 +8,4 @@ The demo is a non-blocking timer, not a busy loop. It stops automatically before
 
 The feature needs a rendered canvas. It is intentionally separate from **Rotate**, which enables manual mouse rotation, and **Export Animation...**, which creates a file rather than an interactive demonstration.
 
-focused check validates timer start/tick/stop, invalid preconditions, and the separate disabled-until-rendered App controls. It does not benchmark frame rates, certify every graphics driver, or run the complete regression suite.
-
+ It does not benchmark frame rates, certify every graphics driver, or run the complete regression suite.

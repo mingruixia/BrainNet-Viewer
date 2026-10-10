@@ -1,4 +1,4 @@
-# Custom edge colors — development build
+# Custom edge colors
 
 [中文](Custom_Edge_Colors.zh-CN.md)
 

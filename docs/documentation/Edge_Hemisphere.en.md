@@ -1,4 +1,4 @@
-# Inter-hemisphere edge filtering — development build
+# Inter-hemisphere edge filtering
 
 In **Visualization Settings → Edges**, enable **Inter Hemi Only**, then click the global **Apply** to commit and render. Revert discards uncommitted changes. Disabled (default) means no hemisphere restriction; Directed Edges remains independent.
 

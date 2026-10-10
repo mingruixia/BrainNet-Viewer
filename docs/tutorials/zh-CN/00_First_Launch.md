@@ -20,7 +20,7 @@
 app = BrainNetViewer;
 ```
 
-预期：英文BrainNet Viewer主窗口打开。固定的开发构建日期不是正式发布日期。若MATLAB解析到另一份`BrainNetViewer`，先修正路径。
+预期：英文BrainNet Viewer主窗口打开。若MATLAB解析到另一份`BrainNetViewer`，先修正路径。
 
 ### Step 02
 

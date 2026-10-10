@@ -20,7 +20,7 @@ In MATLAB, set **Current Folder** to this project's root (the directory containi
 app = BrainNetViewer;
 ```
 
-Expected: the English BrainNet Viewer main window opens. Its fixed development-build date is not a public release date. If MATLAB resolves another `BrainNetViewer`, correct the path before continuing.
+Expected: the English BrainNet Viewer main window opens.  If MATLAB resolves another `BrainNetViewer`, correct the path before continuing.
 
 ### Step 02
 

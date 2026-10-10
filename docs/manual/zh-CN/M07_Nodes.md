@@ -1,8 +1,8 @@
-# M07 · 节点：可见性、标签、大小与颜色
+# 节点：可见性、标签、大小与颜色
 
 [English](../en/M07_Nodes.md) · [手册目录](index.md) · [节点数据规则](../../documentation/Node_Selection.zh-CN.md)
 
-开发版首批正文，2026年9月23日对照 **Visualization Settings → Nodes** 和Settings 1.22.0核查。`.node`每行的1–3列是XYZ坐标，**第4列供模块/颜色使用**，第5列供节点大小使用，第6列为标签。单位和解剖空间须按输入核实，不能从扩展名推断。统一 **Apply** 提交并渲染；**Revert** 撤销待提交编辑。
+`.node`每行的1–3列是XYZ坐标，**第4列供模块/颜色使用**，第5列供节点大小使用，第6列为标签。单位和解剖空间须按输入核实，不能从扩展名推断。统一 **Apply** 提交并渲染；**Revert** 撤销待提交编辑。
 
 ## 可见性与标签
 
@@ -35,5 +35,3 @@ Mapped大小沿用旧版归一化规则，动态范围大时包括对数压缩�
 | **Color Threshold / Low (<=) / High (>)** | 0 / `[37 89 152]/255` / 红色 | Threshold中第4列值`<=`阈值用Low，`>`用High；Mapped范围/色图不影响这两个固定颜色。 |
 
 Modules使用 **Nodes** 的colormap；当Edges选择Node Module时，同模块边可继承其模块颜色。自定义色图不同于与曲面几何绑定的Vertex RGB表。详见[节点配色](../../documentation/Node_Colors.zh-CN.md)、[选择与标签](../../documentation/Node_Selection.zh-CN.md)及[标签位置](../../documentation/Node_Labels.zh-CN.md)。
-
-本章记录当前控件及数值含义，不代表发行验收完成；密集标签、各DPI与当前构建发行验收集成复核仍待完成。

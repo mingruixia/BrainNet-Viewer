@@ -32,4 +32,3 @@ Updated 2026-09-23. The first column is the actual English UI/API term. Chinese 
 | Export Animation... | 导出相机动画 | 不等于时变连接或实时Demo |
 | Safe Fit | 旋转安全取景 | 只作用于电影导出副本 |
 | Provenance | 溯源记录 | 文件身份不等于解剖/统计有效性 |
-| Development build | 开发构建 | 非公开发行，未完成正式发行验收 |

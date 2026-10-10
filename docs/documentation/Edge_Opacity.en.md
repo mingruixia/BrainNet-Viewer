@@ -1,4 +1,4 @@
-# Edge opacity — development build
+# Edge opacity
 
 [中文](Edge_Opacity.zh-CN.md) · [Colors](Edge_Colors.en.md)
 
@@ -8,4 +8,4 @@ Mapped linearly maps selected, sign-adjusted weights from their minimum/maximum 
 
 EC `opacity=1/2`, `opacity_abs=0/1`, `opacity_same`, `opacity_min/max` round-trip; missing sign/range use legacy Absolute/[0.1,0.9] defaults. Invalid codes and empty/reversed/out-of-range bounds are rejected. Settings **1.9.0** adds `edge.opacity_value_mode`; older 1.0–1.8 settings default to Absolute. Previously ignored Signed EC intent requires reimporting the original EC. Scene records a review warning and only rebinds a valid old camera signature. Scene/preset envelope versions are unchanged.
 
-This is focused numerical, geometry, migration and control testing, not full regression or visual certification.  Module colors were addressed in [focused check](Edge_Colors.en.md), with a 20-module limit, and custom-matrix colors in [focused check](Custom_Edge_Colors.en.md). The current version supports [hemisphere filtering](Edge_Hemisphere.en.md). See [sparsity rules](Edge_Sparsity.en.md); label/UI work remains open.
+This is focused numerical, geometry, migration and control testing, not full regression or visual certification.en.en.md). The current version supports [hemisphere filtering](Edge_Hemisphere.en.md). See [sparsity rules](Edge_Sparsity.en.md); label/UI work remains open.

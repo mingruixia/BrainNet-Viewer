@@ -1,4 +1,4 @@
-# M03 · Scenes, presets and legacy configurations
+# Scenes, presets and legacy configurations
 
 [Manual](index.md) · [中文](../zh-CN/M03_Scenes_Presets_Legacy.md) · [Previous: data and coordinates](M02_Data_Formats_Coordinates.md)
 

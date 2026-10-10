@@ -1,117 +1,138 @@
-# BrainNet Viewer Web — local Docker installation
+# BrainNet Viewer Web installation
 
-The Web application runs in a background Docker container and is used through
-a browser. The default host port is **1031**. No MATLAB or desktop Python
-environment is required on the browsing computer.
+[中文](../zh-CN/INSTALLATION.md)
 
-This candidate supports **one user / one shared session on the local computer**.
-Do not publish it on a LAN, Internet or tunnel. Authentication, isolated users,
-TLS and remote-server acceptance require separate work. The initial container
-uses software rendering; a host GPU does not establish Docker GPU acceleration.
+BrainNet Viewer Web runs in the background in Docker. Use it in your browser at
+**http://127.0.0.1:1031/index.html**. MATLAB and a local Python installation are
+not required. The public-beta image is
+[mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer).
 
-## Prerequisites
+## 1. Install and start Docker
 
-- A working Docker engine configured for Linux containers.
-- Docker Compose v2 if using the source-build recipe below.
-- The project source including `src/python`, its Dockerfile and bundled resources.
-- Internet access for the first image build. A transferred, already-built image
-  can be loaded without rebuilding; image distribution is separate from this guide.
+- **Windows:** install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/),
+  use the WSL 2 backend and Linux containers, then start Docker Desktop.
+  If Windows requests a restart while setting up WSL, restart before continuing.
+- **macOS:** install [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
+  for your processor (Apple Silicon or Intel), then open Docker Desktop.
+- **Linux:** install [Docker Engine](https://docs.docker.com/engine/install/)
+  and the [Compose plugin](https://docs.docker.com/compose/install/linux/).
 
-Run `docker version` before proceeding. If it cannot reach the engine, start
-the engine and resolve its access permissions; do not change application pins.
-
-## Build and start from source
-
-From the project root, on Windows, macOS or Linux:
+Wait until Docker reports that the engine is running. Open PowerShell on Windows
+or Terminal on macOS/Linux and run:
 
 ```sh
-docker compose -f src/python/compose.web.yml config
+docker version
+docker compose version
+docker info --format '{{.OSType}}/{{.Architecture}}'
+```
+
+The first command must show both Client and Server sections. The last must show
+Linux. Docker selects the amd64 or arm64 image for the engine automatically; do
+not force amd64 on Apple Silicon.
+
+## 2. Download the Web package and start
+
+Download **BrainNet-Viewer-Web-2.0.0-beta.1.zip** from the
+[GitHub release](https://github.com/mingruixia/BrainNet-Viewer/releases/tag/v2.0.0-beta.1)
+or [NITRC](https://www.nitrc.org/projects/bnv/), then extract it.
+Open a terminal in the extracted folder containing `compose.web.release.yml`.
+These commands work in Windows PowerShell and macOS/Linux Terminal:
+
+```sh
+docker compose -f compose.web.release.yml pull
+docker compose -f compose.web.release.yml up -d
+docker compose -f compose.web.release.yml ps
+```
+
+The first command downloads the application and dependencies from Docker Hub.
+It may take several minutes on the first installation. The second starts the
+background service. A container should appear as running in the third command.
+
+Open **http://127.0.0.1:1031/index.html**. Allow the first startup a short time
+to initialize. Docker Desktop must remain running; closing the terminal is fine.
+If the page is not ready, use the log command below instead of starting a second
+container.
+
+If you downloaded the complete source repository, the equivalent commands are:
+
+```sh
+docker compose -f src/python/compose.web.release.yml pull
+docker compose -f src/python/compose.web.release.yml up -d
+```
+
+Use one of these folder layouts consistently for subsequent commands.
+
+## 3. Stop, reopen and update
+
+Before stopping, restarting or updating, use **Save Scene**, and check that the
+Scene ZIP is present in your browser's download folder.
+
+From the extracted Web package folder:
+
+```sh
+docker compose -f compose.web.release.yml logs --tail 80
+docker compose -f compose.web.release.yml stop
+docker compose -f compose.web.release.yml start
+```
+
+Use `restart` in place of `start` to restart a running service. Refresh the browser
+after starting it. The container restarts with Docker unless you explicitly
+stopped it; the application does not restore an unsaved session automatically.
+
+To update, save the Scene, obtain the Compose file for the desired release, then
+run `pull` and `up -d` again. Open the saved Scene and select Apply. Keep the
+versioned package if you need to return to that version.
+
+## 4. Files and resources
+
+**Add Files** uploads selected local files to the application. The bundled
+surface and atlas-network libraries are available without uploading them.
+**Export Figure** downloads the image and its provenance JSON separately.
+If only one file appears, check the browser's multiple-download permission.
+**Save Scene** downloads a portable ZIP; **Open Scene**, followed by **Apply**,
+restores it.
+
+Uploads and working data inside the container are temporary. Save exported
+files and Scenes on your computer. Files already downloaded are retained when
+the container stops. Opening another tab connects to the same application
+session; it does not create an independent user.
+
+## 5. Troubleshooting
+
+| Symptom | Action |
+| --- | --- |
+| `docker` is not recognized | Finish installing Docker Desktop and reopen the terminal. |
+| Cannot connect to Docker / only Client is shown | Start Docker Desktop, wait for the engine, and check `docker version` again. On Windows confirm WSL 2 and Linux containers. |
+| `pull access denied` or `manifest unknown` | Check the exact image name and version in the Compose file against the release page. |
+| Download timeout, proxy, DNS or certificate error | Check Docker Desktop's network/proxy settings and institutional network access to Docker Hub. Browser Internet access alone does not prove the Docker engine can download images. Keep the complete error when seeking help. |
+| `no matching manifest` | Check the engine OS/architecture. This image uses Linux amd64 or arm64. |
+| Port 1031 is already allocated | Identify the existing service. To use another port, create a file named `.env` beside the Compose file containing `BNV_PORT=1035`, run `up -d`, and open http://127.0.0.1:1035/index.html. |
+| Page unavailable while container is running | Check `ps` and `logs --tail 80`, wait for initialization, and verify the URL and port. |
+| Container stops or a large upload/export fails | Check logs and Docker's available memory/disk space. The recipe caps memory at 8 GiB, CPU use at 2 cores and temporary storage at 512 MiB. Reduce input/output size or adjust these limits deliberately. |
+| Scene disappears after restart | Open the previously downloaded Scene ZIP and select Apply. Unsaved working data is not automatically restored. |
+
+Use the release's checksum file to check downloaded ZIPs. The image requires no
+local scientific Python dependencies. Rebuilding the source is not necessary
+for normal installation.
+
+## Deployment scope
+
+The supplied configuration binds only to this computer, uses one shared
+session and renders with the CPU. CPU quotas are limits, not the host's total
+core count. The presence of a graphics card does not enable container GPU
+rendering. A shared server deployment requires authentication, user isolation
+and HTTPS; it is outside this local installation recipe.
+
+## Optional source build
+
+Developers with the complete repository can build locally:
+
+```sh
 docker compose -f src/python/compose.web.yml up -d --build
 ```
 
-Open **http://127.0.0.1:1031/index.html**. The engine must remain running;
-closing the terminal does not stop the background container.
-Current development builds disable the browser idle-exit timer in container
-mode: the background service remains available until explicitly stopped.
-Earlier images may retain the library's five-minute idle-exit behavior.
+This requires Internet access for build dependencies. Use either the source-build
+service or the downloaded image on port 1031, not both at once.
 
-```sh
-docker compose -f src/python/compose.web.yml ps
-docker compose -f src/python/compose.web.yml logs --tail 60
-docker compose -f src/python/compose.web.yml stop
-docker compose -f src/python/compose.web.yml start
-docker compose -f src/python/compose.web.yml restart
-```
-
-Run these commands against the same project and Compose file. `start` reuses
-existing stopped containers; it does not create or rebuild them. Refresh the
-browser after start/restart. To update source, save your session first and use
-`up -d --build`. Do not run this recipe alongside another service on port 1031.
-
-## Optional Windows lifecycle helper
-
-Build a named image once from the project root:
-
-```powershell
-docker build -f src/python/Dockerfile.web -t brainnet-viewer:web-local src/python
-```
-
-Then use the helper instead of Compose, not both for the same service:
-
-```powershell
-.\tools\manage_brainnet_web.ps1 -Action Start
-.\tools\manage_brainnet_web.ps1 -Action Status
-.\tools\manage_brainnet_web.ps1 -Action Logs
-.\tools\manage_brainnet_web.ps1 -Action Stop
-.\tools\manage_brainnet_web.ps1 -Action Start
-.\tools\manage_brainnet_web.ps1 -Action Restart
-```
-
-It defaults to image `brainnet-viewer:web-local`, container `brainnet-web` and
-host port 1031. Optional `-Image`, `-ContainerName` and `-Port` select a different
-candidate or free local port; the container-internal port remains 1031.
-The helper checks exact image identity and loopback port bindings before
-operating on an existing container. It never replaces/removes one automatically.
-Start is idempotent, and start/restart checks HTTP readiness for up to 30 seconds.
-If PowerShell blocks the script, follow your institution's script policy;
-ordinary Docker commands above remain available. Do not weaken system policy.
-
-## Session and file lifetime
-
-**Save Scene and verify browser downloads before stopping, restarting, updating
-or removing a container.** Settings, cameras, uploads and generated tool files
-are temporary session data in `/tmp`, not persistent project files. Recreating
-or restarting the process does not restore the scene automatically. Closing
-or refreshing a browser tab is not a reliable way to create a new isolated session.
-
-- Add Files uploads local inputs into the container. Local path strings are not
-  server filesystem access.
-- Export Figure downloads an image and its `.provenance.json` separately, not ZIP.
-  Browser download permissions, locations and duplicate names apply.
-- Save Scene downloads a portable Scene ZIP. Open Scene and Apply restore it;
-  this does not restore another user's live browser session.
-- Files already saved on your computer are not deleted by container stop/restart.
-
-## Limits, troubleshooting and verification
-
-The supplied recipe uses a non-root user, read-only root, 512 MiB temporary
-filesystem, 8 GiB memory, 8 CPU quota and PID limit 256. Host CPU count is not
-the CPU quota. Container memory reporting handles cgroup v1/v2. Software
-rendering is expected; GPU inventory and render-device identity are distinct.
-
-If port 1031 is occupied, identify the owner; do not stop an unrelated process.
-Use a free loopback host port with the helper or explicitly adjust the Compose
-port mapping while retaining `127.0.0.1`. If the page does not load, inspect
-status/logs, check the engine and port, then refresh the browser. A readiness
-timeout does not authorize a second competing service.
-
-If an upload/export exceeds limits or the temporary filesystem fills, save
-available results and use smaller inputs/output dimensions. Restart only after
-saving your portable Scene. Do not silently relax dependencies or quotas.
-
-The current candidate has focused Windows-hosted Linux-container lifecycle,
-rendering and export checks; this is not macOS Docker, hardware-GPU, multi-user
-or full three-edition acceptance. Shared scientific usage is covered in the
-[unified tutorials](../../tutorials/unified/en/index.md) and
-[manual](../../manual/en/index.md). Web-specific behavior is described in
-Web development guidance (repository reference).
+Continue with the [shared tutorials](../../tutorials/unified/en/index.md)
+and [user manual](../../manual/en/index.md).

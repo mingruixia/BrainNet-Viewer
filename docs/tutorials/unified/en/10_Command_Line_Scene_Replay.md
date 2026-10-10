@@ -64,7 +64,7 @@ Saved camera restoration depends on compatible content signatures and may fall b
 
 ![Historical MATLAB CLI four-view PCC illustration](../../assets/captures/tutorial08-cli/08-pcc-four-view-cli.png)
 
-Existing MATLAB Desktop CLI illustration: 960 × 720 pixels at 150 DPI, smoothed ICBM152 mesh, P = 0.001 and mapping algorithm 5. It illustrates a complete output, not the parameters of the new commands, a Python output or acceptance of the current candidate package.
+MATLAB CLI example: 960 × 720 pixels at 150 DPI, smoothed ICBM152 mesh, P = 0.001 and mapping algorithm 5. The commands above use their own explicit output settings.
 
 If inputs cannot be found, check the root and preserved relative structure. If a hash mismatch is reported, identify the changed input rather than editing recorded hashes to bypass validation. For output conflicts, select a new filename; for missing output directories, create the intended parent. A graphics-context failure requires a working graphics environment, not different scientific data.
 

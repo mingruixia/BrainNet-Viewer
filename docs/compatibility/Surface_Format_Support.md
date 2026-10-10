@@ -19,13 +19,3 @@ Updated 2026-09-06 · Development scope, not a release-completeness claim.
 | MZ3 overlay-only, AO/JSON lookup/future flags, point clouds, big-endian | Not supported in this step | Explicitly rejected | No automatic atlas interpretation or unsupported flag ignoring |
 
 中文：`.pial` 已支持三种二进制几何编码；坐标按原样保留，尾部标签不做变换。其他扩展名须以本表及当前版本验证结果为准，不能将旧版支持等同于现代版已实现。
-
-Guides: English (repository reference) / 中文 (repository reference).
-
-BrainVISA: English (repository reference) / 中文 (repository reference). 新`.mesh`保留原坐标，不复用旧版XYZ整体取反，旧场景须核对配准。
-
-BYU: English (repository reference) / 中文 (repository reference). 多部件三角网格全部保留为一个曲面；非三角几何明确拒绝。
-
-MNI/BIC: English (repository reference) / 中文 (repository reference). 不等于Wavefront OBJ；不推断MNI标准空间；源颜色/法线不覆盖显示配置。
-
-MZ3: English (repository reference) / 中文 (repository reference). 按内容识别原始/GZip；属性可由第三输出取得，不自动变成曲面映射；解压有大小上限和校验。

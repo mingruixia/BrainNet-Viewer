@@ -1,8 +1,8 @@
-# M08 · 连边：筛选、方向、大小、颜色与透明度
+# 连边：筛选、方向、大小、颜色与透明度
 
 [English](../en/M08_Edges.md) · [手册目录](index.md) · [稀疏度细节](../../documentation/Edge_Sparsity.zh-CN.md)
 
-开发版首批正文，2026年9月23日对照 **Visualization Settings → Edges** 和Settings 1.22.0核查。`.edge`矩阵行列须对应已加载`.node`的原始行序。权重、坐标距离和有向关系须在数据自身的科学语境下解释；连边长度和箭头均不等于白质纤维束。统一 **Apply** 提交并渲染；**Revert** 撤销待提交编辑。
+`.edge`矩阵行列须对应已加载`.node`的原始行序。权重、坐标距离和有向关系须在数据自身的科学语境下解释；连边长度和箭头均不等于白质纤维束。统一 **Apply** 提交并渲染；**Revert** 撤销待提交编辑。
 
 ## 可见性与方向
 
@@ -21,7 +21,7 @@ Top Count遇到并列权重按MATLAB列主序线性索引决定；Legacy Thresho
 | 控件 | 新设置默认值 | 当前规则 |
 |---|---|---|
 | **Size Mode** | Mapped | Uniform用Base Size；Mapped把保留边权重映射为0.4–6半径（常量集合为2）；Raw夹取到0.2–6；Threshold先以原始符号处理后的权重比较`>= Size Threshold`，再按Mapped或Raw计算达标边。低于阈值者用0.4半径，不删除边。 |
-| **Base Size / Size Scale** | 1 / 1 | Base Size仅Uniform使用；正数Size Scale在所有模式下只乘一次。数值是输入坐标单位下的半径，不是像素线宽。 |
+| **Base Size / Size Scale** | 1 / 0.7 | Base Size仅Uniform使用；正数Size Scale在所有模式下只乘一次。数值是输入坐标单位下的半径，不是像素线宽。 |
 | **Size Threshold / Threshold Basis** | 0 / Mapped | 仅Threshold启用；Basis选Mapped或Raw，阈值比较发生在归一化和缩放之前。 |
 | **Size Values** | Absolute | Signed/Absolute与Selection Values及颜色/透明度符号独立。负的无效最终半径会报错，不静默取正。 |
 | **Arrowhead Shape: Length / Width** | 1 / 0.7 | 仅Directed Edges启用；比例范围0.25–3，长度最多为边长的35%。边管在箭头底部终止，避免重叠。只改变几何，不改变矩阵方向或权重。 |
@@ -42,5 +42,3 @@ Threshold+Raw的最小半径规则不同于普通Raw，详见[完整半径计算
 | **Opacity Values** | Absolute | 仅Mapped透明度的Signed/Absolute，与筛选、大小及颜色独立。 |
 
 **Node Module**色图来自Nodes的colormap；Edges色图下拉框不能覆盖它。此模式最多支持20个不同模块，超出会报错而非循环复用颜色。Custom Matrix配色需[明确绑定并核对格式](../../documentation/Custom_Edge_Colors.zh-CN.md)。颜色阈值/长度端点详见[连边配色](../../documentation/Edge_Colors.zh-CN.md)，映射透明度见[连边透明度](../../documentation/Edge_Opacity.zh-CN.md)。显示选项不修改`.edge`文件，也不证明配准。
-
-当前构建集成数值/目视复核、高负载性能与发行截图仍属发行验收工作；本章不保证与旧渲染器逐像素一致。

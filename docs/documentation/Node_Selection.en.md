@@ -1,9 +1,5 @@
 # Node selection, labels and Connected
 
-Subsequent update: [development build / Settings 1.6 edge colors](Edge_Colors.en.md) retains these node rules and adds edge-specific migration review. Version references below describe this node task.
-
-BrainNet Viewer 2.0 development build · development build · Settings 1.5
-
 [中文](Node_Selection.zh-CN.md) · [Node sizes](Node_Sizes.en.md) · [Node colors](Node_Colors.en.md)
 
 ## Display rules
@@ -23,7 +19,7 @@ A label exactly equal to `-` means no label. It does not hide the node. Names su
 
 ## What Connected means
 
-The legacy renderer checks node IDs in `surf.cylinder(:,1:2)` after Nettrans has filtered edges. The modern renderer's selected EdgePairs already has this meaning; development build retains that implementation and adds counterexamples, rather than switching to the raw matrix.
+Connected node selection uses the endpoints of the displayed, filtered edges rather than the raw matrix.
 
 - Undirected mode uses nonzero upper-triangle entries; directed mode uses nonzero off-diagonal entries. A node may be either source or target. The raw matrix is not automatically symmetrized.
 - Diagonal entries do not make a node connected. No selected edges means no Connected nodes.
@@ -41,8 +37,6 @@ Connected is a display rule, not a claim that the raw network has zero degree fo
 4. Use the single bottom **Apply** to commit and render. **Revert** restores the last applied settings. Save Scene or Save Preset stores the applied values.
 
 ![Selection and label settings](../tutorials/assets/captures/tutorial02-nodes/02-nodes-threshold-full-window.png)
-
-Internal GS05 screenshot, not a cleared public tutorial asset; local paths can be visible. All mode/threshold controls remain English. This task does not guarantee collision-free labels, front placement, font weight/angle support or native mouse-dialog usability.
 
 ## Migration and EC
 

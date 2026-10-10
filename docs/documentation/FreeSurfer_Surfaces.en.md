@@ -1,7 +1,5 @@
 # FreeSurfer surfaces (.pial)
 
-BrainNet Viewer 2.0 development build · development build · 2026-09-06
-
 ## Desktop workflow
 
 1. Launch BrainNet Viewer. Under **Data Sources → Surface Mesh**, select a `.pial` file; **Add Files** also recognizes this extension.

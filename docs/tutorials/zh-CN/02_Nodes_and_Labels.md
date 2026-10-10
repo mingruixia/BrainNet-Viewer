@@ -6,7 +6,7 @@
 
 ## 输入
 
-使用 [BrainMesh_ICBM152.nv](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv) 和 [Node_AAL90.node](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AAL90/Node_AAL90.node)，后者有90行。每行是 `X Y Z module value label`：第1–3列为坐标，第4列提供模块/颜色编号，第5列提供映射大小的数值，第6列为脑区标签。第4、5列相互独立；这些模块编号不自动等于Yeo网络，显示节点也不证明空间配准。
+使用 [BrainMesh_ICBM152.nv](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv) 和 [Node_AAL90.node](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90.node)，后者有90行。每行是 `X Y Z module value label`：第1–3列为坐标，第4列提供模块/颜色编号，第5列提供映射大小的数值，第6列为脑区标签。第4、5列相互独立；这些模块编号不自动等于Yeo网络，显示节点也不证明空间配准。
 
 ## 步骤
 

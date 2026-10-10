@@ -1,4 +1,4 @@
-# M09 · Volume-to-surface mapping and statistical controls
+# Volume-to-surface mapping and statistical controls
 
 [中文](../zh-CN/M09_Volume_Mapping.md) · [Manual index](index.md) · [Signed color-axis rules](../../documentation/Volume_Display.en.md) · [Real T-map tutorial](../../tutorials/en/05_Volume_to_Surface_Mapping.md)
 

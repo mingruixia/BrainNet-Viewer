@@ -1,4 +1,4 @@
-# M10 · Atlas and statistical ROIs
+# Atlas and statistical ROIs
 
 [中文](../zh-CN/M10_ROI_Inspection.md) · [Manual index](index.md) · [Statistical ROI rules](../../documentation/Statistical_ROI.en.md) · [Bilateral AAL insula tutorial](../../tutorials/en/06_AAL_Insula_ROIs_and_Inspection.md) · [AAL map Inspect exercise](../../tutorials/en/04_Vertex_Maps_and_Boundaries.md)
 

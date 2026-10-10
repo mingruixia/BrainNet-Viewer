@@ -1,7 +1,5 @@
 # Interface theme, canvas and export backgrounds
 
-development build · Development build · 2026-09-20
-
 - **Theme / Light / Dark** styles the interface, not the scientific canvas. Switching
   theme must not change the rendered background, Scene settings or camera.
 - Choose the canvas color with **Visualization Settings → Global → Background Color → Choose Color**,

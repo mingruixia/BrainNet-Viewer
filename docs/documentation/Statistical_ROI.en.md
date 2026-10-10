@@ -42,5 +42,3 @@ records the representation, filtering, sign policy and surviving voxel counts.
   Inspect `roi_geometry.unsmoothed_fallback_labels` and `skipped_labels`.
   The current version supports a conservative per-component survival guard with whole-ROI fallback;
   this is not full topology preservation or legacy smoothing/expansion equivalence.
-
-

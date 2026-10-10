@@ -22,7 +22,7 @@ class WebWorkspace:
         self.root=Path(root or library_root()).resolve()
         self.settings=deepcopy(DEFAULTS)
         patterns={'surface':['Data/SurfTemplate/*.nv'],
-                  'node':['Data/ExampleFiles/AtlasNetworks/*.node'],
+                  'node':['Data/ExampleFiles/AtlasNetworks/*.node','Data/ExampleFiles/FormatExamples/*.node'],
                   'edge':['Data/ExampleFiles/AtlasNetworks/*.edge'],
                   'surface_map':['Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt'],
                   'volume':['Data/Tutorials/OneSample_ROI11_NC.nii','Data/ExampleFiles/AAL90/aal.nii']}

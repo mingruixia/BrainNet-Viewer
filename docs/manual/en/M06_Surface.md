@@ -1,4 +1,4 @@
-# M06 · Surface appearance, maps and boundaries
+# Surface appearance, maps and boundaries
 
 [中文](../zh-CN/M06_Surface.md) · [Manual index](index.md) · [Boundary details](../../documentation/Surface_Boundaries.en.md)
 

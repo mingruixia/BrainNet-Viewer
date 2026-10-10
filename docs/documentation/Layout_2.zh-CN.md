@@ -1,7 +1,5 @@
 # Layout 2：八分区视图或六完整视图
 
-开发版 · 开发版说明 · 2026-09-21
-
 照常选择Layout 2（界面显示**Overview (6 / 8 Views)**）并Render Scene，现代渲染器自动判断：
 
 - **八视图**：三角面按重心X分成非空、不共用顶点的两组；若内侧局部跨X=0导致共用顶点，还可接受恰有两个独立连通分量、各自至少95%的被引用顶点位于相反X侧的情况。符合条件的分量整体显示，不沿X=0切割。
@@ -13,4 +11,4 @@
 
 Scene仍保存Layout 2，相机可含六或八视图。App/CLI重放旧Scene时，如保存相机的数量与本次不同，会重新适配相机并发出`BNV:Render:Layout2CameraReset`提示，渲染记录写入`reset-layout2-view-count`；不会把八格相机强塞给六格。非法相机仍报错；直接调用`restoreCamera`默认严格检查，只有显式指定`AllowLayout2Fallback=true`才启用此迁移。渲染本身不会覆盖磁盘上的Scene。
 
-渲染/图片导出元数据含`layout_policy.mode/reason`，图片及动画克隆使用实际视图数量。专项验证不替代后续完整回归及视觉验收。
+渲染/图片导出元数据含`layout_policy.mode/reason`，图片及动画克隆使用实际视图数量。

@@ -1,7 +1,5 @@
 # Edge Threshold and Length colors
 
-BrainNet Viewer 2.0 development build · development build · Settings 1.6
-
 [中文](Edge_Colors.zh-CN.md) · [Migration](Migration.en.md) · [Colormaps](Colormaps.en.md)
 
 ## Two fixed colors, two boundary rules
@@ -41,7 +39,7 @@ Settings **1.6.0** adds edge.color_low, edge.color_high and edge.threshold_value
 
 Settings 1.0–1.5 retain the previous base color as Low, use the previous colormap endpoint as High, and default Threshold Values to Absolute. This is a deterministic upgrade, **not recovery of the original EC or preservation of the previous continuous-color appearance**. Threshold equality and Length appearance can change. Review both colors or reimport the untouched original EC. Scene metadata includes edge_color_upgrade; camera rebinding occurs only if the old canonical input/settings signature matched. Stale cameras remain stale; presets do not carry cameras. Previous builds need not accept Settings 1.6.
 
-## Mapped colors — development build update
+## Mapped colors
 
 Under **Edges > Color**, choose Mapped. **Mapped Values** independently chooses Signed or Absolute before range calculation; it does not alter selection, radii, opacity or Threshold Values. Leave the range field empty for Auto over retained weights, or enter `low high` for Fixed. Apply with the single global **Apply**; **Revert** restores applied values.
 
@@ -55,12 +53,12 @@ These are focused tests only, not a new full regression or a full visual/UI cert
 
 ## Remaining boundaries
 
-### Module colors — development build update
+### Module colors
 
-Choose **Node Module** and set **Inter-module Color**. Both endpoints are compared: same-module edges use the **Nodes** module palette, cross-module edges use the explicit RGB. Sorted unique labels from **all loaded nodes**, including isolated/hidden nodes, determine palette rows; edge selection or direction does not renumber colors. Label 21 is an ordinary label, not a cross-module sentinel. Since focused check, same-module edges inherit the Nodes colormap; choose Nodes → Modules if visible node colors should match. The Edges colormap field does not override this mode.
+Choose **Node Module** and set **Inter-module Color**. Both endpoints are compared: same-module edges use the **Nodes** module palette, cross-module edges use the explicit RGB. Sorted unique labels from **all loaded nodes**, including isolated/hidden nodes, determine palette rows; edge selection or direction does not renumber colors. Label 21 is an ordinary label, not a cross-module sentinel. The Edges colormap field does not override this mode.
 
 This version supports at most **20 distinct modules**; extra modules produce an error, not recycled colors. Named/custom palettes are sampled to 20 rows. Legacy EC color=5 imports CM rows 1–20 plus inter-module row 21, and exports those 21 rows. Missing/short/invalid CM is rejected. Export equivalence requires at most 20 modules and no original label 21 because the old renderer has a sentinel collision; the App requires Modern Batch Renderer for this mode.
 
-Settings **1.10.0** adds `edge.inter_module_color`. Older settings default to gray [0.5,0.5,0.5] and require color review; the former first-endpoint behavior is not preserved. Scene metadata records the upgrade and only rebinds valid old camera signatures. Reimport the original EC to recover its palette. Use the global Apply/Revert; no extra subpanel buttons. The focused settings captures above are not network-rendering acceptance evidence.
+Settings **1.10.0** adds `edge.inter_module_color`. Older settings default to gray [0.5,0.5,0.5] and require color review; the former first-endpoint behavior is not preserved. Scene metadata records the upgrade and only rebinds valid old camera signatures. Reimport the original EC to recover its palette. Use the global Apply/Revert; no extra subpanel buttons.
 
 Uniform, Threshold and Length rules remain unchanged. Related guides cover [Raw/Threshold sizes and independent size signs](Edge_Sizes.en.md), [independent opacity signs](Edge_Opacity.en.md), [custom-matrix colors and node binding](Custom_Edge_Colors.en.md), [Inter Hemi Only](Edge_Hemisphere.en.md) and [sparsity/tie rules](Edge_Sparsity.en.md). This guide does not close every legacy-compatibility issue; see [known limitations](Migration.en.md#known-limitations).

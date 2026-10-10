@@ -1,7 +1,5 @@
 # Coordinate and anatomical pane labels
 
-development build · Development build · 2026-09-20
-
 **Show Orientation Labels** controls two pane badges in multi-view layouts (2–5).
 They identify the negative/nonpositive and positive X half-space panes, not the
 screen edges after camera rotation. Single-view layout has no such badges.
@@ -56,4 +54,4 @@ launch paths are unchanged. Legacy badge styling is not modernized here.
 No Scene/Settings schema bump, automatic coordinate inference, resampling or new
 registration is introduced. Animal datasets can use confirmed L/R under exactly
 the same checks; species alone is never evidence of orientation. All-DPI/vector
-visual acceptance remains part of the stage gate.
+Check label readability in the exported figure.

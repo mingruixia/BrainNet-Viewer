@@ -1,7 +1,5 @@
 # MNI/BIC OBJ 曲面
 
-开发版指南 · 开发版 · 2026-09-06
-
 从 **Surface Mesh → Add** 或 **Add Files** 选择 MNI/BIC `.obj`，调整
 **Visualization Settings** 后点击 **Render Scene**。Scene JSON 与
 `BrainNetRender` 使用相同读取器，无需 SPM、BICPL、VTK 或 Python 运行依赖。
@@ -39,4 +37,4 @@ App/Scene/CLI 使用 auto。默认上限为 1000 万顶点、2000 万三角面�
 三角面长度、索引、哈希和尾部数据，但不保证流形拓扑、无自交、配准正确或单位法线。
 
 参见[格式矩阵](../compatibility/Surface_Format_Support.md)与
-[Scene 工作流](Scene_Workflows.zh-CN.md)。研发验证使用项目自建的小型 polygon 文件及由 FreeSurfer fsaverage 转换的皮层文件；后者**不是**原生 MNI/BIC 样例，也不随本文分发。若另行分发该测试文件，须保留 FreeSurfer 来源署名和许可。
+[Scene 工作流](Scene_Workflows.zh-CN.md)。

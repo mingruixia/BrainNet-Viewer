@@ -1,9 +1,5 @@
 # 节点大小：Raw、Mapped与阈值半径
 
-后续更新：[开发版 / Settings 1.6连边配色](Edge_Colors.zh-CN.md)保留本页节点规则，并增加连边迁移复核要求；下文版本号描述本节点专题对应阶段。
-
-BrainNet Viewer 2.0开发版 · 开发版 · Settings 1.4
-
 [English](Node_Sizes.en.md) · [节点配色](Node_Colors.zh-CN.md)
 
 ## 科学含义与计算顺序
@@ -33,9 +29,7 @@ Size Source的 **Node Value** 使用.node第5列；**Module** 使用第4列，�
 
 ![当前节点Threshold大小控件](../tutorials/assets/captures/topic-guides/node-size-threshold-panel.png)
 
-此图聚焦当前设置控件；截图不能替代原生颜色/文件对话框的鼠标验收。
-
-## 旧EC与旧开发版文件
+## 旧EC与旧配置文件
 
 | EC字段 | 现代设置 |
 |---|---|
@@ -51,5 +45,3 @@ Size Source的 **Node Value** 使用.node第5列；**Module** 使用第4列，�
 Settings 1.0–1.3升级到1.4，缺少size_threshold_basis时补Mapped。**旧Uniform在Scale不为1时，以及旧Threshold设置，纠正后可能呈现不同大小，必须复核图像。** 已保存的模块来源大小仍保留为Module；无法区分旧EC误导入与用户有意设置，需重新导入未改动的原EC才能恢复Raw意图，不能一律自动转换。
 
 旧Scene元数据附node_size_upgrade；核对旧规范化输入/设置签名后才迁移有效相机，过期相机不重绑。预设只带设置，不带相机；Scene v0.1和预设v1.0外层版本不变，不保证旧构建读取Settings 1.4。
-
-后续开发版更新：[选择/标签阈值](Node_Selection.zh-CN.md)已修复，Connected已核对；当前Settings 1.5保留这里的1.4大小规范。连边大小/颜色及标签布局仍开放。节点半径变化影响边及箭头与球体接触位置，但不改变边权、筛选和大小规则。参见[剩余限制](Migration.zh-CN.md#known-limitations)。

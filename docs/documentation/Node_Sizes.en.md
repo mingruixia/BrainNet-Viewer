@@ -1,9 +1,5 @@
 # Node sizes: Raw, Mapped and threshold radii
 
-Subsequent update: [development build / Settings 1.6 edge colors](Edge_Colors.en.md) retains these node rules and adds edge-specific migration review. Version references below describe this node task.
-
-BrainNet Viewer 2.0 development build · development build · Settings 1.4
-
 [中文](Node_Sizes.zh-CN.md) · [Node colors](Node_Colors.en.md)
 
 ## Meaning and calculation order
@@ -51,5 +47,3 @@ The implementation follows the frozen legacy renderer's processing order, not th
 Settings 1.0–1.3 upgrade to 1.4. A missing size_threshold_basis starts as Mapped. **Old Uniform settings with Scale other than 1 and old Threshold settings can render differently after correction. Review the output.** Existing saved module-source sizing remains module-source; an old mistaken EC import cannot be distinguished from deliberate module sizing. Reimport the untouched original EC to recover Raw intent. Do not automatically convert every module setting to Raw.
 
 Old Scene metadata records node_size_upgrade. Only a matching original canonical input/settings signature permits camera rebinding; stale cameras stay stale. Presets carry settings, not cameras. Scene v0.1 and preset v1.0 envelope versions are unchanged; earlier builds are not promised to read Settings 1.4.
-
-Subsequent development build update: [selection/label thresholds](Node_Selection.en.md) are repaired and Connected is verified. Current Settings 1.5 retains this 1.4 size contract. Edge size/color semantics and label layout remain open. Changes in node radius affect where edges and arrows meet the sphere, but do not alter edge weights, selection or size rules. See [remaining limitations](Migration.en.md#known-limitations).

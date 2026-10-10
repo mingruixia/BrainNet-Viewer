@@ -2,17 +2,17 @@
 
 [Tutorial index](index.md) · [Next lesson](02_First_Surface_Visualization.md)
 
-Choose MATLAB Desktop if you already use MATLAB, or install Python Desktop in a separate environment. Both lead to the same workflow: select inputs, configure, Apply/render, interact, then save or export. This lesson ends with an open main window; it does not yet load scientific data.
+Choose MATLAB Desktop, Python Desktop in a separate environment, or Docker/Web in a browser. All lead to the same workflow: select inputs, configure, Apply/render, interact, then save or export. This lesson ends with an open main window; it does not yet load scientific data.
 
 ## Choose an edition
 
-MATLAB Desktop needs installed, licensed MATLAB. Python Desktop uses Python, Qt and VTK and does not require MATLAB or SPM. Both need a local graphical desktop; these instructions do not describe a standalone executable, MATLAB Runtime-only package or Docker/browser deployment.
+MATLAB Desktop needs installed, licensed MATLAB. Python Desktop uses Python, Qt and VTK and does not require MATLAB or SPM. The desktop editions need a local graphical desktop. Docker/Web runs in a background container and needs neither MATLAB nor a local Python environment. A standalone executable and MATLAB Runtime-only package are not supplied.
 
 Check the supplied package's compatibility notes and SHA256SUMS. The public beta is named 2.0.0-beta.1; its Python package version is 2.0.0b1. Windows x64 and Apple Silicon macOS have focused development checks; consult release notes for the actual public candidate. Intel Mac, Linux Desktop and other display arrangements require separate validation. For browser use follow the [Docker installation guide](../../../web/en/INSTALLATION.md).
 
 ## Launch MATLAB Desktop
 
-1. Open MATLAB and set Current Folder to the project or distribution root containing the top-level `BrainNetViewer.m` launcher. Do not select the frozen original software folder.
+1. Open MATLAB and set Current Folder to the project or distribution root containing the top-level `BrainNetViewer.m` launcher. Do not select another BrainNet Viewer installation.
 2. Run:
 
 ```matlab
@@ -21,7 +21,7 @@ app = BrainNetViewer;
 
 3. Confirm the English main window appears. If MATLAB opens a different BrainNet installation, check `which BrainNetViewer` and correct the path before proceeding. Do not recursively add conflicting installations.
 
-The launcher locates the modern source tree; entering several `addpath` and `brainnet.app.launch` lines is unnecessary when this root launcher is available. A displayed development-build date is not the public release date.
+The launcher locates the modern source tree; entering several `addpath` and `brainnet.app.launch` lines is unnecessary when this root launcher is available.
 
 ## Install Python Desktop
 
@@ -39,13 +39,27 @@ On Windows without activation, use the interpreter created by the installation i
 
 The installed Windows graphical launcher is `.venv-bnv/Scripts/brainnet-viewer.exe`. The workspace development launcher is not a substitute for a separately installed package. Do not use source `PYTHONPATH` or change dependency constraints to hide installation errors. Keep the complete error and interpreter/architecture information if installation fails.
 
+## Start Docker/Web
+
+Follow the [Docker installation guide](../../../web/en/INSTALLATION.md) for your
+operating system. From the extracted Web package folder:
+
+```sh
+docker compose -f compose.web.release.yml pull
+docker compose -f compose.web.release.yml up -d
+```
+
+Open http://127.0.0.1:1031/index.html. Add Files uploads your local inputs, or
+select a bundled library entry. Save Scene downloads a portable ZIP. Images
+and provenance JSON download separately. Save a Scene before restarting Docker.
+
 ## Find the controls
 
 The left column contains **Data Sources**, a Scene summary and **Export Figure**. The central canvas shows the startup artwork until you render inputs. The right column contains **Visualization Settings**, the shared **Revert/Apply** controls and tools.
 
 ![Python Desktop workspace with file roles and settings](../../../python/en/assets/startup.png)
 
-*Historical Windows Python dev12 illustration reused to identify controls. Its visible version and hardware readout are not current dev20 results. The startup artwork is not a loaded Scene.*
+*Python Desktop workspace. The startup artwork is not a loaded Scene.*
 
 Expand Layout, Surface or another settings section to edit it. Python opens one section at a time. Collapsing the entire settings panel enlarges the canvas. **Apply** commits settings and renders directly; **Render Scene** is available for an explicit redraw. **Revert** discards pending edits. Light/Dark changes the interface theme, not the scientific canvas background.
 

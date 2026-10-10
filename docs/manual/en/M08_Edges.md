@@ -1,4 +1,4 @@
-# M08 · Edges: selection, direction, size, color and opacity
+# Edges: selection, direction, size, color and opacity
 
 [中文](../zh-CN/M08_Edges.md) · [Manual index](index.md) · [Sparsity details](../../documentation/Edge_Sparsity.en.md)
 
@@ -21,7 +21,7 @@ Top Count resolves equal-weight candidates by MATLAB column-major linear index; 
 | Control | New-settings default | Current rule |
 |---|---|---|
 | **Size Mode** | Mapped | Uniform uses Base Size; Mapped maps retained weights to radii 0.4–6 (constant set: 2); Raw clamps to 0.2–6; Threshold first tests original sign-adjusted weights `>= Size Threshold`, then sizes qualifying edges by Mapped or Raw basis. Below threshold uses radius 0.4, not removal. |
-| **Base Size / Size Scale** | 1 / 1 | Base Size is used in Uniform. Positive Size Scale multiplies radii once in all modes. These are radii in input-coordinate units, not pixel widths. |
+| **Base Size / Size Scale** | 1 / 0.7 | Base Size is used in Uniform. Positive Size Scale multiplies radii once in all modes. These are radii in input-coordinate units, not pixel widths. |
 | **Size Threshold / Threshold Basis** | 0 / Mapped | Enabled only in Threshold. Basis is Mapped or Raw; the threshold comparison precedes normalization and scaling. |
 | **Size Values** | Absolute | Signed or Absolute is independent of Selection Values and color/opacity signs. Negative invalid final radii are rejected rather than silently made positive. |
 | **Arrowhead Shape: Length / Width** | 1 / 0.7 | Enabled for Directed Edges. Multipliers are 0.25–3; length is capped at 35% of edge length. The edge tube ends at the arrowhead base to avoid overlap. These settings change geometry, not matrix direction or weight. |

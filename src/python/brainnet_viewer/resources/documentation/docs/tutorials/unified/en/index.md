@@ -1,6 +1,6 @@
-# BrainNet Viewer desktop tutorials
+# BrainNet Viewer tutorials
 
-Use these shared tutorials with MATLAB Desktop or Python Desktop. Installation and genuinely different behavior are labelled by edition; the scientific inputs and core workflow are shared. Start with the first lesson, then load a real surface and save your first Scene.
+Use these shared tutorials with MATLAB Desktop, Python Desktop or Docker/Web. Installation and genuinely different behavior are labelled by edition; the scientific inputs and core workflow are shared. Start with the first lesson, then load a real surface and save your first Scene.
 
 | Lesson | Goal | Input |
 | --- | --- | --- |
@@ -18,6 +18,4 @@ Use these shared tutorials with MATLAB Desktop or Python Desktop. Installation a
 | [12 Camera animation](12_Camera_Animation.md) | Inspect a short orbit before encoding a presentation movie | Real smoothed ICBM152 surface |
 | [13 Performance and reproducibility](13_Performance_and_Reproducibility.md) | Separate processing costs and preserve a repeatable figure | Real PCC map and explicitly identified ICBM152 mesh |
 
-Use the [topic coverage map](Topic_Coverage.md) to find edition-specific differences across these thirteen lessons. The retained MATLAB tutorial collection (repository reference) and Python tutorial collection (repository reference) remain historical references, not additional current acceptance evidence. The [manual entry](../../../manual/en/index.md) links the unified English Word/PDF and distinguishes existing edition-specific references. 
-
-Illustrations are reused with their original edition identity. A historical screenshot demonstrates navigation, not acceptance of the current software package. No prebuilt Scene files are supplied by these lessons. Software installation and tutorial completion do not establish spatial registration or statistical validity.
+Illustrations are reused with their original edition identity. No prebuilt Scene files are supplied by these lessons. Software installation and tutorial completion do not establish spatial registration or statistical validity.

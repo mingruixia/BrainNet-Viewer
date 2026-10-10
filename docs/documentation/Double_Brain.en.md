@@ -1,7 +1,5 @@
 # Double Brain
 
-development build · Development build · 21 September 2026
-
 Load a surface, optionally with a node file and edge matrix. Set Layout to **Single View** and direction to **Left (Sagittal)**, **Superior (Axial)** or **Anterior (Coronal)**. Under **Surface**, enable **Double Brain**, then use the global **Apply** to commit and render. Disable the checkbox to return to one brain. Revert restores the last applied setting; Restore Defaults turns this option off.
 
 ## Input order matters
@@ -16,7 +14,5 @@ Only display coordinates move. Source files, coordinates, IDs, filtering, node v
 
 - Settings 1.17 adds `surface.double_brain` (default false). Older Scene/preset files migrate with it off; an old EC `msh.doublebrain` value of 0/1 is preserved when imported/exported.
 - App Apply, preset compatibility and render entry points reject unsupported combinations. Use a surface with optional nodes/edges, uniform or vertex RGB color, Single View and one of the three directions above. No volume/ROI/scalar-map input, node-only scene, montage or arbitrary camera-direction preset is supported for initial Double Brain rendering. Subsequent camera interactions/animation remain available.
-- Surface boundary masks override the same vertices on both surfaces; focused check preserves independent RGB elsewhere. This is not general multi-subject scene composition.
+ This is not general multi-subject scene composition.
 - Scene/preset JSON, figure metadata, camera replay and movie cloning preserve the option. Toggling or changing direction invalidates display geometry as needed, without reinterpreting original coordinates.
-
-Focused checks and limitations are recorded in the focused check report. Full regression, manual visual acceptance and all-platform certification remain pending.

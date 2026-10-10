@@ -1,8 +1,8 @@
-# M03 · Scene、预设与旧版配置
+# Scene、预设与旧版配置
 
 [手册目录](index.md) · [English](../en/M03_Scenes_Presets_Legacy.md) · [上一章：数据与坐标](M02_Data_Formats_Coordinates.md)
 
-状态：开发版首批正文，2026-09-24；发行流程仍须与候选发行版核对。
+状态首批正文，2026-09-24；发行流程仍须与候选发行版核对。
 
 ## 选择合适的文件
 

@@ -1,6 +1,6 @@
-# Desktop tutorial topic coverage
+# Tutorial topic coverage
 
-Use this map to find a shared workflow and its edition-specific instructions. Coverage means the topic is documented, not that every option, platform or installed package has been tested again. Follow the actual lesson before using a dataset or copying a command.
+Use this map to find a shared workflow and its edition-specific instructions. Follow the actual lesson before using a dataset or copying a command.
 
 | Topic and shared lesson | MATLAB Desktop distinction | Python Desktop distinction |
 | --- | --- | --- |
@@ -22,8 +22,17 @@ Both editions retain the core workflow: open the main window, select inputs, con
 
 ## Documentation and evidence boundaries
 
-The [tutorial index](index.md) is the primary shared learning route. The [manual entry](../../../manual/en/index.md) provides the unified English Word/PDF and distinguishes existing edition-specific references. 
+The [tutorial index](index.md) is the primary shared learning route. The [manual entry](../../../manual/en/index.md) provides the unified English Word/PDF and distinguishes existing edition-specific references.
 
-Historical screenshots and measurements retain their original edition identity. They are not current-package test results. The Python candidate evidence summary (repository reference) reports its scoped evidence separately; it is not a MATLAB result or certification of every configuration. The lessons do not establish Intel Mac, Linux or untested monitor/scaling support.
+No prebuilt Scene files are supplied by the shared lessons. Docker/Web deployment is covered in lesson 01 and the linked installation guide. Time-varying connectivity, AI and fiber tracking are not features of this public beta. Installation guidance, compatibility statements and future features should not be inferred from this topic list.
 
-No prebuilt Scene files are supplied by the shared lessons. They do not teach Docker/Web deployment, time-varying connectivity, AI or fiber tracking as implemented desktop features. Installation guidance, compatibility statements and future features should not be inferred from this topic list.
+## Docker/Web edition
+
+The shared scientific inputs and settings also apply to Web. Select bundled
+resources or upload local files. Apply renders remotely; camera tools target
+the selected view. Mesh tools and camera animation run in the container.
+Scene save/open uses portable ZIP files, while Export Figure downloads an image
+and sidecar separately. Colormap rows can be entered in the Web settings.
+Command-line rendering in lesson 10 is a desktop/source workflow, not a browser
+command. The supplied Web service has one shared session and uses CPU rendering.
+See the [Docker installation guide](../../../web/en/INSTALLATION.md).

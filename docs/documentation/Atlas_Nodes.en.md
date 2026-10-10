@@ -18,4 +18,3 @@ For each label, the unweighted mean of **one-based voxel-centre indices** is tra
 Each row is `X Y Z module size label`; label is the original numeric region ID. All nodes share the selected module/size constants. A `#` JSON comment records source paths/SHA-256 (both paired members), region order/counts, centroid rule, affine, declared space/units and timestamp. Review paths before sharing. Modern node import accepts comments; every external `.node` reader has not been certified.
 
 Voxel grouping uses million-element chunks instead of rescanning the atlas per region. Reading and initial unique-label detection still use the full atlas: this is not streaming, multi-core or GPU acceleration; no benchmark speedup is claimed. Up to 100,000 labels are accepted. The window previews the first 100 nodes but saves all reviewed nodes. No settings schema change or automatic Scene loading.
-
