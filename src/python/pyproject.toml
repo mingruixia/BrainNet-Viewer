@@ -60,6 +60,11 @@ brainnet_viewer = [
     "resources/documentation/docs/compatibility/*.md",
     "resources/documentation/docs/documentation/*.md",
     "resources/documentation/docs/manual/en/*.docx",
+    "resources/documentation/*.md", "resources/documentation/*.txt", "resources/documentation/LICENSE",
+    "resources/documentation/docs/*.md",
+    "resources/documentation/docs/compatibility/*.md",
+    "resources/documentation/docs/documentation/*.md",
+    "resources/documentation/docs/manual/en/*.docx",
     "resources/documentation/docs/manual/en/*.md",
     "resources/documentation/docs/manual/en/*.pdf",
     "resources/documentation/docs/manual/zh-CN/*.md",
@@ -104,5 +109,5 @@ brainnet_viewer = [
     "resources/Data/ExampleFiles/FormatExamples/*.md",
     "resources/assets/branding/*.png",
     "resources/assets/ui/*.svg",
-    "resources/notices/*.md", "resources/notices/LICENSE",
+    "resources/notices/*.md", "resources/notices/*.txt", "resources/notices/LICENSE",
 ]

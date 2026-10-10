@@ -18,7 +18,7 @@ app = BrainNetViewer;
 
 ## 2. 选择和读取数据
 
-在 **Data Sources** 中使用 **Add Files**，或分别选择Surface、Nodes、Edges、Volume等输入。**Open Scene JSON** 用于打开已保存的Scene，而不是NIfTI或曲面文件。选择相容的数据后点击 **Validate and Load**，在绘图前读取文件并检查输入错误。曲面可以单独显示；其他输入组合取决于所需可视化。角色及格式边界见[README](../../README.zh-CN.md#操作流程)和[曲面格式矩阵](../compatibility/Surface_Format_Support.md)。
+在 **Data Sources** 中使用 **Add Files**，或分别选择Surface、Nodes、Edges、Volume等输入。**Open Scene JSON** 用于打开已保存的Scene，而不是NIfTI或曲面文件。选择相容的数据后点击 **Validate and Load**，在绘图前读取文件并检查输入错误。曲面可以单独显示；其他输入组合取决于所需可视化。角色及格式边界见[README](../../README.zh-CN.md#安装与启动)和[曲面格式矩阵](../compatibility/Surface_Format_Support.md)。
 
 App默认数据根目录为`src/matlab/BrainNetViewer`。选择根目录以外的文件时，App会要求选择 **Stage and Add** 或 **Cancel**，不会静默保存外部绝对路径。确认后，App将校验副本放到`user-data/imports/<hash>/`，并复制所支持的本地配套文件（如成对NIfTI头/图像文件）；原文件不修改。这样Scene可相对数据根目录引用该副本，但**不**因此获得再分发权，也**不**自动确认空间配准。依照原始数据权限保护原文件和副本。
 
