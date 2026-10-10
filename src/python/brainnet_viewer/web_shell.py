@@ -50,8 +50,8 @@ html,body {margin:0;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif}
 .bnv .v-expansion-panel-title[aria-expanded='true']::after {content:' v'}
 .bnv .v-expansion-panel-title__icon {display:none}.bnv .v-expansion-panel-text__wrapper {padding:10px 4px}
 .bnv-actions {display:grid;grid-template-columns:1fr 1fr;gap:6px}.bnv-pending {font-size:12px;color:var(--muted);margin:0;padding:5px}
-.bnv-tools {flex-shrink:0}.bnv-tools summary {list-style:none;cursor:pointer;font-size:13px;font-weight:700;min-height:36px;padding:8px 10px;background:var(--bg);border-bottom:1px solid var(--border)}
-.bnv-tools summary::-webkit-details-marker {display:none}.bnv-tools summary::after {content:' >'}.bnv-tools[open] summary::after {content:' v'}
+.bnv-tools {flex-shrink:0}.bnv-tools summary {list-style:none;cursor:pointer;display:flex;align-items:center;box-sizing:border-box;line-height:1;font-size:13px;font-weight:700;background:var(--bg);border-bottom:1px solid var(--border)}
+.bnv-tools summary::-webkit-details-marker {display:none}.bnv-tools summary::after {content:' >';white-space:pre}.bnv-tools[open] summary::after {content:' v'}
 .bnv-tools .bnv-actions {margin-top:6px}
 .bnv-source-row {display:grid;grid-template-columns:minmax(0,1fr) 42px 38px;gap:4px;align-items:start}.bnv-source-row .v-btn{height:40px}.bnv-data-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}.bnv-data-actions .v-btn{height:32px}.bnv-dialog{background:#fff;color:#10244b}.bnv .v-expansion-panel-text h4{font-size:13px;font-weight:700;margin:10px 0}
 .bnv-strip {flex-shrink:0;background:var(--panel);border-top:1px solid var(--border);padding:6px 10px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between;color:var(--muted)}.bnv-strip>span:first-child{flex:1;min-width:0;overflow-wrap:anywhere}

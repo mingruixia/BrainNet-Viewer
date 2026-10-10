@@ -35,13 +35,13 @@ CSS = """
 .bnv-toolbar {padding:6px;gap:4px}.bnv-toolbar .v-btn {height:30px}
 .bnv-right-header {min-height:36px;padding:4px 8px}.bnv-right-header h3 {font-size:13px}
 .bnv-settings-body {gap:5px;padding:0 6px 6px}
-.bnv .v-expansion-panel-title,.bnv .v-expansion-panel-title--active {min-height:32px!important;padding:6px 8px}
+.bnv .v-expansion-panel-title,.bnv .v-expansion-panel-title--active,.bnv .bnv-tools summary {min-height:32px!important;padding:6px 8px}
 .bnv .v-expansion-panel--active:not(:first-child),.bnv .v-expansion-panel--active + .v-expansion-panel {margin-top:0}
 .bnv .v-expansion-panel-text__wrapper {padding:7px 4px}
 .bnv .v-expansion-panel-text h4 {margin:7px 0 4px;font-size:12px}
 .bnv-pending {padding:3px 0;font-size:11px;line-height:1.35}
 .bnv-canvas-status {padding:4px 8px;font-size:11px}.bnv-strip {padding:4px 8px;font-size:11px}
-.bnv-tools {border-top:1px solid var(--border);padding-top:5px}.bnv-tools h4 {font-size:12px;margin-bottom:4px}
+.bnv-tools {padding-top:0}
 .bnv-three-actions {grid-template-columns:repeat(3,minmax(0,1fr))}
 .bnv-merge {max-height:calc(100dvh - 48px);overflow:auto;font-family:'Segoe UI',Arial,sans-serif}
 .bnv-merge .bnv-control-row {grid-template-columns:112px minmax(0,1fr)}
