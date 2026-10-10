@@ -11,7 +11,9 @@ MATLAB 安装
 
 PYTHON 环境要求
 Python 桌面版使用 Python、Qt 和 VTK，不需要 MATLAB 或 SPM。
-使用 Python 3.10 或 3.11、具有可用 OpenGL 的本地图形桌面和可写用户目录。
+Apple Silicon macOS 要求 Python 3.11 或更新版本，已验证 Python 3.11。
+Windows、Linux 和 Intel macOS 使用 Python 3.10 或 3.11。
+需要具有可用 OpenGL 的本地图形桌面和可写用户目录。
 除非已另行提供固定版本依赖，安装依赖需要联网。不要在机器之间复制虚拟
 环境，不要静默放宽 wheel 中固定的依赖约束。
 wheel 包含原有曲面库、图谱/网络示例、真实教程数据、双图谱 Inspect 表及
@@ -33,13 +35,15 @@ py -3.10 替换为本机 Python 3.10 可执行文件的完整路径。
 无需保留命令窗口。需要查看报错时，用该环境的 python -m brainnet_viewer 启动。
 
 PYTHON 安装 — macOS
-使用 Python 3.10 或 3.11，在 Python 解压目录的终端中运行：
-    python3 -m venv .venv-bnv
+Apple Silicon 请使用 Python 3.11，在 Python 解压目录的终端中运行：
+    python3.11 -m venv .venv-bnv
     source .venv-bnv/bin/activate
     BNV_WHEEL_URL="$(python -c 'from pathlib import Path; print(Path("brainnet_viewer-2.0.0b1-py3-none-any.whl").resolve().as_uri())')"
     python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
     python -m pip check
     brainnet-viewer
+原生 ARM64 macOS 自动选择 SciPy 1.17.1，要求 Python 3.11 或更新版本。
+Intel macOS 第一条命令也可用 Python 3.10，并保留 SciPy 1.15.3。
 若随包 wheel 名称变化，请替换成实际文件名。不要把 Windows 虚拟环境复制
 到 Mac。本包是桌面软件，不是独立程序、离线安装器、Docker 镜像或浏览器应用。
 
@@ -51,7 +55,7 @@ python 替换为 & $bnvPython：
 文件选择器默认打开对应资源库。修改示例前，请先复制到自己的可写目录。
 
 指南
-两版均提供统一英文 Word/PDF 手册和共享图文教程，可从软件 Help 打开。
+三版均提供统一英文 Word/PDF 手册和共享图文教程，可从软件 Help 打开。
 MATLAB 统一 PDF 位于 docs/manual/en；Python 手册位于已安装资源目录下的
 documentation/docs/manual/en。保留随附 GPL、资源署名和第三方许可说明。
 

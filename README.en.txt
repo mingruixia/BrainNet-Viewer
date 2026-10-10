@@ -12,8 +12,10 @@ same time. MATLAB is required; this is not a standalone application.
 
 PYTHON REQUIREMENTS
 Python Desktop uses Python, Qt and VTK; MATLAB and SPM are not required.
-Use Python 3.10 or 3.11, a local graphical desktop with working OpenGL, and a
-writable user folder. Dependency installation needs network access unless the
+Apple Silicon macOS requires Python 3.11 or newer; Python 3.11 is verified.
+Windows, Linux and Intel macOS use Python 3.10 or 3.11. A local graphical desktop
+with working OpenGL and a writable user folder is required.
+Dependency installation needs network access unless the
 fixed dependencies are supplied separately. Do not copy environments between
 machines or silently change the wheel's fixed dependency constraints.
 The wheel contains the original surface library, atlas/network examples,
@@ -36,13 +38,15 @@ to launch without retaining a command window. For error output, launch with
 the environment's python -m brainnet_viewer instead.
 
 PYTHON INSTALLATION — macOS
-Use Python 3.10 or 3.11. In a terminal in the extracted Python folder:
-    python3 -m venv .venv-bnv
+On Apple Silicon, use Python 3.11. In a terminal in the extracted Python folder:
+    python3.11 -m venv .venv-bnv
     source .venv-bnv/bin/activate
     BNV_WHEEL_URL="$(python -c 'from pathlib import Path; print(Path("brainnet_viewer-2.0.0b1-py3-none-any.whl").resolve().as_uri())')"
     python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
     python -m pip check
     brainnet-viewer
+Native ARM64 macOS selects SciPy 1.17.1, which requires Python 3.11 or newer.
+Intel macOS may use Python 3.10 for the first command and retains SciPy 1.15.3.
 Use the supplied wheel's actual filename if it changes. Do not copy a Windows
 virtual environment onto a Mac. This is a desktop package, not a standalone
 executable, offline installer, Docker image or browser application.
