@@ -20,7 +20,7 @@ The merged mesh has the **same set of vertex coordinates** as the original full 
 
 ## Step 03 · Save a boundary on the matched original pair
 
-In the main App, load `Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv` as **Surface Mesh** and `Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt` as **Surface Map**. These are the [verified Tutorial 04 pair](04_Vertex_Maps_and_Boundaries.md), not the new merged file. Click **Validate and Load**. In **Visualization Settings → Surface**, choose **Scalar Map**, **Opacity 1**, **Colormap Jet**, **Color Limits `0 90`**, **Boundary Automatic**, **Boundary Color black**, and turn **Show Surface Colorbar** off because region IDs are categories. Click the shared **Apply**. Then choose **Tools → Save Surface Boundary...** and a new `.txt` filename.
+In the main App, load `Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv` as **Surface Mesh** and `resources/atlases/AAL90/icbm_vertex_AAL_label.txt` as **Surface Map**. These are the [verified Tutorial 04 pair](04_Vertex_Maps_and_Boundaries.md), not the new merged file. Click **Validate and Load**. In **Visualization Settings → Surface**, choose **Scalar Map**, **Opacity 1**, **Colormap Jet**, **Color Limits `0 90`**, **Boundary Automatic**, **Boundary Color black**, and turn **Show Surface Colorbar** off because region IDs are categories. Click the shared **Apply**. Then choose **Tools → Save Surface Boundary...** and a new `.txt` filename.
 
 ![AAL vertex labels with automatic boundaries on the matched smoothed ICBM152 mesh](../assets/captures/tutorial04-aal/04-aal-map-full-window.png)
 

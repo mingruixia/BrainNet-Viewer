@@ -12,7 +12,8 @@
 - 提供AAL/Brodmann坐标Inspect、曲面工具、相机动画、Scene及显示Preset。
 - 图片支持像素/实际尺寸、DPI、透明度及溯源；Web图片与sidecar分别下载，Scene打包下载。
 - 改善窗口自适应、弹窗焦点、多脑视图和导出后的画布状态恢复。
-- 保留12份曲面模板；整合AtlasNetworks节点/连边库，保留AAL90，加入更新的群体连接示例。
+- 保留12份曲面模板与AAL90网络示例；AtlasNetworks提供14套GroupFC配对文件，包含AAL116、Schaefer1000与Brainnetome246，并更新Brodmann82、Dos160、Fair34、HOA112的连边、模块及连接强度。
+- AAL90体积、顶点标签与辅助文件归入图谱资源库，节点/连边教程统一使用AAL90；AAL3v2和Shen278体积文件名与目录名称一致。
 - 提供统一英文图文Word/PDF手册、共享教程及中英文Python/Docker安装说明。
 
 软件代码沿用GPL-3.0，附带资源保留来源、引文及相应说明。

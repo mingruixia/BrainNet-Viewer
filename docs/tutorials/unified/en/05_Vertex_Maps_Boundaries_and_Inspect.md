@@ -6,7 +6,7 @@ Display the historical AAL vertex-label table, outline its transitions and query
 
 ## Choose the documented pair
 
-Use `Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt` as **Surface Map**. Choose the documented surface for the edition's exercise:
+Use `resources/atlases/AAL90/icbm_vertex_AAL_label.txt` as **Surface Map**. Choose the documented surface for the edition's exercise:
 
 | Edition | Surface Mesh | Demonstration settings |
 | --- | --- | --- |
@@ -74,3 +74,5 @@ If no mapped patches appear, confirm the Surface Map role and Scalar Map mode. I
 Atlas reference: Tzourio-Mazoyer et al. (2002). Automated anatomical labeling of activations in SPM using a macroscopic anatomical parcellation of the MNI MRI single-subject brain. *NeuroImage* 15:273–289. The historical citation does not determine the exact local projection protocol.
 
 Continue with [Statistical volume to surface mapping](06_Statistical_Volume_to_Surface.md).
+
+For AAL90 auxiliary inputs, `resources/atlases/AAL90/` is relative to the repository/MATLAB archive root. In the installed Python/Docker resource library, choose `atlases/AAL90/`.

@@ -2,7 +2,7 @@
 
 [English](../en/02_Nodes_and_Labels.md) · [教程索引](index.md) · [节点设置](../../manual/zh-CN/M07_Nodes.md)
 
-使用原配套 AAL90 节点表，在 ICBM152 曲面上以四脑视图展示，不再使用自制八节点教学网络。
+使用AAL90 节点表，在 ICBM152 曲面上以四脑视图展示。
 
 ## 输入
 

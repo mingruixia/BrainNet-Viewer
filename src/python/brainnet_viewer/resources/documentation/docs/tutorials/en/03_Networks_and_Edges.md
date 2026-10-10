@@ -6,7 +6,7 @@ Display the bundled AAL90 weighted network in four views. The matrix must use ex
 
 ## Inputs
 
-Use [ICBM152](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv), [AAL90 nodes](../../../../Data/ExampleFiles/AtlasNetworks/AAL90.node), and [Edge_AAL90_Weighted.edge](../../../../Data/ExampleFiles/AtlasNetworks/AAL90_Weighted.edge). The example matrix is symmetric and 90 × 90; it is not the eight-node directed teaching network.
+Use [ICBM152](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv), [AAL90 nodes](../../../../Data/ExampleFiles/AtlasNetworks/AAL90.node), and [Edge_AAL90_Weighted.edge](../../../../Data/ExampleFiles/AtlasNetworks/AAL90_Weighted.edge). The example matrix is symmetric and 90 × 90.
 
 ## Steps
 

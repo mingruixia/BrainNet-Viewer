@@ -8,7 +8,7 @@ on the selected view. Export Figure saves the displayed scene.
 ## 1. AAL vertex labels and Inspect
 
 Surface: `Data/SurfTemplate/BrainMesh_ICBM152.nv`.
-Surface Map: `Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt`.
+Surface Map: `atlases/AAL90/icbm_vertex_AAL_label.txt`.
 Choose Single View, Left Lateral, Surface opacity 1 and Mapped surface colors.
 Select a categorical palette such as hsv. Enable automatic boundaries if desired.
 Enable Inspect and click the surface to display MNI coordinates, Brodmann Area
@@ -37,7 +37,7 @@ does not change the statistical interpretation or provide additional inference.
 ## 3. Bilateral insula ROI
 
 Surface: `Data/SurfTemplate/BrainMesh_ICBM152.nv`.
-Volume: `Data/ExampleFiles/AAL90/aal.nii`.
+Volume: `atlases/AAL90/aal.nii`.
 Enable Volume display and select ROI Drawing. Set Threshold Mode to None,
 turn off Draw All ROIs, and enter ROI Selection `29,30` (left/right insula).
 Use Single View, Superior, surface opacity 0.3, and Label Index ROI colors.
@@ -56,13 +56,7 @@ of healthy adults. See the bundled atlas network notice for citations.
 
 ## Additional library files
 
-The original surface collection and approved AAL90, Brodmann82, Dos160,
-Fair34 and HOA112 template examples are included. Each template directory
-contains its original Reference.txt. AAL116 and Custom/Node_ROI are standalone
-node examples; do not pair them with a differently sized edge matrix.
-Cover.mat is a historical MATLAB settings example, not a Python Scene file.
-Tutorial02 vertex nodes match the ICBM152 surface. Tutorial03's eight-node
-directed matrix is illustrative, not an empirical connectivity result.
+The library contains AAL90 and fourteen matched GroupFC pairs, including AAL116, Schaefer1000 and Brainnetome246. See `Data/ExampleFiles/AtlasNetworks/README.md` for the complete list and citations. Pair files from the same atlas and never substitute a differently sized matrix.
 
 References: Tzourio-Mazoyer et al. (2002), NeuroImage 15:273–289;
 Xia et al. (2014), J Alzheimers Dis 39:527–543;

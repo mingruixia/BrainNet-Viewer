@@ -33,9 +33,11 @@
 ### Resources and documentation
 
 - All 12 supplied surface templates are retained.
-- AtlasNetworks combines paired examples, including AAL90, with the updated
-  AAL3v2, Glasser360, Power264, Shen278 and Schaefer100/200/400Yeo7 group networks.
-- Separate format examples and AAL90 volume/vertex-map support files remain available.
+- AtlasNetworks retains AAL90 and includes fourteen matched GroupFC networks,
+  including AAL116, Schaefer1000 and Brainnetome246. Brodmann82, Dos160,
+  Fair34 and HOA112 now have GroupFC pairs with module colors and strength sizes.
+- AAL90 volume/vertex-map support files are in the atlas library; node and edge
+  tutorials use AAL90. AAL3v2 and Shen278 volume filenames match their library names.
 - Unified illustrated English Word/PDF manual and shared tutorials; bilingual Python
   and Docker installation instructions.
 

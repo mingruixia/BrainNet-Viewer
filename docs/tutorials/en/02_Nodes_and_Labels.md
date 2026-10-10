@@ -2,7 +2,7 @@
 
 [中文](../zh-CN/02_Nodes_and_Labels.md) · [Tutorial index](index.md) · [Node controls](../../manual/en/M07_Nodes.md)
 
-Display the bundled AAL90 regional nodes on ICBM152 in four views, using the original node table rather than an invented teaching network.
+Display the bundled AAL90 regional nodes on ICBM152 in four views.
 
 ## Inputs
 

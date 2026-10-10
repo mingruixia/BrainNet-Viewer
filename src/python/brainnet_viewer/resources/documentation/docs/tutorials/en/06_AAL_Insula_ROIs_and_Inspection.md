@@ -21,7 +21,7 @@ In this exact `aal.nii` (SHA-256 `2926fcc98efc709f77c8cca2f9c1d797eba3e9a1b222a8
 
 ### Step 01
 
-Launch `app = BrainNetViewer;`. In **Data Sources → Add Files**, choose [`BrainMesh_ICBM152_smoothed.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv) as **Surface Mesh** and [`aal.nii`](../../../../Data/ExampleFiles/AAL90/aal.nii) as **Volume / Atlas**. Click **Validate and Load**. Check that the volume is 181 × 217 × 181 with 1 mm voxels. These project files are used in their stored MNI-like coordinates; the App does not perform registration, and this lesson is not an independent spatial-alignment audit.
+Launch `app = BrainNetViewer;`. In **Data Sources → Add Files**, choose [`BrainMesh_ICBM152_smoothed.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv) as **Surface Mesh** and [`aal.nii`](../../../../atlases/AAL90/aal.nii) as **Volume / Atlas**. Click **Validate and Load**. Check that the volume is 181 × 217 × 181 with 1 mm voxels. These project files are used in their stored MNI-like coordinates; the App does not perform registration, and this lesson is not an independent spatial-alignment audit.
 
 ### Step 02
 

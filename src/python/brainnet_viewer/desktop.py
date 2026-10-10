@@ -715,6 +715,8 @@ class BrainNetWindow(W.QMainWindow):
         paired={"node":"edge","edge":"node"}.get(role)
         if paired in self.paths and self.paths[paired].parent.is_dir(): return self.paths[paired].parent
         if role=="surface": return LIBRARY/"Data/SurfTemplate"
+        if role in ("surface_map","volume") and (LIBRARY/"atlases/AAL90").is_dir():
+            return LIBRARY/"atlases/AAL90"
         networks=LIBRARY/"Data/ExampleFiles/AtlasNetworks"
         return networks if role in ("node","edge") and networks.is_dir() else LIBRARY/"Data"
 

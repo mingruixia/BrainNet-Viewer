@@ -14,11 +14,9 @@ subregions in Alzheimer's disease. J Alzheimers Dis 39:527–543.
 The demonstration volume is a one-sample PCC-subregion seed connectivity
 statistical map in standard MNI space, not a disease-group difference map.
 
-Tutorial02_ICBM152_Vertex_Nodes.node and
-Tutorial03_Illustrative_Directed8.edge are project tutorial assets authorized
-for redistribution. The directed matrix is illustrative, not empirical.
-Original historical example files retain the citations supplied with them;
-the newer group network collection has its own atlas network notice.
+Node and edge tutorials use AAL90.node and its paired AAL90_Weighted.edge
+or AAL90_Binary.edge in Data/ExampleFiles/AtlasNetworks. Retain the AAL
+citation. GroupFC files have their own atlas network notice.
 
 These resources are visualization examples. Smoothing, interpolation and
 cluster-size display filtering do not constitute statistical correction.

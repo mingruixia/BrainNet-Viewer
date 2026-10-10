@@ -6,7 +6,7 @@ Display the historical AAL vertex-label map on its matched smoothed ICBM152 surf
 
 ## Data and interpretation
 
-Load [`BrainMesh_ICBM152_smoothed.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv) as **Surface** and [`icbm_vertex_AAL_label.txt`](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt) as **Surface Map**. Use this surface and vertex-map pairing. The map SHA-256 is `7cd6b8aa19c2aae6161015d62d22770a1fdfdf61d7e29354e8174dbd7853d131`. It contains **81,924** integer vertex labels; 79 distinct IDs occur, spanning 0–90. ID 0 occurs **7,352** times and is treated as unlabeled/background; the remaining **74,572** vertices have positive IDs. “AAL90” does not mean all 90 positive IDs occur on this mesh. Read the [source, compatibility and rights note](Resource_Attribution.md) before using the image in a publication.
+Load [`BrainMesh_ICBM152_smoothed.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv) as **Surface** and [`icbm_vertex_AAL_label.txt`](../../../resources/atlases/AAL90/icbm_vertex_AAL_label.txt) as **Surface Map**. Use this surface and vertex-map pairing. The map SHA-256 is `7cd6b8aa19c2aae6161015d62d22770a1fdfdf61d7e29354e8174dbd7853d131`. It contains **81,924** integer vertex labels; 79 distinct IDs occur, spanning 0–90. ID 0 occurs **7,352** times and is treated as unlabeled/background; the remaining **74,572** vertices have positive IDs. “AAL90” does not mean all 90 positive IDs occur on this mesh. Read the [source, compatibility and rights note](Resource_Attribution.md) before using the image in a publication.
 
 This table is a categorical atlas-derived projection, **not** a statistical map. The local materials cite Tzourio-Mazoyer et al., *NeuroImage* 15:273–289 (2002), but do not establish the exact atlas version, projection algorithm or spatial-registration accuracy.  Tested on Windows/MATLAB R2025a Update 1; runtime and peak memory were not measured.
 
@@ -44,9 +44,9 @@ To verify that the intended file is loaded, run this from the project root:
 sourceRoot = fullfile(pwd,"src","matlab","BrainNetViewer");
 addpath(sourceRoot);
 ref = brainnet.core.InputReference("surface_map", ...
-    "Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt", ...
+    "resources/atlases/AAL90/icbm_vertex_AAL_label.txt", ...
     Sha256="7cd6b8aa19c2aae6161015d62d22770a1fdfdf61d7e29354e8174dbd7853d131");
-ids = brainnet.io.readSurfaceMap(ref,sourceRoot);
+ids = brainnet.io.readSurfaceMap(ref,pwd);
 [numel(ids),numel(unique(ids)),sum(ids==0)]  % [81924 79 7352]
 ```
 

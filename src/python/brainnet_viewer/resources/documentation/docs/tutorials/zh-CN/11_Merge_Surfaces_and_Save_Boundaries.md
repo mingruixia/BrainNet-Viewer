@@ -20,7 +20,7 @@
 
 ## 步骤 03 · 在原配曲面上保存边界
 
-回到主App，以`Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv`作为 **Surface Mesh**、`Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt`作为 **Surface Map**。这是[教程04核验过的原配组合](04_Vertex_Maps_and_Boundaries.md)，**不是**新合并文件。点 **Validate and Load**；在 **Visualization Settings → Surface** 中设 **Scalar Map**、**Opacity 1**、**Colormap Jet**、**Color Limits `0 90`**、**Boundary Automatic**、**Boundary Color black**；关闭 **Show Surface Colorbar**，因为脑区编号不是连续效应量。点底部共用 **Apply**，再选 **Tools → Save Surface Boundary...**，指定新的`.txt`文件名。
+回到主App，以`Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv`作为 **Surface Mesh**、`resources/atlases/AAL90/icbm_vertex_AAL_label.txt`作为 **Surface Map**。这是[教程04核验过的原配组合](04_Vertex_Maps_and_Boundaries.md)，**不是**新合并文件。点 **Validate and Load**；在 **Visualization Settings → Surface** 中设 **Scalar Map**、**Opacity 1**、**Colormap Jet**、**Color Limits `0 90`**、**Boundary Automatic**、**Boundary Color black**；关闭 **Show Surface Colorbar**，因为脑区编号不是连续效应量。点底部共用 **Apply**，再选 **Tools → Save Surface Boundary...**，指定新的`.txt`文件名。
 
 ![原配ICBM152平滑曲面上的AAL顶点标签及自动边界](../assets/captures/tutorial04-aal/04-aal-map-full-window.png)
 

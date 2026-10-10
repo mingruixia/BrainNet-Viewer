@@ -44,7 +44,7 @@ This is linear midpoint refinement, not smoothing, registration or additional an
 
 ## Generate two nodes from the historical AAL atlas
 
-Use `Data/ExampleFiles/AAL90/aal.nii`, not AAL3v2. The following IDs are the same historical bilateral insula labels used in [lesson 07](07_AAL_Insula_ROIs.md).
+Use `resources/atlases/AAL90/aal.nii`, not AAL3v2. The following IDs are the same historical bilateral insula labels used in [lesson 07](07_AAL_Insula_ROIs.md).
 
 1. Open Atlas Nodes in Python, or **Generate Nodes from Atlas...** in MATLAB. Choose the historical AAL NIfTI file.
 2. Enter Region IDs `29,30` in that order. Set **Color / Module** to `1` and **Size Value** to `1` in Python; use the corresponding Color/module and Size controls in MATLAB. These are constants for this exercise, not estimates from connectivity.
@@ -71,3 +71,5 @@ If Save is disabled, check input count, completed review and the tool's specific
 Atlas reference: Tzourio-Mazoyer et al. (2002). Automated anatomical labeling of activations in SPM using a macroscopic anatomical parcellation of the MNI MRI single-subject brain. *NeuroImage* 15:273–289. The atlas-centroid exercise does not recreate the prepared group-level connectivity examples.
 
 Next: [camera animation of a static brain scene](12_Camera_Animation.md).
+
+For AAL90 auxiliary inputs, `resources/atlases/AAL90/` is relative to the repository/MATLAB archive root. In the installed Python/Docker resource library, choose `atlases/AAL90/`.

@@ -20,18 +20,24 @@ def library_root():
 class WebWorkspace:
     def __init__(self, root=None, *, scratch=None):
         self.root=Path(root or library_root()).resolve()
+        self.atlas_root=self.root/'atlases'
+        if not self.atlas_root.is_dir() and self.root.name=='BrainNetViewer' and self.root.parent.name=='matlab':
+            self.atlas_root=self.root.parents[2]/'resources/atlases'
         self.settings=deepcopy(DEFAULTS)
         patterns={'surface':['Data/SurfTemplate/*.nv'],
-                  'node':['Data/ExampleFiles/AtlasNetworks/*.node','Data/ExampleFiles/FormatExamples/*.node'],
+                  'node':['Data/ExampleFiles/AtlasNetworks/*.node'],
                   'edge':['Data/ExampleFiles/AtlasNetworks/*.edge'],
-                  'surface_map':['Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt'],
-                  'volume':['Data/Tutorials/OneSample_ROI11_NC.nii','Data/ExampleFiles/AAL90/aal.nii']}
+                  'surface_map':['atlases/AAL90/icbm_vertex_AAL_label.txt'],
+                  'volume':['Data/Tutorials/OneSample_ROI11_NC.nii','atlases/AAL90/aal.nii']}
         self.catalog={role:{} for role in patterns}
         for role,globs in patterns.items():
             for pattern in globs:
-                for path in sorted(self.root.glob(pattern)):
-                    if path.is_file() and path.resolve().is_relative_to(self.root):
-                        self.catalog[role][path.relative_to(self.root).as_posix()]=path.resolve()
+                base=self.atlas_root if pattern.startswith('atlases/') else self.root
+                glob=pattern.removeprefix('atlases/') if pattern.startswith('atlases/') else pattern
+                for path in sorted(base.glob(glob)):
+                    if path.is_file() and path.resolve().is_relative_to(base.resolve()):
+                        key=('atlases/' if base==self.atlas_root else '')+path.relative_to(base).as_posix()
+                        self.catalog[role][key]=path.resolve()
         self.paths={}; self.plotter=None; self.renderer=None; self.render_settings=None; self.render_paths=None
         self._temp=TemporaryDirectory(prefix='brainnet-web-',dir=scratch)
         self.scratch=Path(self._temp.name)
@@ -49,7 +55,7 @@ class WebWorkspace:
             if not isinstance(key,str) or key not in self.catalog[role]:
                 raise ValueError('Choose a bundled input from the library.')
             path=self.catalog[role][key]
-            if not path.is_file() or not any(path.resolve().is_relative_to(root) for root in (self.root,self.assets)):
+            if not path.is_file() or not any(path.resolve().is_relative_to(root) for root in (self.root,self.atlas_root.resolve(),self.assets)):
                 raise ValueError('Bundled input is unavailable.')
             paths[role]=path
         if 'surface' not in paths: raise ValueError('Select a surface first.')

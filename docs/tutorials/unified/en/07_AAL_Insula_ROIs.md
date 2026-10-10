@@ -6,7 +6,7 @@ Draw the left and right insula from the bundled historical AAL label atlas, view
 
 ## Select the atlas and surface
 
-Use `Data/ExampleFiles/AAL90/aal.nii` as **Volume / Atlas**. The exact historical file assigns **29 = Insula L** and **30 = Insula R**; its documented dimensions are 181 × 217 × 181 with 1 mm voxels. SHA-256: `2926fcc98efc709f77c8cca2f9c1d797eba3e9a1b222a8e0cfa70ab131394c80`. These IDs must not be carried over to AAL3v2 or another atlas without checking its definitions.
+Use `resources/atlases/AAL90/aal.nii` as **Volume / Atlas**. The exact historical file assigns **29 = Insula L** and **30 = Insula R**; its documented dimensions are 181 × 217 × 181 with 1 mm voxels. SHA-256: `2926fcc98efc709f77c8cca2f9c1d797eba3e9a1b222a8e0cfa70ab131394c80`. These IDs must not be carried over to AAL3v2 or another atlas without checking its definitions.
 
 For context, use the documented MATLAB smoothed ICBM152 surface or Python original ICBM152 surface, as in lesson 06. Retain **Prof. Alan C. Evans (MNI)** surface credit and the [existing AAL attribution](../../en/Resource_Attribution.md). The application does not register the atlas and surface.
 
@@ -60,3 +60,5 @@ After Apply, confirm the exact atlas, IDs `29,30`, top view, opacity and palette
 Atlas reference: Tzourio-Mazoyer et al. (2002). Automated anatomical labeling of activations in SPM using a macroscopic anatomical parcellation of the MNI MRI single-subject brain. *NeuroImage* 15:273–289. This citation does not make every later AAL version's IDs interchangeable.
 
 Continue with [Multi view layouts and figure export](08_Layouts_and_Figure_Export.md).
+
+For AAL90 auxiliary inputs, `resources/atlases/AAL90/` is relative to the repository/MATLAB archive root. In the installed Python/Docker resource library, choose `atlases/AAL90/`.

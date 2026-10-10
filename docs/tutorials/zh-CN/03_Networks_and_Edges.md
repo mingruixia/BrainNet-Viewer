@@ -6,7 +6,7 @@
 
 ## 输入
 
-使用 [ICBM152](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv)、[AAL90节点](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90.node)及 [Edge_AAL90_Weighted.edge](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90_Weighted.edge)。该示例是对称90×90矩阵，不是八节点有向教学网络。
+使用 [ICBM152](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv)、[AAL90节点](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90.node)及 [Edge_AAL90_Weighted.edge](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/AAL90_Weighted.edge)。该示例是对称90×90矩阵。
 
 ## 步骤
 

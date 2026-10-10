@@ -26,8 +26,12 @@ render, interact with a selected view, then save/export. Save Scene preserves
 inputs and settings; presets store display settings. Follow the shared manual
 and tutorials for scientific inputs, edition differences and export options.
 
-The original surface library, atlas-network examples and real tutorial inputs
-are included. Inspect uses AAL/Brodmann lookup in an MNI-like space; verify
+The surface library, atlas-network examples and real tutorial inputs
+are included. [AtlasNetworks](../Data/ExampleFiles/AtlasNetworks/README.md)
+contains AAL90 and fourteen GroupFC pairs, including AAL116, Schaefer1000 and
+Brainnetome246. AAL90 volume and vertex-label inputs are in
+`resources/atlases/AAL90/` (source/MATLAB archive) or `atlases/AAL90/`
+(Python/Docker resource library). Inspect uses AAL/Brodmann lookup in an MNI-like space; verify
 registration and coordinate correspondence for your own data. The application
 interface is English and is not restricted to human-brain data.
 

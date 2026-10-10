@@ -23,7 +23,10 @@ Data Sources读取文件 → Visualization Settings配置 → Apply绘图 →
 操作所选子图 → 保存/导出。Scene保存输入和设置；Preset保存显示配置。
 科学输入、版本差异及导出设置参见统一手册和教程。
 
-包含原曲面库、图谱网络示例和真实教程数据。Inspect基于MNI类空间查询
+包含曲面库、图谱网络示例和真实教程数据。[AtlasNetworks](src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/README.md)
+保留AAL90，并提供14套GroupFC配对文件，包含AAL116、Schaefer1000和Brainnetome246。
+AAL90体积和顶点标签位于源码/MATLAB包根目录的`resources/atlases/AAL90/`；
+Python/Docker资源库中对应`atlases/AAL90/`。Inspect基于MNI类空间查询
 AAL/Brodmann；使用个人数据前确认配准与坐标对应。界面为英文，
 软件不限于人脑数据。Web支持本机单一共享会话和软件渲染，
 停止或更新容器前保存便携Scene。

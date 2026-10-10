@@ -6,7 +6,7 @@
 
 ## 数据与解释
 
-将[`BrainMesh_ICBM152_smoothed.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv)作为**Surface**、[`icbm_vertex_AAL_label.txt`](../../../../Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt)作为**Surface Map**。两份文件应按此组合使用。映射SHA-256为`7cd6b8aa19c2aae6161015d62d22770a1fdfdf61d7e29354e8174dbd7853d131`。文件含**81,924**个整数顶点标签，实际出现79个ID，范围0–90；ID 0有**7,352**个顶点，本教程将其作为未标注/背景，另有**74,572**个顶点为正ID。文件夹名“AAL90”不表示该曲面出现全部90个正ID。发表图片前请读[来源、兼容性和权利说明](Resource_Attribution.md)。
+将[`BrainMesh_ICBM152_smoothed.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv)作为**Surface**、[`icbm_vertex_AAL_label.txt`](../../../../atlases/AAL90/icbm_vertex_AAL_label.txt)作为**Surface Map**。两份文件应按此组合使用。映射SHA-256为`7cd6b8aa19c2aae6161015d62d22770a1fdfdf61d7e29354e8174dbd7853d131`。文件含**81,924**个整数顶点标签，实际出现79个ID，范围0–90；ID 0有**7,352**个顶点，本教程将其作为未标注/背景，另有**74,572**个顶点为正ID。文件夹名“AAL90”不表示该曲面出现全部90个正ID。发表图片前请读[来源、兼容性和权利说明](Resource_Attribution.md)。
 
 这是一份按类别编码的图谱衍生顶点投影，**不是统计图**。本地资料引用Tzourio-Mazoyer等，*NeuroImage* 15:273–289（2002），但没有独立记录确切图谱版本、投影算法或空间配准精度。使用本课指定的AAL表及原配曲面。专项环境为Windows/MATLAB R2025a Update 1；耗时和峰值内存未测量。
 
@@ -44,9 +44,9 @@
 sourceRoot = fullfile(pwd,"src","matlab","BrainNetViewer");
 addpath(sourceRoot);
 ref = brainnet.core.InputReference("surface_map", ...
-    "Data/ExampleFiles/AAL90/icbm_vertex_AAL_label.txt", ...
+    "resources/atlases/AAL90/icbm_vertex_AAL_label.txt", ...
     Sha256="7cd6b8aa19c2aae6161015d62d22770a1fdfdf61d7e29354e8174dbd7853d131");
-ids = brainnet.io.readSurfaceMap(ref,sourceRoot);
+ids = brainnet.io.readSurfaceMap(ref,pwd);
 [numel(ids),numel(unique(ids)),sum(ids==0)]  % [81924 79 7352]
 ```
 
