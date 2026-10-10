@@ -69,6 +69,9 @@ classdef BrainNetApp < matlab.apps.AppBase
         SurfaceSubdivisionWindow = []
         AtlasNodeWindow = []
         ToolsPanel = []
+        ToolsContainerGrid = []
+        ToolsToggleButton = []
+        ToolsPanelCollapsed (1,1) logical = true
         ToolsGrid = []
         MergeSurfacesToolButton = []
         ConvertSurfaceToolButton = []
@@ -1136,6 +1139,7 @@ classdef BrainNetApp < matlab.apps.AppBase
             value.visualization_settings = app.DraftOptions.toVisualizationStruct();
             value.full_settings_open = ~app.SettingsPanelCollapsed;
             value.settings_panel_collapsed = app.SettingsPanelCollapsed;
+            value.tools_panel_collapsed = app.ToolsPanelCollapsed;
             value.settings_accordion = app.SettingsAccordion.snapshot();
             value.embedded_render_active = ...
                 ~isempty(app.BatchRenderer.ActiveTarget) && ...
@@ -1205,7 +1209,7 @@ classdef BrainNetApp < matlab.apps.AppBase
                 string(app.ImportSettingsButton.Text); ...
                 string(app.LoadPresetButton.Text); string(app.SavePresetButton.Text); ...
                 string(app.ColormapEditorButton.Text); ...
-                string(app.ToolsPanel.Title); ...
+                string(app.ToolsToggleButton.Text); ...
                 string(app.MergeSurfacesToolButton.Text); ...
                 string(app.ConvertSurfaceToolButton.Text); ...
                 string(app.SubdivideSurfaceToolButton.Text); ...
@@ -1757,7 +1761,7 @@ classdef BrainNetApp < matlab.apps.AppBase
             app.SettingsPanel.Layout.Row = 1;
             app.SettingsPanel.Layout.Column = 3;
             app.SettingsGrid = uigridlayout(app.SettingsPanel, [4 1]);
-            app.SettingsGrid.RowHeight = {34, 30, '1x', 104};
+            app.SettingsGrid.RowHeight = {34, 30, '1x', 30};
             app.SettingsGrid.Padding = [0 0 0 0];
             app.SettingsGrid.RowSpacing = 3;
             app.SettingsHeaderGrid = uigridlayout(app.SettingsGrid, [1 2]);
@@ -1806,10 +1810,20 @@ classdef BrainNetApp < matlab.apps.AppBase
         end
 
         function createToolsPanel(app)
-            app.ToolsPanel = uipanel(app.SettingsGrid, 'Title', 'Tools', ...
-                'FontWeight', 'bold', 'Tag', 'BrainNetToolsPanel');
+            app.ToolsPanel = uipanel(app.SettingsGrid, 'BorderType', 'none', ...
+                'Tag', 'BrainNetToolsPanel');
             app.ToolsPanel.Layout.Row = 4;
-            app.ToolsGrid = uigridlayout(app.ToolsPanel, [3 2]);
+            app.ToolsContainerGrid = uigridlayout(app.ToolsPanel, [2 1]);
+            app.ToolsContainerGrid.RowHeight = {28, 0};
+            app.ToolsContainerGrid.Padding = [0 0 0 0];
+            app.ToolsContainerGrid.RowSpacing = 3;
+            app.ToolsToggleButton = uibutton(app.ToolsContainerGrid, 'push', ...
+                'Text', 'Tools >', 'FontWeight', 'bold', 'Tag', 'ToolsToggle', ...
+                'Tooltip', 'Expand tools', 'ButtonPushedFcn', @(~,~) app.toggleToolsPanel());
+            app.ToolsToggleButton.Layout.Row = 1;
+            app.ToolsGrid = uigridlayout(app.ToolsContainerGrid, [3 2]);
+            app.ToolsGrid.Layout.Row = 2;
+            app.ToolsGrid.Visible = 'off';
             app.ToolsGrid.RowHeight = {24, 24, 24};
             app.ToolsGrid.ColumnWidth = {'1x', '1x'};
             app.ToolsGrid.Padding = [5 4 5 4];
@@ -3012,6 +3026,11 @@ classdef BrainNetApp < matlab.apps.AppBase
             app.setSettingsPanelCollapsed(~app.SettingsPanelCollapsed);
         end
 
+        function toggleToolsPanel(app)
+            app.ToolsPanelCollapsed = ~app.ToolsPanelCollapsed;
+            app.applySettingsPanelState();
+        end
+
         function applySettingsPanelState(app)
             if isempty(app.SettingsPanel) || ~isvalid(app.SettingsPanel)
                 return;
@@ -3028,7 +3047,20 @@ classdef BrainNetApp < matlab.apps.AppBase
                 app.SettingsHeaderGrid.Padding = [0 0 0 0];
             else
                 app.PresetActionGrid.Visible = 'on';
-                app.SettingsGrid.RowHeight = {34, 30, '1x', 104};
+                if app.ToolsPanelCollapsed
+                    toolsHeight = 30;
+                    app.ToolsContainerGrid.RowHeight = {28, 0};
+                    app.ToolsGrid.Visible = 'off';
+                    app.ToolsToggleButton.Text = 'Tools >';
+                    app.ToolsToggleButton.Tooltip = 'Expand tools';
+                else
+                    toolsHeight = 116;
+                    app.ToolsContainerGrid.RowHeight = {28, 84};
+                    app.ToolsGrid.Visible = 'on';
+                    app.ToolsToggleButton.Text = 'Tools v';
+                    app.ToolsToggleButton.Tooltip = 'Collapse tools';
+                end
+                app.SettingsGrid.RowHeight = {34, 30, '1x', toolsHeight};
                 app.SettingsTitleLabel.Visible = 'on';
                 app.FullSettingsPanel.Visible = 'on';
                 app.ToolsPanel.Visible = 'on';
@@ -3484,7 +3516,7 @@ classdef BrainNetApp < matlab.apps.AppBase
                 app.PreviewGrid, app.PreviewToolbarGrid, app.PreviewCanvasGrid, ...
                 app.StartupGrid, app.SettingsGrid, app.SettingsHeaderGrid, ...
                 app.FullSettingsGrid, app.PresetActionGrid, app.ExportGrid, app.ResourceGrid, ...
-                app.ToolsGrid};
+                app.ToolsGrid, app.ToolsContainerGrid};
             for index = 1:numel(grids)
                 if ~isempty(grids{index}) && isvalid(grids{index})
                     grids{index}.BackgroundColor = panelColor;
@@ -3514,6 +3546,8 @@ classdef BrainNetApp < matlab.apps.AppBase
             app.RenderButton.FontColor = [1 1 1];
             app.ExportButton.BackgroundColor = primaryColor;
             app.ExportButton.FontColor = [1 1 1];
+            app.ToolsToggleButton.BackgroundColor = panelColor;
+            app.ToolsToggleButton.FontColor = textColor;
             app.ExportTransparencyCheckBox.FontColor = textColor;
             if isprop(app.SummaryArea, 'HTMLSource')
                 app.refreshSceneSummaryHtml();
