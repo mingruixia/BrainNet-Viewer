@@ -2,6 +2,14 @@
 
 ## 2.0.0-beta.1
 
+### Compatibility
+
+- On macOS, the canvas toolbar wraps at narrow widths so button labels remain readable.
+
+- Native Apple Silicon macOS uses SciPy 1.17.1 to avoid the PROPACK native-library
+  load failure seen with SciPy 1.15.3 on recent macOS. Python 3.11 or newer is required
+  on this platform; Python 3.11 is the verified configuration.
+
 ### Editions and workspace
 
 - MATLAB Desktop with an App-style workspace and no SPM dependency.

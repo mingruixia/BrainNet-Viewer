@@ -1,4 +1,5 @@
 """BrainNet Viewer shell aligned with the MATLAB desktop and approved design."""
+import sys
 from PySide6 import QtCore, QtGui, QtWidgets as W
 from . import __version__
 from .desktop_style import card, FitImage, StatusStrip, ExportUnitChoice, theme_icon
@@ -11,6 +12,43 @@ def button(text,handler,primary=False):
     widget=W.QPushButton(text); widget.clicked.connect(handler)
     if primary: widget.setObjectName("Primary")
     return widget
+
+
+
+class MacCanvasToolbar(W.QWidget):
+    """Keep native Mac button labels readable when the canvas is narrow."""
+    def __init__(self, grid):
+        super().__init__()
+        self.grid=grid
+        self.wide=[]
+        for index in range(grid.count()):
+            self.wide.append((grid.itemAt(index).widget(),grid.getItemPosition(index)))
+        self.compact=None
+        grid.setSizeConstraint(W.QLayout.SetNoConstraint)
+        self.setLayout(grid)
+        self.setSizePolicy(W.QSizePolicy.Ignored,W.QSizePolicy.Fixed)
+
+    def resizeEvent(self,event):
+        super().resizeEvent(event)
+        self.reflow()
+
+    def reflow(self):
+        widgets=[item[0] for item in self.wide]
+        spacing=self.grid.horizontalSpacing()
+        threshold=sum(w.sizeHint().width() for w in widgets[:6])+6*spacing+max(
+            widgets[6].sizeHint().width(),sum(w.sizeHint().width() for w in widgets[-2:])+spacing)
+        compact=self.width()<threshold
+        if compact==self.compact:
+            return
+        self.compact=compact
+        positions=[(0,0,1,1),(0,1,1,1),(0,2,1,1),(0,3,1,1),
+                   (1,0,1,1),(1,1,1,1),(1,2,1,2),
+                   (2,0,1,2),(2,2,1,2),(3,0,1,2),(3,2,1,1),(3,3,1,1)]
+        for widget,_ in self.wide:
+            self.grid.removeWidget(widget)
+        for index,(widget,wide_position) in enumerate(self.wide):
+            self.grid.addWidget(widget,*(positions[index] if compact else wide_position))
+        self.updateGeometry()
 
 
 def build_shell(app,library):
@@ -92,7 +130,11 @@ def build_shell(app,library):
     toolbar.addWidget(button("Clear Figure",app.clear_figure),1,4,1,2)
     app.popout_button=button("Pop Out",app.pop_out); app.popout_button.setEnabled(False); toolbar.addWidget(app.popout_button,1,6)
     app.render_button=button("Render Scene",app.render_scene,True); toolbar.addWidget(app.render_button,1,7)
-    center_layout.addLayout(toolbar)
+    if sys.platform == "darwin":
+        app.canvas_toolbar=MacCanvasToolbar(toolbar)
+        center_layout.addWidget(app.canvas_toolbar)
+    else:
+        center_layout.addLayout(toolbar)
     app.startup_content=W.QWidget(); app.startup_content.setObjectName("PanelContent"); app.canvas_layout=W.QVBoxLayout(app.startup_content); app.canvas_layout.setContentsMargins(24,16,24,16)
     app.startup=FitImage(library/"assets/branding/BrainNet_Viewer_2_Startup_PSD-v1.png"); app.canvas_layout.addWidget(app.startup,1)
     info=W.QLabel(f"Version {__version__} · Public Beta 1 · Developer: Mingrui Xia\nProject: https://github.com/mingruixia/BrainNet-Viewer")

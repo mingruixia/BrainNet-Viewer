@@ -6,8 +6,10 @@ NITRC release and verify its SHA-256 against that release's SHA256SUMS.
 MATLAB and SPM are not required. Dependencies need Internet access unless
 supplied in a separate offline collection.
 
-Use Python 3.10 or 3.11, a graphical desktop with working OpenGL and a writable
-folder. Windows x64 and Apple Silicon macOS have focused development checks;
+Apple Silicon macOS requires Python 3.11 or newer; Python 3.11 is the verified
+configuration. Windows, Linux and Intel macOS use Python 3.10 or 3.11. A graphical
+desktop with working OpenGL and a writable folder is required.
+Windows x64 and Apple Silicon macOS have focused development checks;
 Linux Desktop and Intel Mac require their own validation. Preserve dependency
 pins and create a separate virtual environment.
 
@@ -34,7 +36,7 @@ app without a new console. The module command above shows startup errors.
 On the graphical desktop, open a terminal in the wheel directory:
 
 ```bash
-python3 -m venv .venv-bnv
+python3.11 -m venv .venv-bnv
 source .venv-bnv/bin/activate
 BNV_WHEEL="$(pwd)/brainnet_viewer-2.0.0b1-py3-none-any.whl"
 BNV_WHEEL_URL="$(python -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())' "$BNV_WHEEL")"
@@ -43,8 +45,11 @@ python -m pip check
 brainnet-viewer
 ```
 
-Select Python 3.10 or 3.11 for the first command; never copy virtual environments
-between operating systems.
+On Apple Silicon macOS, use the Python 3.11 command above. The package selects
+SciPy 1.17.1 for native ARM64 macOS; this dependency requires Python 3.11 or newer.
+On Linux or Intel macOS, Python 3.10 may be used instead for the first command;
+these platforms retain SciPy 1.15.3. Never copy virtual environments between
+operating systems.
 
 ## First use
 

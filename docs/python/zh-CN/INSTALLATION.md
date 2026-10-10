@@ -5,7 +5,9 @@ BrainNet Viewer 2.0.0-beta.1 对应 Python 包版本 **2.0.0b1**。
 根据该版 SHA256SUMS 校验。不需要 MATLAB 或 SPM。
 除非另备离线依赖集合，安装依赖需要联网。
 
-使用 Python 3.10 或 3.11、支持 OpenGL 的图形桌面和可写目录。
+Apple Silicon macOS 要求 Python 3.11 或更新版本，已验证配置为 Python 3.11。
+Windows、Linux 和 Intel macOS 使用 Python 3.10 或 3.11。
+需要支持 OpenGL 的图形桌面和可写目录。
 Windows x64 和 Apple Silicon macOS 有开发专项检查；Linux Desktop 和
 Intel Mac 需独立验证。保留固定依赖，每次使用独立虚拟环境。
 
@@ -32,7 +34,7 @@ $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path
 在图形桌面终端进入 wheel 目录：
 
 ```bash
-python3 -m venv .venv-bnv
+python3.11 -m venv .venv-bnv
 source .venv-bnv/bin/activate
 BNV_WHEEL="$(pwd)/brainnet_viewer-2.0.0b1-py3-none-any.whl"
 BNV_WHEEL_URL="$(python -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())' "$BNV_WHEEL")"
@@ -41,7 +43,9 @@ python -m pip check
 brainnet-viewer
 ```
 
-第一行请选择 Python 3.10 或 3.11；不要跨系统复制虚拟环境。
+Apple Silicon macOS 请使用上面的 Python 3.11 命令。原生 ARM64 macOS 自动选择
+SciPy 1.17.1，该依赖要求 Python 3.11 或更新版本。Linux 或 Intel macOS
+第一行也可使用 Python 3.10；这些平台保留 SciPy 1.15.3。不要跨系统复制虚拟环境。
 
 ## 首次使用
 
