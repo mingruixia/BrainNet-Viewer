@@ -6,7 +6,7 @@
 
 ## 共用输入与参数
 
-与[教程00](00_First_Launch.md)使用**同一份**[`BrainMesh_ICBM152.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv)，SHA-256为`471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`。它有81,924顶点、163,840三角面，已位于App数据根目录。见[提供者、坐标和权利说明](Resource_Attribution.md)。使用与教程00相同的Windows/R2025a Update 1内部构建；时间和内存尚未实测。
+与[教程00](00_First_Launch.md)使用**同一份**[`BrainMesh_ICBM152.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv)，SHA-256为`471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`。它有81,924顶点、163,840三角面，已位于App数据根目录。见[提供者、坐标和权利说明](Resource_Attribution.md)。使用与教程00相同的Windows/R2025a Update 1内部构建；时间和内存尚未实测。
 
 | 控件 | 练习设置 | 预期作用 |
 |---|---|---|

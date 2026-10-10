@@ -1,6 +1,6 @@
 # Installation, launch and version scope
 
-[中文](../zh-CN/M01_Installation_Launch.md) · [Manual index](index.md) · [First-launch tutorial](../../tutorials/en/00_First_Launch.md) · [Requirements](../../../README.md#requirements-and-scope)
+[中文](../zh-CN/M01_Installation_Launch.md) · [Manual index](index.md) · [First-launch tutorial](../../tutorials/en/00_First_Launch.md) · [Requirements](../../../README.md#install-and-launch)
 
 BrainNet Viewer is a MATLAB desktop application for visualizing brain surfaces, networks and mapped volumes. This chapter explains installation requirements, startup and the main workflow.
 

@@ -6,7 +6,7 @@ Change the ICBM152 surface's uniform color and opacity, frame it, then save and 
 
 ## Shared input and parameters
 
-Use the **same** [`BrainMesh_ICBM152.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv) as [tutorial 00](00_First_Launch.md), SHA-256 `471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`. It has 81,924 vertices and 163,840 faces and is already under the App data root. See its [provider, coordinate and rights note](Resource_Attribution.md). Use the same Windows/R2025a Update 1 internal build as tutorial 00. Time and memory are not yet measured.
+Use the **same** [`BrainMesh_ICBM152.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv) as [tutorial 00](00_First_Launch.md), SHA-256 `471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`. It has 81,924 vertices and 163,840 faces and is already under the App data root. See its [provider, coordinate and rights note](Resource_Attribution.md). Use the same Windows/R2025a Update 1 internal build as tutorial 00. Time and memory are not yet measured.
 
 | Control | Exercise value | Expected role |
 |---|---|---|

@@ -21,7 +21,7 @@
 
 ### Step 01
 
-执行`app = BrainNetViewer;`。在**Data Sources → Add Files**中把[`BrainMesh_ICBM152_smoothed.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv)选为**Surface Mesh**，把[`aal.nii`](../../../src/matlab/BrainNetViewer/Data/ExampleFiles/AAL90/aal.nii)选为**Volume / Atlas**，点击**Validate and Load**。确认体数据为181×217×181、1 mm。两份文件按其存储的类MNI坐标使用；App不执行配准，本教程也不构成独立的空间对齐审计。
+执行`app = BrainNetViewer;`。在**Data Sources → Add Files**中把[`BrainMesh_ICBM152_smoothed.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv)选为**Surface Mesh**，把[`aal.nii`](../../../../Data/ExampleFiles/AAL90/aal.nii)选为**Volume / Atlas**，点击**Validate and Load**。确认体数据为181×217×181、1 mm。两份文件按其存储的类MNI坐标使用；App不执行配准，本教程也不构成独立的空间对齐审计。
 
 ### Step 02
 

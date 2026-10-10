@@ -6,7 +6,7 @@ For `2.0.0-beta.1`, build date **1 Oct 2026**. This MATLAB public beta is intend
 
 ## 1. Install and launch
 
-Validation includes Windows MATLAB R2025a Update 1, focused Windows R2024b Update 1 checks and macOS R2024a team workflow checks. MATLAB must be installed and activated. MATLAB Runtime-only installation and Linux are not certified. Some features require additional toolboxes; see the [requirements and limitations](../../README.md#requirements-and-scope).
+Validation includes Windows MATLAB R2025a Update 1, focused Windows R2024b Update 1 checks and macOS R2024a team workflow checks. MATLAB must be installed and activated. MATLAB Runtime-only installation and Linux are not certified. Some features require additional toolboxes; see the [requirements and limitations](../../README.md#install-and-launch).
 
 Set MATLAB's **Current Folder** to the project root containing the top-level `BrainNetViewer.m`, then run:
 
@@ -18,7 +18,7 @@ That entry point adds `src/matlab/BrainNetViewer` itself. From another working f
 
 ## 2. Select and load data
 
-In **Data Sources**, use **Add Files** or the individual Surface, Nodes, Edges, Volume, and related slots. **Open Scene JSON** is for an existing saved Scene, not a NIfTI or mesh. Select compatible files, then click **Validate and Load** to read them and see input errors before visualizing. A surface can be used alone; other roles depend on the intended visualization. The current role/format boundaries are summarized in the [README](../../README.md#inputs-and-outputs) and [surface-format matrix](../compatibility/Surface_Format_Support.md).
+In **Data Sources**, use **Add Files** or the individual Surface, Nodes, Edges, Volume, and related slots. **Open Scene JSON** is for an existing saved Scene, not a NIfTI or mesh. Select compatible files, then click **Validate and Load** to read them and see input errors before visualizing. A surface can be used alone; other roles depend on the intended visualization. The current role/format boundaries are summarized in the [README](../../README.md#workflow) and [surface-format matrix](../compatibility/Surface_Format_Support.md).
 
 The App's default data root is `src/matlab/BrainNetViewer`. A file outside that root is not read by silent absolute-path reference: the App asks **Stage and Add** or **Cancel**. On approval, it verifies a copy under `user-data/imports/<hash>/` and stages supported local companion files such as paired NIfTI header/image files. The original is not changed. This import makes the Scene reference relative to the data root; it does **not** grant redistribution rights or independently validate spatial registration. Keep original and staged data private as required by their permissions.
 

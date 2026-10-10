@@ -4,7 +4,7 @@
 
 本教程使用真实单样本功能连接T图，位于标准MNI空间。数据来自Xia等（2014），*Journal of Alzheimer's Disease* **39**:527–543中的PCC亚区种子点分析；它**不是**AD与对照组的组间差异图。复用前请阅读[确切文件来源与解释说明](Resource_Attribution.md)。
 
-使用[`BrainMesh_ICBM152_smoothed.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv)作为**Surface Mesh**，[`OneSample_ROI11_NC.nii`](../../../src/matlab/BrainNetViewer/Data/Tutorials/OneSample_ROI11_NC.nii)作为**Volume / Atlas**。NIfTI SHA-256为`e27d9eca7e20f31ed090e410fdb5b4a409565c2fafc3bc86dff21277e58aad5f`，头文件描述`REST{T_[37.0]}`；图像61×73×61体素、3 mm，T统计量自由度37。曲面来源须另署名Prof. Alan C. Evans（MNI），不可与研究论文作者混同。
+使用[`BrainMesh_ICBM152_smoothed.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv)作为**Surface Mesh**，[`OneSample_ROI11_NC.nii`](../../../../Data/Tutorials/OneSample_ROI11_NC.nii)作为**Volume / Atlas**。NIfTI SHA-256为`e27d9eca7e20f31ed090e410fdb5b4a409565c2fafc3bc86dff21277e58aad5f`，头文件描述`REST{T_[37.0]}`；图像61×73×61体素、3 mm，T统计量自由度37。曲面来源须另署名Prof. Alan C. Evans（MNI），不可与研究论文作者混同。
 
 | 控件 | 教学取值 | 理由 |
 |---|---|---|

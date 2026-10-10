@@ -6,7 +6,7 @@ Load the ICBM152 brain surface, render it in the main canvas and save a PNG with
 
 ## Input and prerequisites
 
-Use the project's existing [`BrainMesh_ICBM152.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv) at `src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`, SHA-256 `471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`. It is a real human-brain surface template with **81,924 vertices and 163,840 triangular faces**, not a participant scan. Credit **Prof. Alan C. Evans (MNI)** in redistributed material; see the [source and coordinate note](Resource_Attribution.md).
+Use the project's existing [`BrainMesh_ICBM152.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv) at `src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`, SHA-256 `471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`. It is a real human-brain surface template with **81,924 vertices and 163,840 triangular faces**, not a participant scan. Credit **Prof. Alan C. Evans (MNI)** in redistributed material; see the [source and coordinate note](Resource_Attribution.md).
 
 For the current internal build, use Windows with MATLAB R2025a Update 1 and the checked-out project. Runtime-only packaging and other platforms are not certified. Required time and peak memory have **not yet been measured**. Start with a clean MATLAB path: do not add the frozen legacy folder or another BrainNet installation.
 

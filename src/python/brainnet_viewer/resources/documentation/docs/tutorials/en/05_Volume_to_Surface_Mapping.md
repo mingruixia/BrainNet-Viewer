@@ -4,7 +4,7 @@
 
 This lesson uses a real, one-sample functional-connectivity T map in standard MNI space. The map comes from a PCC-subregion seed analysis in Xia et al. (2014), *Journal of Alzheimer's Disease* **39**:527–543. It is **not** the paper's Alzheimer's-versus-control group contrast. Read the [exact-file provenance and interpretation note](Resource_Attribution.md) before reuse.   
 
-Use [`BrainMesh_ICBM152_smoothed.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv) as **Surface Mesh** and [`OneSample_ROI11_NC.nii`](../../../src/matlab/BrainNetViewer/Data/Tutorials/OneSample_ROI11_NC.nii) as **Volume / Atlas**. The NIfTI SHA-256 is `e27d9eca7e20f31ed090e410fdb5b4a409565c2fafc3bc86dff21277e58aad5f`; its header contains `REST{T_[37.0]}`. The matched example yielded 61 × 73 × 61 voxels, 3 mm spacing and T degrees of freedom 37. The surface's source is credited to Prof. Alan C. Evans (MNI); that source credit is distinct from the study citation.
+Use [`BrainMesh_ICBM152_smoothed.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv) as **Surface Mesh** and [`OneSample_ROI11_NC.nii`](../../../../Data/Tutorials/OneSample_ROI11_NC.nii) as **Volume / Atlas**. The NIfTI SHA-256 is `e27d9eca7e20f31ed090e410fdb5b4a409565c2fafc3bc86dff21277e58aad5f`; its header contains `REST{T_[37.0]}`. The matched example yielded 61 × 73 × 61 voxels, 3 mm spacing and T degrees of freedom 37. The surface's source is credited to Prof. Alan C. Evans (MNI); that source credit is distinct from the study citation.
 
 | Control | Exercise value | Why |
 |---|---|---|

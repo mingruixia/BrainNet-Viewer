@@ -6,7 +6,7 @@
 
 ## 输入与前提
 
-使用项目中现有的[`BrainMesh_ICBM152.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv)，路径为`src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`，SHA-256为`471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`。这是真实人脑曲面模板，**81,924顶点、163,840三角面**，不是被试扫描。分发时保留 **Prof. Alan C. Evans（MNI）** 署名；见[来源与坐标说明](Resource_Attribution.md)。
+使用项目中现有的[`BrainMesh_ICBM152.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv)，路径为`src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`，SHA-256为`471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`。这是真实人脑曲面模板，**81,924顶点、163,840三角面**，不是被试扫描。分发时保留 **Prof. Alan C. Evans（MNI）** 署名；见[来源与坐标说明](Resource_Attribution.md)。
 
 当前内部构建使用Windows及MATLAB R2025a Update 1和项目工作目录。仅MATLAB Runtime及其他平台尚未认证；所需时间与峰值内存**尚未实测**。从干净MATLAB路径开始，不要加入冻结的旧版目录或另一套BrainNet。
 
