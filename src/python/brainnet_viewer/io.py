@@ -1,8 +1,10 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Numerical inputs, independent of either user interface or renderer."""
 from dataclasses import dataclass
-from pathlib import Path, PureWindowsPath
+from pathlib import Path, PureWindowsPath, PurePosixPath
 import hashlib
-import xml.etree.ElementTree as ET
+import re
+from defusedxml import ElementTree as ET
 import numpy as np
 
 
@@ -14,13 +16,21 @@ def sha256(path):
     return digest.hexdigest()
 
 
-def resolve_asset(root, relative):
-    """Scene references cannot escape their explicitly supplied data root."""
+def validate_asset_path(relative):
+    """Check reference syntax without consulting the current filesystem."""
     if not isinstance(relative, str) or not relative or "\\" in relative:
         raise ValueError("Scene paths must be nonempty relative paths using '/'.")
-    path = Path(relative)
+    path = PurePosixPath(relative)
     if path.is_absolute() or PureWindowsPath(relative).drive or ".." in path.parts:
         raise ValueError("Absolute paths and parent traversal are not allowed in a Scene.")
+    if "\x00" in relative:
+        raise ValueError("Scene paths cannot contain a null character.")
+    return path
+
+
+def resolve_asset(root, relative):
+    """Scene references cannot escape their explicitly supplied data root."""
+    path = validate_asset_path(relative)
     root = Path(root).resolve()
     result = (root / path).resolve()
     if not result.is_relative_to(root):
@@ -31,7 +41,7 @@ def resolve_asset(root, relative):
 def data_lines(path):
     with Path(path).open(encoding="utf-8-sig") as stream:
         for number, line in enumerate(stream, 1):
-            line = line.split("#", 1)[0].strip()
+            line = re.split(r"(?<!\S)#", line, maxsplit=1)[0].strip()
             if line:
                 yield number, line
 

@@ -7,6 +7,9 @@ BrainNet Viewer Web 在 Docker 后台运行，通过浏览器
 公测镜像为
 [mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer)。
 
+已发布镜像保持不变。默认源码分支的维护更新需要本机源码构建，拉取原公测标签
+不会安装这些更新。GPU选择与CPU回退见末尾的源码构建部分。
+
 ## 1. 安装并启动 Docker
 
 - **Windows：**安装 [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)，
@@ -104,7 +107,7 @@ docker compose -f compose.web.release.yml start
 
 ## 部署范围
 
-随附配置仅允许本机访问，使用一个共享会话并由 CPU 渲染。
+已发布镜像的配置仅允许本机访问，使用一个共享会话并由 CPU 渲染。
 CPU 配额不是主机总核数；拥有显卡不会自动开启容器 GPU 渲染。
 共享服务器部署需要身份认证、用户隔离及 HTTPS，不属于本安装配置的适用范围。
 
@@ -117,5 +120,50 @@ docker compose -f src/python/compose.web.yml up -d --build
 ```
 
 构建依赖需要联网下载。在 1031 端口上选择源码构建服务或下载镜像中的一种，避免同时启动。
+
+源码镜像使用Python 3.12及固定应用依赖。Compose不分配GPU：Auto进行真实试绘，
+没有GPU访问权限时通常选择CPU。源码Compose上限为8核CPU、8 GiB内存及512 MiB临时存储。
+ARM64源码绘图尚未验证，模拟ARM64的图形探测失败，因此构建成功不代表可正常绘图；
+已发布的ARM64镜像未替换。
+
+### Windows优先GPU的源码启动
+
+使用Docker Desktop的WSL 2后端、Linux容器及支持的NVIDIA驱动。
+先保存Scene并停止占用1031端口的其他服务。在仓库根目录构建独立本机镜像，
+然后使用配套PowerShell启动工具：
+
+```powershell
+docker build -f src/python/Dockerfile.web -t brainnet-viewer:web-local src/python
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Start -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031 -Backend Auto
+```
+
+Auto先在临时容器中分配GPU并核验实际绘图，GPU启动不可用则启动CPU容器。
+`-Backend CPU`明确选择软件绘图；`-Backend GPU`要求硬件绘图，不满足则报错，
+不会静默回退。能列出GPU不代表硬件绘图可用。已有容器保留原后端，Stop/Restart
+不会重新配置；切换后端请用新的容器名称及空闲端口。
+
+```powershell
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Status -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Logs -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Stop -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031
+```
+
+Windows WSL/NVIDIA路径已有本机绘图检查；Linux GPU及其他驱动需各平台独立配置。
+macOS Docker不会自动将Mac GPU提供给此Linux镜像。启动后的GPU进程崩溃或内存
+耗尽不属于会话内自动恢复保证。
+
+### 源码Web会话及输入限制
+
+浏览器始终使用相同的回环主机名及端口。源码服务在认证/连接入口拒绝缺失或异源
+Origin，通过同源请求获取每次启动的新key。它不提供用户登录，不适合公网多用户服务；
+未经独立部署设计，不要暴露到网络或嵌入其他网站的iframe。
+
+静止画面使用2倍采样，移动画面降低采样及质量。CPU曲面细节简化仅用于交互期间，
+静止、Inspect及导出恢复原几何；输出图片尺寸仍由Export Figure设置。
+
+Scene JSON元数据上限32 MiB，科学文件上传每份32 MiB，Scene ZIP压缩大小64 MiB，
+会话文件总量128 MiB。便携Scene保存先暂存并核验资产，再提交新文件名，要求文件系统
+支持硬链接。请使用支持的本机文件系统及新的Scene名称，不覆盖已有输出。
+重启前保存下载文件。
 
 使用方法见[统一教程](../../tutorials/unified/en/index.md)和[用户手册](../../manual/en/index.md)。

@@ -1,0 +1,8 @@
+{
+  "schema_version":"0.1","id":"CP_SURFACE","name":"Synthetic index fixture",
+  "loadfile":1,"map_mode":0,"coordinate_space":"synthetic-mm",
+  "redistribution_status":"project-test-fixture",
+  "inputs":{"surface":{"role":"surface","relative_path":"tetrahedron.nv","sha256":"","coordinate_space":"synthetic-mm","source_uri":"","redistribution_status":"project-test-fixture","metadata":{}}},
+  "options":{"layout":1,"view_direction":1,"mesh_alpha":0.3,"node_labels":2,"edge_draw_mode":1,"edge_threshold":0,"volume_display":false,"volume_type":1,"map_algorithm":2,"roi_draw_all":true,"positive_maximum":[],"negative_minimum":[]},
+  "metadata":{}
+}

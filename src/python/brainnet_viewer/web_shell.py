@@ -109,10 +109,13 @@ def build_shell(server, workspace, initial, actions):
                                 v3.VSelect(v_model=(role,''),items=('catalog_'+role,items),id='bnv-file-'+role,title=(role,),variant='outlined',density='compact',hide_details=True,classes='bnv-file')
                                 v3.VBtn('Add',click=f"upload_role = '{role}'; upload_open = true",variant='outlined',title='Upload '+label)
                                 v3.VBtn('×',click=f"{role} = ''",variant='outlined',title='Clear '+label)
-                        with html.Div(classes='bnv-data-actions'):
-                            v3.VBtn('Open Scene',click='scene_open = true',variant='outlined')
+                        with html.Div(classes='bnv-source-row bnv-scene-row'):
+                            html.Label('Scene File',**{'for':'bnv-scene-file'})
+                            html.Span('{{ scene_filename }}',id='bnv-scene-file',title=('scene_filename',),classes='bnv-scene-name')
+                            v3.VBtn('Open',click='scene_open = true',variant='outlined',title='Open Scene JSON or ZIP')
+                        with html.Div(classes='bnv-data-actions',id='bnv-scene-actions'):
                             v3.VBtn('Save Scene',variant='outlined',click="trigger('save_brainnet_scene').then(data => utils.download('BrainNet.scene.zip', utils.get('Uint8Array').from(utils.get('atob')(data), c => c.charCodeAt(0)), 'application/zip')).catch(cause => { error = 'Scene save failed: ' + (cause.message || JSON.stringify(cause)); })")
-                        v3.VBtn('Import Settings',click='legacy_open = true',variant='outlined',block=True,classes='mb-2')
+                            v3.VBtn('Import Settings',click='legacy_open = true',variant='outlined')
                         html.Pre('{{ summary }}',classes='bnv-summary')
                     with html.Div(classes='bnv-export'):
                         html.H3('Export Figure')
@@ -140,11 +143,17 @@ def build_shell(server, workspace, initial, actions):
                         v3.VBtn('Render Scene',click=actions['apply'],color='#0754e9')
                     with html.Div(classes='bnv-canvas'):
                         # Keep the remote view mounted while switching from the welcome image.
-                        with html.Div(classes='bnv-view',style=("rendered ? '' : 'visibility:hidden'",)):
-                            view=vtk.VtkRemoteView(initial.render_window,interactive_ratio=1,interactive_quality=95,
-                                                   interactor_events=('inspect_events',['LeftButtonPress']),
+                        with html.Div(classes='bnv-view',style=("rendered ? '' : 'visibility:hidden'",),raw_attrs=[':data-cpu-detail-uses="cpu_detail_uses"']):
+                            # Transient CPU detail and transmission are reduced only during interaction.
+                            # Still frames and figure exports restore full original geometry.
+                            view=vtk.VtkRemoteView(initial.render_window,interactive_ratio=.65,interactive_quality=70,
+                                                   raw_attrs=[':key="view_generation"'],
+                                                   StartAnimation=actions['stream_start'],EndAnimation=actions['stream_end'],
+                                                   interactor_events=('inspect_events',['LeftButtonPress','StartAnimation','EndAnimation']),
                                                    LeftButtonPress=(actions['inspect_event'],'[$event.position]'),
-                                                   still_ratio=1,still_quality=100,style='height:100%;width:100%')
+                                                   # Remote vtk.js sizes its stream in CSS pixels, unlike desktop HiDPI.
+                                                   # Sample still frames at 2x; transient frames retain the existing budget.
+                                                   still_ratio=2,still_quality=100,style='height:100%;width:100%')
                         with html.Div(classes='bnv-welcome',v_if='!rendered'):
                             html.Img(src=('brand_image',),alt='BrainNet Viewer startup brain')
                             html.Div(f'Version {__version__} · Public Beta 1 · Developer: Mingrui Xia',classes='bnv-welcome-info')

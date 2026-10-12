@@ -6,6 +6,11 @@ BrainNet Viewer 2.0.0-beta.1 visualizes brain surfaces, nodes, connections,
 surface maps and atlas ROIs. Choose MATLAB Desktop, Python Desktop, or the
 Docker-hosted Web edition. Developer: Mingrui Xia.
 
+The default branch includes maintenance updates after the public beta. Download
+packages and the Docker Hub `2.0.0-beta.1` image remain tied to that release;
+they do not include these newer source changes. See [Changes](CHANGELOG.md)
+and the source-install sections below to use the updated code.
+
 ## Install and launch
 
 - MATLAB: install and activate MATLAB, set Current Folder to this repository
@@ -35,7 +40,8 @@ Brainnetome246. AAL90 volume and vertex-label inputs are in
 registration and coordinate correspondence for your own data. The application
 interface is English and is not restricted to human-brain data.
 
-Web supports a local single-user shared session and software rendering.
+Web supports a local single-user shared session. Source builds prefer a verified
+GPU when available and otherwise use CPU rendering; the released image uses CPU.
 Save a portable Scene before stopping or updating the container.
 Desktop/Python/Web compatibility notes describe the checked environments.
 
@@ -58,4 +64,4 @@ https://doi.org/10.1371/journal.pone.0068910
 [Changes](CHANGELOG.md)
 
 Contact Mingrui Xia: mxia@bnu.edu.cn; mingruixia@gmail.com.
-Project code uses [GPL-3.0](LICENSE). Retain code and bundled-resource notices.
+Project code uses [GPL-3.0-or-later](LICENSE). Retain code and bundled-resource notices.

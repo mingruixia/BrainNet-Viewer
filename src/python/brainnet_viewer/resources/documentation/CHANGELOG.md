@@ -1,5 +1,24 @@
 # Changes in BrainNet Viewer
 
+## Unreleased
+
+- Align Web Scene File / Open and Save Scene / Import Settings with the desktop editions.
+- Sharpen Web still frames using 2x sampling without enlarging labels or compounding
+  sampling on Apply. Reduce streamed resolution and JPEG quality during interaction.
+- Temporarily reduce surface detail for CPU interaction, restoring original geometry
+  for still frames, Inspect, Scene operations and export; GPU rendering retains full geometry.
+- Prefer a GPU verified by an isolated graphics probe; use CPU at startup when GPU
+  rendering is unavailable. Add explicit Auto/GPU/CPU selection to the local launcher.
+- Update pypdf to 6.19.0 and use defusedxml for XML entity protection.
+- Preserve `#` within node labels in MATLAB and Python.
+- Harden Python Scene paths, duplicate-key/nonfinite checks and bounded JSON input;
+  stage and verify portable assets before committing a new Scene without overwriting files.
+- Restrict local Web Host/Origin and bootstrap authentication through a same-origin
+  request using a random per-start key. Keep the local single-user deployment scope.
+- Build source Docker images on a pinned Python 3.12 base, check dependencies and
+  report HTTP health. ARM64 source rendering remains unverified; released images are unchanged.
+- Clarify GPL-3.0-or-later for project code while retaining bundled-resource terms.
+
 ## 2.0.0-beta.1
 
 ### Editions and workspace
@@ -41,5 +60,5 @@
 - Unified illustrated English Word/PDF manual and shared tutorials; bilingual Python
   and Docker installation instructions.
 
-Project code is GPL-3.0. Bundled resources retain their source credits and notices.
+Project code is GPL-3.0-or-later. Bundled resources retain their source credits and notices.
 See the installation guides for deployment requirements and edition differences.

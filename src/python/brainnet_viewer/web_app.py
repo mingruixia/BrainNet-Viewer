@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Local single-user browser prototype; no desktop Qt dependency."""
 import argparse
 import base64
@@ -12,18 +13,23 @@ def create_app(server=None, workspace=None):
     from trame.app import get_server
     import pyvista as pv
     server=server or get_server('brainnet-web',client_type='vue3')
+    from .web_security import install
+    install(server)
     workspace=workspace or WebWorkspace()
+    from .web_detail import WebInteractionDetail
+    detail=WebInteractionDetail()
+    workspace.interaction_detail=detail
     state,ctrl=server.state,server.controller
     server.options['ws_max_msg_size']=72*1024*1024
     state.update({'status':'Select inputs, configure, then Apply.','error':'','preset':1,'view_direction':1,
                   'opacity':.3,'node_scale':1.,'edge_scale':.7,'width':2000,'height':1500,'dpi':300,
                   'transparent':False,'export_format':'png','export_units':'Pixels','export_ready':False,
                   'interaction':'Rotate','rendered':False,'volume_mode':'surface-map',
-                  'inspect_on':False,'inspect_text':'','boundary_ready':False,'boundary_busy':False})
+                  'inspect_on':False,'inspect_text':'','boundary_ready':False,'boundary_busy':False,'cpu_detail_uses':0,'view_generation':0})
     for role in workspace.catalog: state[role]=''
     seed(state,workspace.settings)
     state.update({'upload_open':False,'scene_open':False,'upload_role':'auto','upload_files':[],
-                  'scene_files':[],'splittable':True,'bind_open':False,'bind_kind':'boundary','bind_files':[],
+                  'scene_files':[],'scene_filename':'Open JSON / ZIP','splittable':True,'bind_open':False,'bind_kind':'boundary','bind_files':[],
                   'bind_order_confirmed':False})
     bindings={}; edge_bindings={}; map_selection=None
     pending_base=None
@@ -538,6 +544,7 @@ def create_app(server=None, workspace=None):
         try:
             if len(state.scene_files)!=1: raise ValueError('Choose one Scene JSON or ZIP.')
             item=ClientFile(state.scene_files[0]); chosen=open_bundle(workspace,item.name,item.content)
+            state.scene_filename=item.name
             catalogs()
             for role in workspace.catalog: state[role]=chosen.get(role,'')
             bindings.clear(); edge_bindings.clear(); controls(workspace.settings); state.scene_open=False; state.scene_files=[]
@@ -558,6 +565,7 @@ def create_app(server=None, workspace=None):
         except Exception as error: state.error=str(error)
     @ctrl.trigger('save_brainnet_scene')
     def save_scene():
+        detail.finish()
         from .web_assets import save_bundle
         from .session import signature, content_hashes, validate_session
         try:
@@ -585,23 +593,38 @@ def create_app(server=None, workspace=None):
         bindings.clear(); edge_bindings.clear(); workspace.settings=deepcopy(DEFAULTS); controls(workspace.settings)
         state.status='Default settings restored. Current canvas retained until Apply.'
     def clear():
+        detail.clear()
         navigation.stop()
         view.replace_view(initial.render_window); workspace.close_render()
         state.inspect_on=False; state.inspect_text=''
         state.rendered=False; state.boundary_ready=False; state.error=''; state.status='Figure cleared. Input files retained.'
     def apply():
         nonlocal pending_base
+        detail.clear()
         navigation.stop()
         try:
             current_window=workspace.plotter.render_window if workspace.plotter else initial.render_window
             canvas_size=tuple(current_window.GetSize())
+            if server.protocol:
+                from trame_vtk.modules.vtk import get_helper
+                quality=server.protocol_call('viewport.image.push.quality.get',get_helper(server).id(current_window)) or {}
+                ratio=float(quality.get('ratio',1))
+                if ratio>0:
+                    # GetSize is the sampled image size, not the CSS canvas.
+                    # Reusing it as the new view's originalSize compounds HiDPI.
+                    canvas_size=tuple(max(10,int(size/ratio+.5)) for size in canvas_size)
             validate()
             settings=read(state,pending_base or workspace.settings,workspace.paths,bindings,edge_bindings)
             previous=workspace.settings; workspace.settings=settings
             try: workspace.render()
             except Exception: workspace.settings=previous; raise
             workspace.plotter.render_window.SetSize(*canvas_size)
+            detail.prepare(workspace.renderer)
+            workspace.set_screen_ratio(2)
             bindings.clear(); edge_bindings.clear(); view.replace_view(workspace.plotter.render_window)
+            # A new native view subscription otherwise starts at ratio=1; the
+            # client only re-sends unchanged stillRatio props after interaction.
+            state.view_generation+=1
             pending_base=None
             set_interaction(state.interaction)
             state.inspect_text='Click a surface vertex (default MNI coordinates).' if state.inspect_on else ''
@@ -611,12 +634,14 @@ def create_app(server=None, workspace=None):
         except Exception as error:
             state.error=str(error); state.status='Apply failed; correct the inputs/settings.'
     def reset():
+        detail.finish()
         navigation.stop()
         if workspace.renderer: workspace.renderer.reset(); view.update()
     def set_interaction(interaction,**_):
         if workspace.plotter:
             workspace.plotter.enable_custom_trackball_style(left={'Rotate':'rotate','Pan':'pan','Zoom':'dolly'}.get(interaction,'rotate'))
     def toggle_inspect():
+        detail.finish()
         state.inspect_on=not state.inspect_on
         state.inspect_text='Click a surface vertex (default MNI coordinates).' if state.inspect_on else ''
     def inspect_event(event):
@@ -624,6 +649,7 @@ def create_app(server=None, workspace=None):
         position=event if isinstance(event,dict) else {}
         inspect_position(position.get('x'),position.get('y'))
     def inspect_position(x,y):
+        detail.finish()  # Inspect always resolves original vertex IDs, never proxy indices.
         if not state.inspect_on or not workspace.renderer: return
         try:
             import math
@@ -670,6 +696,7 @@ def create_app(server=None, workspace=None):
         return base64.b64encode(download()).decode('ascii')
     @ctrl.trigger('export_brainnet_files')
     def export_files():
+        detail.finish()
         navigation.stop()
         try:
             files=workspace.export_files(state.width,state.height,state.dpi,state.transparent,
@@ -698,6 +725,7 @@ def create_app(server=None, workspace=None):
             state.animation_status='Cancelling animation; waiting for renderer cleanup…'
     @ctrl.trigger('export_brainnet_animation')
     async def animation_export():
+        detail.finish()
         navigation.stop()
         nonlocal animation_job
         if animation_job is not None: raise ValueError('An animation export is already running.')
@@ -766,6 +794,18 @@ def create_app(server=None, workspace=None):
              'open_node_colors':open_node_colors,'choose_node_color':choose_node_color,
              'demo_start':navigation.start,'demo_stop':navigation.stop,'toolbar_view':navigation.direction,
              'resources_refresh':navigation.refresh,'legacy_review':legacy_review,'legacy_use':legacy_use}
+    def start_detail():
+        workspace.set_screen_ratio(.65)
+        if not state.inspect_on:
+            detail.start()
+            if detail.active: state.cpu_detail_uses+=1
+    actions['stream_start']=start_detail
+    def finish_detail():
+        changed=detail.active or getattr(workspace,'screen_ratio',1)!=2
+        detail.finish()
+        workspace.set_screen_ratio(2)
+        if changed: view.update()  # Always push original geometry after the last proxy frame.
+    actions['stream_end']=finish_detail
     view=build_shell(server,workspace,initial,actions)
     navigation.refresh()
     def close(*_,**__):
@@ -792,6 +832,8 @@ def main(argv=None):
     args=parser.parse_args(argv)
     if args.host not in ('127.0.0.1','localhost','::1') and not (args.container and args.host=='0.0.0.0'):
         parser.error('Only loopback is supported; server multi-user deployment is not implemented.')
+    from .web_backend import bootstrap
+    bootstrap('brainnet_viewer.web_app',argv)
     server,_,_=create_app()
     # A background container stays available until explicitly stopped.
     server.start(host=args.host,port=args.port,open_browser=False,

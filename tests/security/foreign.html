@@ -1,0 +1,33 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Local browser cross-origin check</title>
+<h1>Local browser cross-origin check</h1>
+<p>Serve this page on a different local port. Enter the loopback URL of a Web
+server you control. The check attempts only a bootstrap request and WebSocket
+handshake; it does not upload, modify a Scene or authenticate. A network or
+startup failure is inconclusive; verify the server's same-origin operation first.</p>
+<label>Target <input id="target" value="http://127.0.0.1:1031"></label>
+<button id="run">Run read-only cross-origin checks</button>
+<pre id="result">Not run</pre>
+<script>
+document.querySelector('#run').onclick = async () => {
+  const target = new URL(document.querySelector('#target').value);
+  if (target.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(target.hostname)
+      || target.username || target.password || target.origin === location.origin) {
+    document.querySelector('#result').textContent = 'Use a different HTTP loopback origin.';
+    return;
+  }
+  const result = {};
+  try {
+    const reply = await fetch(target.origin + '/bnv-session', {method: 'POST'});
+    result.bootstrap = 'Unexpected readable response: ' + reply.status;
+  } catch (_) { result.bootstrap = 'Cross-origin response inaccessible'; }
+  result.websocket = await new Promise(resolve => {
+    const ws = new WebSocket('ws://' + target.host + '/ws');
+    const timer = setTimeout(() => {ws.close(); resolve('Timed out; inconclusive');}, 4000);
+    ws.onopen = () => {clearTimeout(timer); ws.close(); resolve('Unexpected accepted handshake');};
+    ws.onerror = () => {clearTimeout(timer); resolve('Handshake refused');};
+  });
+  document.querySelector('#result').textContent = JSON.stringify(result, null, 2);
+};
+</script>

@@ -7,6 +7,10 @@ BrainNet Viewer Web runs in the background in Docker. Use it in your browser at
 not required. The public-beta image is
 [mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer).
 
+This download image is unchanged. Maintenance updates on the default source
+branch require a local source build; pulling the beta tag does not install them.
+The source-build instructions at the end cover GPU selection and CPU fallback.
+
 ## 1. Install and start Docker
 
 - **Windows:** install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/),
@@ -117,7 +121,7 @@ for normal installation.
 
 ## Deployment scope
 
-The supplied configuration binds only to this computer, uses one shared
+The released-image configuration binds only to this computer, uses one shared
 session and renders with the CPU. CPU quotas are limits, not the host's total
 core count. The presence of a graphics card does not enable container GPU
 rendering. A shared server deployment requires authentication, user isolation
@@ -125,7 +129,7 @@ and HTTPS; it is outside this local installation recipe.
 
 ## Optional source build
 
-Developers with the complete repository can build locally:
+Use the complete current source repository, with the terminal at its root:
 
 ```sh
 docker compose -f src/python/compose.web.yml up -d --build
@@ -133,6 +137,60 @@ docker compose -f src/python/compose.web.yml up -d --build
 
 This requires Internet access for build dependencies. Use either the source-build
 service or the downloaded image on port 1031, not both at once.
+
+The source image uses Python 3.12 and fixed application dependencies. Compose
+does not allocate a GPU: Auto performs a real graphics probe and normally chooses
+CPU without GPU access. Source Compose allows up to 8 CPU cores, 8 GiB memory and
+512 MiB temporary storage. ARM64 source rendering is not yet verified: an emulated
+ARM64 graphics probe failed, so do not treat a successful build as a usable renderer.
+The existing released ARM64 image has not been replaced.
+
+### Windows GPU-preferred source launch
+
+Use Docker Desktop with WSL 2, Linux containers and a supported NVIDIA driver.
+Save your Scene and stop any other service using port 1031 first. Build a distinct
+local image, then use the supplied PowerShell launcher:
+
+```powershell
+docker build -f src/python/Dockerfile.web -t brainnet-viewer:web-local src/python
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Start -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031 -Backend Auto
+```
+
+Auto first allocates the GPU to a disposable container and verifies actual
+rendering. It starts a CPU container if GPU startup is unavailable. Use `-Backend
+CPU` to request software rendering, or `-Backend GPU` to require hardware rendering
+and fail rather than silently fall back. Merely listing a GPU is not proof of
+hardware rendering. An existing container retains its backend; Stop/Restart do not
+reconfigure it. Use a new container name and a free port for a different backend.
+
+```powershell
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Status -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Logs -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031
+powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Stop -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031
+```
+
+The Windows WSL/NVIDIA path has local rendering checks. Linux GPU deployment and
+other drivers require platform-specific configuration; macOS Docker does not
+automatically expose the Mac GPU to this Linux image. GPU process crashes or memory
+exhaustion after startup are not covered by an in-session recovery guarantee.
+
+### Source Web session and input limits
+
+Use the exact loopback hostname and port in the browser URL consistently. The
+source server rejects foreign or missing origins on its authentication/connection
+endpoints and obtains a fresh key through a same-origin request. It has no user
+login and is not a public multi-user server. Do not expose it on the network or
+embed it in another site's iframe without a separately designed deployment.
+
+Still frames use 2x sampling; moving frames use lower sampling/quality. CPU-only
+surface detail reduction is temporary; still frames, Inspect and export restore
+the original geometry. Export image dimensions are set by Export Figure.
+
+Scene JSON metadata is limited to 32 MiB; scientific-file uploads to 32 MiB each,
+Scene ZIPs to 64 MiB compressed and session files to 128 MiB. Portable Scene saves
+stage and verify assets before committing a new filename, and require a filesystem
+supporting hard links. Use a local supported filesystem and a new Scene name;
+existing output is not overwritten. Save downloaded files before restarting.
 
 Continue with the [shared tutorials](../../tutorials/unified/en/index.md)
 and [user manual](../../manual/en/index.md).

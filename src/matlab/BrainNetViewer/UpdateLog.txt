@@ -1,6 +1,9 @@
-BrainNet Viewer 2.0.0-beta.1
+BrainNet Viewer source maintenance updates
 
-Build date: 1 October 2026. MATLAB public beta for evaluation and feedback before the stable 2.0 version. The build date is not a statement of the actual publication date.
+- Preserve word-internal # in node labels.
+- Clarify GPL-3.0-or-later for project code; bundled-resource terms are unchanged.
+
+BrainNet Viewer 2.0.0-beta.1
 
 Interface and interaction
 
@@ -36,6 +39,6 @@ Compatibility and limitations
 - Paired .hdr/.img inputs must be NIfTI, not plain Analyze 7.5. Statistical thresholds require valid metadata and do not provide multiple-comparison correction.
 - Inspect and mesh tools do not establish registration. Check coordinates, units, atlas correspondence and scientific interpretation for each dataset.
 - Complete legacy feature equivalence, pixel-identical historical output, EPS/EMF, arbitrary Plot Edit and application-integrated printing are not promised. Exact-size vector export has documented limitations on older MATLAB releases.
-- Software code is GPL-3.0; third-party resources retain their own notices, terms and citations. See the manual and migration guide for detailed scope.
+- Software code is GPL-3.0-or-later; third-party resources retain their own notices, terms and citations. See the manual and migration guide for detailed scope.
 
 See CHANGELOG.md and CHANGELOG.zh-CN.md for the bilingual change history.

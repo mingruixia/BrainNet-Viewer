@@ -7,7 +7,7 @@ services:
       - "127.0.0.1:1031:1031"
     read_only: true
     environment:
-      LIBGL_ALWAYS_SOFTWARE: "1"
+      BNV_RENDER_BACKEND: auto
     tmpfs:
       - /tmp:size=512m,mode=1777
     mem_limit: 8g

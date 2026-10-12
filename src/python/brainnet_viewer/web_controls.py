@@ -10,6 +10,8 @@ CSS = """
 .bnv-source-row {grid-template-columns:80px minmax(0,1fr) 36px 26px;gap:3px;align-items:center}
 .bnv-source-row>label {font-size:11px;font-weight:600;line-height:1.2}
 .bnv-source-row .v-btn {height:30px;padding:0 3px}.bnv-file {margin:0;min-width:0}
+.bnv-source-row.bnv-scene-row {grid-template-columns:80px minmax(0,1fr) 65px}
+.bnv-scene-name {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px;line-height:30px}
 .bnv-summary {flex:1;min-height:95px;max-height:none;margin:0;padding:6px;font:12px/1.45 'Segoe UI',Arial,sans-serif}
 .bnv-control-row {display:grid;grid-template-columns:108px minmax(0,1fr);align-items:center;gap:6px;margin-bottom:5px;min-width:0}
 .bnv-control-row>label {font-size:12px;line-height:1.25;overflow-wrap:anywhere}

@@ -1,5 +1,18 @@
 # BrainNet Viewer 更新记录
 
+## 尚未发行
+
+- Web的Scene File/Open及Save Scene/Import Settings布局与桌面版对齐。
+- 静止画面采用2倍采样，保持文字大小，避免Apply后采样叠加；交互期间降低传输分辨率及JPEG质量。
+- CPU交互临时降低曲面细节，静止、Inspect、Scene及导出恢复原几何；GPU始终使用完整几何。
+- 启动时通过隔离试绘核验GPU，不可用则回退CPU；本机启动工具支持Auto/GPU/CPU选择。
+- pypdf升级至6.19.0，XML使用defusedxml防止实体扩展。
+- MATLAB及Python节点读取保留标签内部的`#`。
+- Python Scene强化路径、重复键、非有限值及JSON大小检查；便携资产先暂存核验，再提交新Scene，避免覆盖已有文件。
+- 本机Web限制Host/Origin，通过同源请求取得每次启动的随机认证key；适用范围仍为本机单用户。
+- 源码Docker构建使用固定Python 3.12底座，增加依赖核验及HTTP健康检查；ARM64源码绘图尚未验证，已发布镜像不变。
+- 明确项目代码使用GPL-3.0-or-later，随附资源保留各自条款。
+
 ## 2.0.0-beta.1
 
 - MATLAB App式桌面界面，移除SPM依赖；新增独立Python桌面版与Docker/Web版。
@@ -16,5 +29,5 @@
 - AAL90体积、顶点标签与辅助文件归入图谱资源库，节点/连边教程统一使用AAL90；AAL3v2和Shen278体积文件名与目录名称一致。
 - 提供统一英文图文Word/PDF手册、共享教程及中英文Python/Docker安装说明。
 
-软件代码沿用GPL-3.0，附带资源保留来源、引文及相应说明。
+软件代码使用GPL-3.0-or-later，附带资源保留来源、引文及相应说明。
 部署要求和各版本差异见安装指南。

@@ -5,6 +5,10 @@
 BrainNet Viewer 2.0.0-beta.1用于曲面、节点、连边、曲面映射与图谱ROI可视化。
 提供MATLAB桌面版、Python桌面版和Docker/Web版。开发者：Mingrui Xia。
 
+默认分支包含公测发布后的维护更新。下载包及Docker Hub的`2.0.0-beta.1`
+镜像仍对应原公测版，不包含这些较新的源码修改。更新内容见[更新说明](CHANGELOG.zh-CN.md)，
+使用更新代码请按安装指南的源码安装部分操作。
+
 ## 安装与启动
 
 - MATLAB：安装并激活MATLAB，Current Folder切换到仓库根目录，
@@ -28,7 +32,8 @@ Data Sources读取文件 → Visualization Settings配置 → Apply绘图 →
 AAL90体积和顶点标签位于源码/MATLAB包根目录的`resources/atlases/AAL90/`；
 Python/Docker资源库中对应`atlases/AAL90/`。Inspect基于MNI类空间查询
 AAL/Brodmann；使用个人数据前确认配准与坐标对应。界面为英文，
-软件不限于人脑数据。Web支持本机单一共享会话和软件渲染，
+软件不限于人脑数据。Web支持本机单一共享会话；源码构建在可用时优先使用
+经过实际试绘核验的GPU，否则使用CPU，已发布镜像使用CPU。
 停止或更新容器前保存便携Scene。
 
 ## 源码构建
@@ -47,4 +52,4 @@ https://doi.org/10.1371/journal.pone.0068910
 [NITRC](https://www.nitrc.org/projects/bnv/) · [更新说明](CHANGELOG.zh-CN.md)
 
 联系人Mingrui Xia：mxia@bnu.edu.cn；mingruixia@gmail.com。
-代码使用[GPL-3.0](LICENSE)，请保留代码及资源说明。
+代码使用[GPL-3.0-or-later](LICENSE)，请保留代码及资源说明。

@@ -1,0 +1,4 @@
+# UTF-8 labels and midline coordinates
+-2 0 0 1 2 Left region
+2 0 0 2 3 Right region
+0 1 0 2 4 中线 Midline

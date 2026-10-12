@@ -1,14 +1,27 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Portable Scene JSON and separate desktop asset locations."""
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 import json
 import shutil
-from .io import resolve_asset, sha256, gifti_dependencies
+import os
+from tempfile import TemporaryDirectory, NamedTemporaryFile
+from .io import resolve_asset, validate_asset_path, sha256, gifti_dependencies
 from .settings import normalize, finite_json
 from .session import KEY, content_hash, document_signature, attach_session, validate_session
 
 ROLES = {"surface": 1, "node": 2, "edge": 4, "surface_map": 8, "volume": 8}
+SCENE_JSON_LIMIT = 32 * 1024 * 1024
+
+
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON key: {key}")
+        result[key] = value
+    return result
 
 
 @dataclass
@@ -59,7 +72,7 @@ def validate_document(document):
     for role, reference in inputs.items():
         if not isinstance(reference, dict) or reference.get("role") != role:
             raise ValueError("Scene input role mismatch.")
-        resolve_asset(Path.cwd(), reference.get("relative_path"))
+        validate_asset_path(reference.get("relative_path"))
         digest = reference.get("sha256", "")
         if not isinstance(digest, str) or (digest and (len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest))):
             raise ValueError("Invalid input SHA-256.")
@@ -84,10 +97,16 @@ def validate_document(document):
     finite_json(document)
 
 
-def read_scene(path, data_root, resolve=True):
+def read_scene(path, data_root, resolve=True, *, max_bytes=SCENE_JSON_LIMIT):
     def invalid(value): raise ValueError(f"Nonfinite JSON value: {value}")
-    text=Path(path).read_text(encoding="utf-8-sig")
-    document = json.loads(text, parse_constant=invalid)
+    if not isinstance(max_bytes, int) or isinstance(max_bytes, bool) or max_bytes < 1:
+        raise ValueError("Scene JSON limit must be a positive integer.")
+    with Path(path).open("rb") as stream:
+        raw = stream.read(max_bytes + 1)
+    if len(raw) > max_bytes:
+        raise ValueError(f"Scene JSON exceeds the {max_bytes}-byte metadata limit.")
+    text = raw.decode("utf-8-sig")
+    document = json.loads(text, parse_constant=invalid, object_pairs_hook=unique_object)
     validate_document(document)
     scene = Scene(document, Path(data_root).resolve())
     if "session_state" in document.get("metadata",{}):
@@ -99,15 +118,29 @@ def read_scene(path, data_root, resolve=True):
 
 def write_scene(scene, path):
     validate_document(scene.document)
-    Path(path).write_text(json.dumps(scene.document, ensure_ascii=False, allow_nan=False, indent=2), encoding="utf-8")
+    raw = json.dumps(scene.document, ensure_ascii=False, allow_nan=False, indent=2).encode("utf-8")
+    if len(raw) > SCENE_JSON_LIMIT:
+        raise ValueError("Scene JSON exceeds the metadata limit.")
+    path = Path(path)
+    temporary = None
+    try:
+        with NamedTemporaryFile(dir=path.parent, prefix=".bnv-json-", delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(raw)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def portable_scene(paths, settings, destination, base_document=None, session=None):
     """Copy selected files into an explicit data root, never constrain original paths."""
-    destination = Path(destination).resolve()
-    if destination.exists(): raise ValueError("Choose a new Scene filename; existing files are not overwritten.")
+    destination = Path(destination).absolute()
+    if os.path.lexists(destination): raise ValueError("Choose a new Scene filename; existing files are not overwritten.")
     asset_dir = destination.parent / (destination.stem + "_assets")
-    if asset_dir.exists(): raise ValueError("The portable asset folder already exists.")
+    if os.path.lexists(asset_dir): raise ValueError("The portable asset folder already exists.")
     document = {"schema_version": "0.1", "id": "PYTHON_SCENE", "name": destination.stem,
                 "loadfile": 0, "map_mode": 0, "coordinate_space": "mixed-or-unverified",
                 "redistribution_status": "user-supplied", "inputs": {},
@@ -149,10 +182,34 @@ def portable_scene(paths, settings, destination, base_document=None, session=Non
             if not dependency.is_file(): raise ValueError(f"Missing paired asset: {dependency}")
             relative = dependency.relative_to(source.parent)
             copies.append((dependency, asset_dir / role / relative))
-    for source, target in copies:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
-    scene = Scene(document, destination.parent)
-    scene.resolve()
-    write_scene(scene, destination)
-    return scene
+    # Stage under the destination filesystem. Reserve the final directory using
+    # mkdir (no replacement), then publish the complete JSON without overwriting.
+    # The two paths are not a single crash-atomic transaction; JSON is committed last.
+    owned_identity = None
+    committed = False
+    with TemporaryDirectory(prefix=".bnv-scene-", dir=destination.parent) as temporary:
+        stage = Path(temporary)
+        try:
+            for source, target in copies:
+                staged = stage / target.relative_to(destination.parent)
+                staged.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, staged)
+            staged_scene = Scene(document, stage)
+            staged_scene.resolve()  # Detect source changes and paired/external corruption.
+            staged_json = stage / "Scene.json"
+            write_scene(staged_scene, staged_json)
+            asset_dir.mkdir()  # Exclusive reservation; pre-existing paths remain untouched.
+            info = asset_dir.stat()
+            owned_identity = (info.st_dev, info.st_ino)
+            for child in (stage / asset_dir.name).iterdir():
+                child.rename(asset_dir / child.name)
+            scene = Scene(document, destination.parent)
+            scene.resolve()
+            os.link(staged_json, destination)  # Atomic, complete, no-clobber JSON commit.
+            committed = True
+            return scene
+        finally:
+            if not committed and owned_identity is not None and asset_dir.is_dir() and not asset_dir.is_symlink():
+                info = asset_dir.stat()
+                if (info.st_dev, info.st_ino) == owned_identity:
+                    shutil.rmtree(asset_dir)

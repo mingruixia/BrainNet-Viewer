@@ -75,3 +75,32 @@ CLI 导出使用本版本 Scene，参见统一命令行教程。
 
 浏览器使用参见[Docker安装](../../web/zh-CN/INSTALLATION.md)。
 联系人 Mingrui Xia：mxia@bnu.edu.cn；mingruixia@gmail.com。
+
+## 安装当前源码
+
+默认源码分支包含后续维护更新（包版本2.0.0b1.post2），不在已下载的2.0.0b1
+wheel中。请在完整仓库根目录打开终端并创建新环境。Windows推荐Python 3.12，
+Apple Silicon仍要求Python 3.11或更新版本；不要复用或改动已有公测环境。
+
+Windows PowerShell：
+
+```powershell
+py -3.12 -m venv .venv-bnv-source
+$bnvPython = (Resolve-Path .venv-bnv-source/Scripts/python.exe).Path
+& $bnvPython -m pip install "./src/python[desktop]"
+& $bnvPython -m pip check
+& $bnvPython -m brainnet_viewer
+```
+
+macOS/Linux终端：
+
+```bash
+python3.11 -m venv .venv-bnv-source
+source .venv-bnv-source/bin/activate
+python -m pip install './src/python[desktop]'
+python -m pip check
+brainnet-viewer
+```
+
+保留项目固定依赖。安装源码不会更新已有wheel或已下载的安装包。
+各平台及图形驱动要求仍然适用，安装成功本身不代表绘图已验证。

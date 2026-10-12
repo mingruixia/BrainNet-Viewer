@@ -22,7 +22,7 @@ while true
         break;
     end
     lineNumber = lineNumber + 1;
-    commentAt = strfind(line, '#');
+    commentAt = regexp(line, '(?<!\S)#', 'once');
     if ~isempty(commentAt)
         line = line(1:commentAt(1) - 1);
     end

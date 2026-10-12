@@ -84,3 +84,35 @@ For CLI export, use a same-edition Scene and the shared command-line tutorial.
 
 For browser use see [Docker installation](../../web/en/INSTALLATION.md).
 Contact Mingrui Xia: mxia@bnu.edu.cn; mingruixia@gmail.com.
+
+## Install the current source
+
+The default source branch includes maintenance updates (package version
+2.0.0b1.post2) that are not in the downloadable 2.0.0b1 wheel. For source
+installation, open a terminal at the complete repository root and use a new
+environment. Python 3.12 is recommended on Windows; Apple Silicon still requires
+Python 3.11 or newer. Do not reuse or change an existing beta environment.
+
+Windows PowerShell:
+
+```powershell
+py -3.12 -m venv .venv-bnv-source
+$bnvPython = (Resolve-Path .venv-bnv-source/Scripts/python.exe).Path
+& $bnvPython -m pip install "./src/python[desktop]"
+& $bnvPython -m pip check
+& $bnvPython -m brainnet_viewer
+```
+
+macOS/Linux Terminal:
+
+```bash
+python3.11 -m venv .venv-bnv-source
+source .venv-bnv-source/bin/activate
+python -m pip install './src/python[desktop]'
+python -m pip check
+brainnet-viewer
+```
+
+Keep the project's dependency pins. Source installation does not update any
+previously installed wheel or downloaded package. Platform/graphics requirements
+still apply; a successful installation alone does not verify rendering.

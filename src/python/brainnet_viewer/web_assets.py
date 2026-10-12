@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded browser uploads and portable Scene bundles in owned workspaces."""
 import io
 import shutil
@@ -6,7 +7,7 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 from .io import resolve_asset, gifti_dependencies
-from .scene import read_scene, portable_scene
+from .scene import read_scene, portable_scene, SCENE_JSON_LIMIT
 
 FILE_LIMIT=32*1024*1024
 SESSION_LIMIT=128*1024*1024
@@ -121,7 +122,7 @@ def open_bundle(workspace,name,data):
                 file_role(path.name,role); dependency_check(path,folder); paths[role]=path
             scene.resolve()
         elif Path(name).suffix.lower()=='.json':
-            if len(data)>2*1024*1024: raise ValueError('Scene JSON exceeds 2 MiB.')
+            if len(data)>SCENE_JSON_LIMIT: raise ValueError('Scene JSON exceeds the metadata limit.')
             quota(workspace.assets,len(data)); scene_path=folder/'Scene.json'; scene_path.write_bytes(data)
             scene=read_scene(scene_path,workspace.root,resolve=False)
             for role,ref in scene.document['inputs'].items():

@@ -1,0 +1,40 @@
+{
+  "fixture_version": "0.1",
+  "oracle_basis": "Analytic values and code-derived edge rules; not a MATLAB execution result",
+  "surface": {
+    "vertices": [[0,0,0],[2,0,0],[0,3,0],[0,0,4]],
+    "faces_zero_based": [[0,2,1],[0,1,3],[0,3,2],[1,2,3]]
+  },
+  "nodes": {
+    "positions": [[-2,0,0],[2,0,0],[0,1,0]],
+    "modules": [1,2,2], "values": [2,3,4],
+    "labels": ["Left region","Right region","中线 Midline"]
+  },
+  "matrix": [[1,0.5,-0.8],[0.2,2,0.5],[-0.1,0.5,3]],
+  "edge_cases": [
+    {"name":"undirected_absolute_threshold", "directed":false,"mode":"threshold","value_mode":"absolute","threshold":0.5,"pairs_zero_based":[[0,1],[0,2],[1,2]],"values":[0.5,-0.8,0.5]},
+    {"name":"directed_signed_threshold", "directed":true,"mode":"threshold","value_mode":"signed","threshold":0.5,"pairs_zero_based":[[0,1],[2,1],[1,2]],"values":[0.5,0.5,0.5]},
+    {"name":"directed_absolute_threshold", "directed":true,"mode":"threshold","value_mode":"absolute","threshold":0.5,"pairs_zero_based":[[0,1],[2,1],[0,2],[1,2]],"values":[0.5,0.5,-0.8,0.5]},
+    {"name":"top_count_tie_column_major", "directed":false,"mode":"sparsity","value_mode":"signed","sparsity":0.34,"pairs_zero_based":[[0,1],[1,2]],"values":[0.5,0.5]},
+    {"name":"top_count_tie_minimum_one", "directed":false,"mode":"sparsity","value_mode":"signed","sparsity":0.01,"pairs_zero_based":[[0,1]],"values":[0.5]},
+    {"name":"zero_sparsity", "directed":false,"mode":"sparsity","value_mode":"signed","sparsity":0,"pairs_zero_based":[],"values":[]}
+  ],
+  "affine": {
+    "zero_based": [[0,-2,0,10],[3,0,0,-20],[0,0,4,30],[0,0,0,1]],
+    "one_based": [[0,-2,0,12],[3,0,0,-23],[0,0,4,26],[0,0,0,1]],
+    "points": [
+      {"voxel_zero_based":[0,0,0],"voxel_one_based":[1,1,1],"world":[10,-20,30]},
+      {"voxel_zero_based":[1,2,3],"voxel_one_based":[2,3,4],"world":[6,-17,42]}
+    ]
+  },
+  "json_semantics": {"empty_array":[],"empty_object":{},"negative":-0.5,"unicode":"脑区", "nonfinite_allowed":false},
+  "signature_status": "pending MATLAB raw jsonencode byte vectors; no cross-language signature claim",
+  "negative_cases": [
+    {"name":"parent_traversal","mutation":"inputs.surface.relative_path=../outside.nv","expected":"reject"},
+    {"name":"absolute_path","mutation":"inputs.surface.relative_path=C:/outside.nv","expected":"reject"},
+    {"name":"wrong_mask","mutation":"loadfile=15 for surface-only input","expected":"reject"},
+    {"name":"role_mismatch","mutation":"inputs.surface.role=node","expected":"reject"},
+    {"name":"hash_mismatch","mutation":"nonempty sha256 does not match asset bytes","expected":"reject at load"},
+    {"name":"unknown_settings_version","mutation":"options.visualization_settings.schema_version=999.0.0","expected":"reject or read-only; proposed cross-platform policy"}
+  ]
+}

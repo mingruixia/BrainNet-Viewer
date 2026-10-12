@@ -3,7 +3,8 @@ param(
     [ValidateSet('Start','Stop','Restart','Status','Logs')][string]$Action,
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9._:/@-]*$')][string]$Image='brainnet-viewer:web-local',
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9_.-]*$')][string]$ContainerName='brainnet-web',
-    [ValidateRange(1024,65535)][int]$Port=1031
+    [ValidateRange(1024,65535)][int]$Port=1031,
+    [ValidateSet('Auto','GPU','CPU')][string]$Backend='Auto'
 )
 $ErrorActionPreference='Stop'
 
@@ -35,11 +36,37 @@ switch ($Action) {
         if ($bnvExists) {
             if (-not $bnvContainer.State.Running) { Invoke-BnvDocker -Arguments @('start',$ContainerName) | Out-Null }
         } else {
-            Invoke-BnvDocker -Arguments @('run','-d','--name',$ContainerName,
+            # Docker cannot conditionally allocate a GPU inside Compose. Probe the
+            # actual native render in a disposable container before choosing flags.
+            $bnvGpuArguments=@('--gpus','all','--env','NVIDIA_DRIVER_CAPABILITIES=graphics,utility,compute')
+            if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
+                $bnvGpuArguments+=@('--mount','type=bind,source=/usr/lib/wsl/lib,target=/usr/lib/wsl/lib,readonly',
+                    '--mount','type=bind,source=/usr/lib/wsl/drivers,target=/usr/lib/wsl/drivers,readonly')
+            }
+            $bnvSelected='cpu'
+            if ($Backend -ne 'CPU') {
+                try {
+                    $bnvProbe=Invoke-BnvDocker -Arguments (@('run','--rm','--read-only',
+                        '--tmpfs','/tmp:size=512m,mode=1777','--cpus','8','--memory','8g',
+                        '--pids-limit','256','--cap-drop','ALL','--security-opt','no-new-privileges:true',
+                        '--entrypoint','python')+$bnvGpuArguments+@($Image,'-m','brainnet_viewer.web_backend','--probe-gpu'))
+                    Write-Output $bnvProbe
+                    $bnvSelected='gpu'
+                } catch {
+                    if ($Backend -eq 'GPU') { throw }
+                    Write-Warning "GPU startup unavailable; using CPU. $($_.Exception.Message)"
+                }
+            }
+            $bnvRuntimeBackend=$bnvSelected
+            if ($Backend -eq 'Auto' -and $bnvSelected -eq 'gpu') { $bnvRuntimeBackend='auto' }
+            $bnvRunArguments=@('run','-d','--name',$ContainerName,
                 '--label','org.brainnetviewer.application=web','--read-only',
                 '--tmpfs','/tmp:size=512m,mode=1777','--cpus','8','--memory','8g',
                 '--pids-limit','256','--cap-drop','ALL','--security-opt','no-new-privileges:true',
-                '--env','LIBGL_ALWAYS_SOFTWARE=1','-p',"127.0.0.1:${Port}:1031",$Image) | Out-Null
+                '--env',"BNV_RENDER_BACKEND=$bnvRuntimeBackend",'-p',"127.0.0.1:${Port}:1031")
+            if ($bnvSelected -eq 'gpu') { $bnvRunArguments+=$bnvGpuArguments }
+            Invoke-BnvDocker -Arguments ($bnvRunArguments+@($Image)) | Out-Null
+            Write-Output "Requested backend: $Backend; selected: $bnvSelected"
         }
     }
     'Stop' { if ($bnvExists -and $bnvContainer.State.Running) { Invoke-BnvDocker -Arguments @('stop','--time','10',$ContainerName) | Out-Null } }

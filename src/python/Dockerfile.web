@@ -1,21 +1,24 @@
-FROM python:3.10-slim-bookworm AS builder
+FROM python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 AS builder
 WORKDIR /build
 COPY pyproject.toml README.md ./
 COPY brainnet_viewer ./brainnet_viewer
 RUN pip wheel --no-deps --wheel-dir /wheels .
 
-FROM python:3.10-slim-bookworm
+FROM python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libopengl0 libgl1 libegl1 libxrender1 libgl1-mesa-dri libfontconfig1 fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/brainnet
 COPY --from=builder /wheels /wheels
 RUN pip install --no-cache-dir "brainnet-viewer[web] @ file://$(find /wheels -name '*.whl')" \
+    && pip check \
     && useradd --uid 10001 --create-home brainnet
 ENV PYVISTA_OFF_SCREEN=true \
     MPLCONFIGDIR=/tmp/matplotlib \
     XDG_CACHE_HOME=/tmp/cache \
-    VTK_DEFAULT_OPENGL_WINDOW=vtkEGLRenderWindow
+    VTK_DEFAULT_OPENGL_WINDOW=vtkEGLRenderWindow \
+    BNV_RENDER_BACKEND=auto
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 CMD python -c "from urllib.request import urlopen; urlopen('http://127.0.0.1:1031/index.html', timeout=2).close()"
 USER brainnet
 EXPOSE 1031
 ENTRYPOINT ["python", "-m", "brainnet_viewer.web_app"]

@@ -127,10 +127,25 @@ class WebWorkspace:
             nonlocal fitting
             if renderer.exporting or fitting: return
             fitting=True
-            try: renderer.resize_fit(*window.GetSize())
+            try:
+                renderer.resize_fit(*window.GetSize())
+                renderer.update_annotation_fonts(window.GetDPI()/getattr(self,'screen_ratio',1))
             finally: fitting=False
         self._resize_observer=plot.render_window.AddObserver('ModifiedEvent',fit_canvas,1.)
         return renderer
+
+    def set_screen_ratio(self, ratio):
+        # Scalar bars/title/legends use fixed pixels; preserve their CSS extent
+        # when the remote image is sampled above/below the CSS canvas size.
+        self.screen_ratio=float(ratio)
+        if self.renderer:
+            # Point-sized node labels must scale with the raster as well. Keep
+            # the base screen DPI; figure export retains its own DPI transaction.
+            if not hasattr(self,'_screen_dpi_base'):
+                self._screen_dpi_base=self.plotter.render_window.GetDPI()
+            self.plotter.render_window.SetDPI(max(1,int(self._screen_dpi_base*self.screen_ratio+.5)))
+            self.renderer.update_label_records()
+            self.renderer.update_annotation_fonts(self.plotter.render_window.GetDPI()/self.screen_ratio)
 
     def download(self, width=1600,height=1200,dpi=200,transparent=False,format='png',units='Pixels'):
         files=self.export_files(width,height,dpi,transparent,format,units)
@@ -141,6 +156,7 @@ class WebWorkspace:
         return archive.getvalue()
 
     def export_files(self,width=1600,height=1200,dpi=200,transparent=False,format='png',units='Pixels',filename='BrainNet'):
+        if getattr(self,'interaction_detail',None): self.interaction_detail.finish()
         if self.renderer is None: raise ValueError('Render a scene before exporting.')
         from .web_export import preferences,image_name
         options,(width,height)=preferences(width,height,dpi,transparent,format,units)
@@ -160,6 +176,7 @@ class WebWorkspace:
             folder.rmdir()
 
     def close_render(self):
+        if getattr(self,'interaction_detail',None): self.interaction_detail.clear()
         if self._resize_observer is not None and self.plotter is not None:
             self.plotter.render_window.RemoveObserver(self._resize_observer)
         self._resize_observer=None
