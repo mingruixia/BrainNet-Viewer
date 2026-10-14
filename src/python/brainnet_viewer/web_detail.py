@@ -1,7 +1,9 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Temporary CPU surface detail, never a scientific-data or export transformation."""
 import pyvista as pv
 from collections import OrderedDict
 import hashlib
+from .web_backend import hardware
 
 
 class WebInteractionDetail:
@@ -13,8 +15,10 @@ class WebInteractionDetail:
         self.finish(); self.entries=[]; self._producers=[]; self.renderer=renderer; self.note=''
         # EGL's actual device is unknown until the first native frame is drawn.
         renderer.plotter.render_window.Render()
-        device=renderer.plotter.render_window.ReportCapabilities().lower()
-        if not any(name in device for name in ('llvmpipe','softpipe','software rasterizer')):
+        capabilities=renderer.plotter.render_window.ReportCapabilities()
+        device=next((line.split(':',1)[1].strip() for line in capabilities.splitlines()
+                     if 'OpenGL renderer string:' in line),'')
+        if not device or hardware(device):
             return  # Hardware rendering keeps full geometry even during interaction.
         for picks in renderer.pick_actors:
             for actor,_transform in picks or []:

@@ -27,7 +27,7 @@ Data Sources读取文件 → Visualization Settings配置 → Apply绘图 →
 操作所选子图 → 保存/导出。Scene保存输入和设置；Preset保存显示配置。
 科学输入、版本差异及导出设置参见统一手册和教程。
 
-包含曲面库、图谱网络示例和真实教程数据。[AtlasNetworks](../Data/ExampleFiles/AtlasNetworks/README.md)
+包含曲面库、图谱网络示例和真实教程数据。[AtlasNetworks](src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/README.md)
 保留AAL90，并提供14套GroupFC配对文件，包含AAL116、Schaefer1000和Brainnetome246。
 AAL90体积和顶点标签位于源码/MATLAB包根目录的`resources/atlases/AAL90/`；
 Python/Docker资源库中对应`atlases/AAL90/`。Inspect基于MNI类空间查询
@@ -35,6 +35,10 @@ AAL/Brodmann；使用个人数据前确认配准与坐标对应。界面为英�
 软件不限于人脑数据。Web支持本机单一共享会话；源码构建在可用时优先使用
 经过实际试绘核验的GPU，否则使用CPU，已发布镜像使用CPU。
 停止或更新容器前保存便携Scene。
+
+Web仅支持一名受信任用户的私有本机。同源bootstrap不是操作系统用户认证，
+本机进程可伪造请求头；不要在多用户共享主机或公网运行。参见
+[安全说明](SECURITY.md)。源码变更不会自动升级已有下载包或容器。
 
 ## 源码构建
 

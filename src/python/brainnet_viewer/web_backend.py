@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """GPU-first Web startup with an isolated native render probe and CPU fallback.
 
 Container GPU allocation is the launcher's responsibility. Never infer rendering
@@ -34,12 +35,15 @@ def driver_environment(base, *, cpu=False):
         env['GALLIUM_DRIVER']='llvmpipe'
     else:
         env.pop('LIBGL_ALWAYS_SOFTWARE',None)
+        adapter=base.get('MESA_D3D12_DEFAULT_ADAPTER_NAME')
+        if adapter:
+            env['MESA_D3D12_DEFAULT_ADAPTER_NAME']=adapter
         if (Path('/dev/dxg').exists() and Path('/usr/lib/wsl/lib/libd3d12.so').is_file()
                 and Path('/usr/lib/wsl/drivers').is_dir()):
             previous=env.get('LD_LIBRARY_PATH','')
             env['LD_LIBRARY_PATH']='/usr/lib/wsl/lib'+(':'+previous if previous else '')
             env.update(GALLIUM_DRIVER='d3d12',MESA_LOADER_DRIVER_OVERRIDE='d3d12',
-                       MESA_D3D12_DEFAULT_ADAPTER_NAME='NVIDIA',EGL_PLATFORM='surfaceless')
+                       EGL_PLATFORM='surfaceless')
     return env
 
 def probe(env, *, run=subprocess.run):
@@ -83,9 +87,14 @@ def configure_backend(mode=None, *, run=subprocess.run):
 def bootstrap(module=None, argv=None):
     # Linux's dynamic loader consumes LD_LIBRARY_PATH at process startup.
     # Updating os.environ after Python imports is not enough for WSL D3D12.
-    if os.environ.get('BNV_WEB_BOOTSTRAPPED')=='1': return
+    # exec preserves PID; an inherited marker from a parent must not skip the
+    # actual probe. This is loader state, not an authentication credential.
+    marker=str(os.getpid())
+    if os.environ.get('BNV_WEB_BOOTSTRAPPED')==marker: return
     configure_backend()
-    os.environ['BNV_WEB_BOOTSTRAPPED']='1'
+    os.environ['BNV_WEB_BOOTSTRAPPED']=marker
+    if sys.platform != 'linux':
+        return  # Only Linux needs LD_LIBRARY_PATH applied through re-exec.
     command=([sys.executable,'-m',module,*(sys.argv[1:] if argv is None else argv)]
              if module else [sys.executable,*sys.argv])
     os.execvpe(sys.executable,command,dict(os.environ))

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "brainnet-viewer"
-version = "2.0.0b1.post2"
+dynamic = ["version"]
 description = "BrainNet Viewer brain connectome visualization for desktop and web"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -34,6 +34,10 @@ brainnet-viewer = "brainnet_viewer.desktop:main"
 
 [project.scripts]
 brainnet-render = "brainnet_viewer.cli:main"
+brainnet-web = "brainnet_viewer.web_app:cli"
+
+[tool.setuptools.dynamic]
+version = {attr = "brainnet_viewer.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -48,7 +52,6 @@ brainnet_viewer = [
     "resources/documentation/docs/compatibility/*.md",
     "resources/documentation/docs/documentation/*.md",
     "resources/documentation/docs/manual/en/*.docx",
-    "resources/documentation/*.md", "resources/documentation/LICENSE",
     "resources/documentation/*.md", "resources/documentation/*.txt", "resources/documentation/LICENSE",
     "resources/documentation/docs/manual/en/*.md",
     "resources/documentation/docs/manual/en/*.pdf",

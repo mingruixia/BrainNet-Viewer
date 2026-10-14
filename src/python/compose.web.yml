@@ -4,14 +4,15 @@ services:
       context: .
       dockerfile: Dockerfile.web
     ports:
-      - "127.0.0.1:1031:1031"
+      - "127.0.0.1:${BNV_PORT:-1031}:1031"
     read_only: true
     environment:
       BNV_RENDER_BACKEND: auto
+      MESA_D3D12_DEFAULT_ADAPTER_NAME: ${MESA_D3D12_DEFAULT_ADAPTER_NAME:-}
     tmpfs:
       - /tmp:size=512m,mode=1777
-    mem_limit: 8g
-    cpus: 8
+    mem_limit: ${BNV_MEM:-8g}
+    cpus: ${BNV_CPUS:-2}
     pids_limit: 256
     cap_drop: [ALL]
     security_opt:

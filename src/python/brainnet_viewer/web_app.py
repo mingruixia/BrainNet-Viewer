@@ -825,19 +825,35 @@ def create_app(server=None, workspace=None):
     return server,workspace,actions
 
 
-def main(argv=None):
+def _arguments(argv=None):
     parser=argparse.ArgumentParser(description='BrainNet Web local single-user prototype.')
     parser.add_argument('--host',default='127.0.0.1'); parser.add_argument('--port',type=int,default=1031)
     parser.add_argument('--container',action='store_true',help='Permit wildcard bind inside a locally published container only.')
     args=parser.parse_args(argv)
     if args.host not in ('127.0.0.1','localhost','::1') and not (args.container and args.host=='0.0.0.0'):
         parser.error('Only loopback is supported; server multi-user deployment is not implemented.')
-    from .web_backend import bootstrap
-    bootstrap('brainnet_viewer.web_app',argv)
+    if not 1 <= args.port <= 65535:
+        parser.error('Port must be between 1 and 65535.')
+    return args
+
+
+def main(argv=None):
+    """Run in the caller's process; never replace an embedded/test interpreter."""
+    args=_arguments(argv)
     server,_,_=create_app()
     # A background container stays available until explicitly stopped.
     server.start(host=args.host,port=args.port,open_browser=False,
                  timeout=0 if args.container else None)
 
 
-if __name__=='__main__': main()
+def cli(argv=None):
+    """Standalone command entry owns the native-loader bootstrap/re-exec."""
+    import sys
+    argv=list(sys.argv[1:] if argv is None else argv)
+    _arguments(argv)  # Reject invalid binds before probing graphics drivers.
+    from .web_backend import bootstrap
+    bootstrap('brainnet_viewer.web_app',argv)
+    return main(argv)
+
+
+if __name__=='__main__': cli()

@@ -3,6 +3,15 @@
 from pathlib import Path
 import secrets
 from urllib.parse import urlsplit
+from importlib.metadata import version
+
+
+CLIENT_VERSIONS = {'trame': '4.0.0', 'trame-vtk': '2.11.17'}
+
+
+def require_client_versions():
+    if any(version(name) != expected for name, expected in CLIENT_VERSIONS.items()):
+        raise RuntimeError('Unsupported Web client versions; use the pinned Web dependencies.')
 
 
 def authority(value, scheme="http"):
@@ -38,6 +47,7 @@ def install(server):
     """Attach through the SDK bind lifecycle; never patch installed SDK files."""
     if getattr(server, "_bnv_security_installed", False):
         return
+    require_client_versions()
     from aiohttp import web
     token = secrets.token_urlsafe(32)
     server.cli.set_defaults(authKey=token, authKeyFile="")
@@ -60,6 +70,8 @@ def install(server):
 
     def bind(bound):
         app = bound.app
+        if not callable(getattr(server.protocol, 'updateSecret', None)):
+            raise RuntimeError('Unsupported Web authentication protocol; refusing startup.')
         app.middlewares.append(guard)
         # The SDK's documented launcher bootstrap supplies the secret in a POST
         # response, never a URL/query string, shared state, log or persistent file.

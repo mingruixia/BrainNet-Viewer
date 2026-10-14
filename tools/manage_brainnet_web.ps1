@@ -82,7 +82,7 @@ switch ($Action) {
     'Status' { }
 }
 if ($Action -in @('Start','Restart')) {
-    $bnvDeadline=(Get-Date).AddSeconds(30)
+    $bnvDeadline=(Get-Date).AddSeconds(90)
     $bnvReady=$false
     do {
         try {
@@ -91,7 +91,7 @@ if ($Action -in @('Start','Restart')) {
         } catch { }
         if (-not $bnvReady) { Start-Sleep -Milliseconds 300 }
     } while (-not $bnvReady -and (Get-Date) -lt $bnvDeadline)
-    if (-not $bnvReady) { throw "Container started but HTTP readiness was not confirmed in 30 seconds. Use Logs; do not start another copy." }
+    if (-not $bnvReady) { throw "Container started but HTTP readiness was not confirmed in 90 seconds. Use Logs; do not start another copy." }
 }
 $bnvNames=Invoke-BnvDocker -Arguments @('container','ls','-a','--filter',('name=^'+[regex]::Escape($ContainerName)+'$'),'--format','{{.Names}}')
 if ($bnvNames -ne $ContainerName) { Write-Output 'Container is not created.'; return }

@@ -24,4 +24,7 @@ fall back to CPU at startup; GPU allocation depends on the Docker host. Save a p
 Scene before stopping/updating its container. Project code uses GPL-3.0-or-later;
 bundled resources retain accompanying terms.
 
+This requires one trusted local user; same-origin bootstrap is not OS-user
+authentication. Do not use shared-user hosts or public hosting.
+
 Developer: Mingrui Xia — mxia@bnu.edu.cn; mingruixia@gmail.com.

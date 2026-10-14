@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "Please cite the BrainNet Viewer paper when using this software."
+title: "BrainNet Viewer"
+type: software
+authors:
+  - family-names: Xia
+    given-names: Mingrui
+repository-code: "https://github.com/mingruixia/BrainNet-Viewer"
+url: "https://www.nitrc.org/projects/bnv/"
+license: GPL-3.0-or-later
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Xia
+      given-names: Mingrui
+    - family-names: Wang
+      given-names: Jinhui
+    - family-names: He
+      given-names: Yong
+  title: "BrainNet Viewer: A Network Visualization Tool for Human Brain Connectomics"
+  journal: "PLoS ONE"
+  volume: "8"
+  issue: "7"
+  start: e68910
+  year: 2013
+  doi: "10.1371/journal.pone.0068910"

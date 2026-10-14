@@ -19,7 +19,14 @@ with ZipFile(sys.argv[1]) as archive:
         assert hashlib.sha256(source.read_bytes()).digest() == hashlib.sha256(archive.read(name)).digest(), name
     metadata = next(name for name in archive.namelist() if name.endswith(".dist-info/METADATA"))
     text = archive.read(metadata).decode()
-    version = re.search(r'^version\s*=\s*"([^"]+)"', (root / "pyproject.toml").read_text(), re.MULTILINE).group(1)
+    version = re.search(r'^__version__\s*=\s*"([^"]+)"', (root / "brainnet_viewer/__init__.py").read_text(), re.MULTILINE).group(1)
+    project = (root / 'pyproject.toml').read_text()
+    assert 'dynamic = ["version"]' in project and 'attr = "brainnet_viewer.__version__"' in project
+    match = re.fullmatch(r'(\d+\.\d+\.\d+)b(\d+)(?:\.post(\d+))?', version)
+    assert match, 'Add an explicit MATLAB display mapping for the next version scheme.'
+    display = match[1] + '-beta.' + match[2] + ('+post' + match[3] if match[3] else '')
+    matlab = root.parents[1] / 'src/matlab/BrainNetViewer/+brainnet/+app/productInfo.m'
+    assert re.search(r"'version',\s*'" + re.escape(display) + "'", matlab.read_text()), 'MATLAB/Python version mismatch'
     assert f"Version: {version}" in text.splitlines()
     assert "License-Expression: GPL-3.0-or-later" in text
 print(f"Wheel payloads verified: {len(paths)}")

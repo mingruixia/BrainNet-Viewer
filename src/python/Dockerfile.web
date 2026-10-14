@@ -18,7 +18,7 @@ ENV PYVISTA_OFF_SCREEN=true \
     XDG_CACHE_HOME=/tmp/cache \
     VTK_DEFAULT_OPENGL_WINDOW=vtkEGLRenderWindow \
     BNV_RENDER_BACKEND=auto
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 CMD python -c "from urllib.request import urlopen; urlopen('http://127.0.0.1:1031/index.html', timeout=2).close()"
+HEALTHCHECK --interval=30s --timeout=3s --start-period=90s --retries=3 CMD python -c "from urllib.request import urlopen; urlopen('http://127.0.0.1:1031/index.html', timeout=2).close()"
 USER brainnet
 EXPOSE 1031
 ENTRYPOINT ["python", "-m", "brainnet_viewer.web_app"]

@@ -32,7 +32,7 @@ inputs and settings; presets store display settings. Follow the shared manual
 and tutorials for scientific inputs, edition differences and export options.
 
 The surface library, atlas-network examples and real tutorial inputs
-are included. [AtlasNetworks](../Data/ExampleFiles/AtlasNetworks/README.md)
+are included. [AtlasNetworks](src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/README.md)
 contains AAL90 and fourteen GroupFC pairs, including AAL116, Schaefer1000 and
 Brainnetome246. AAL90 volume and vertex-label inputs are in
 `resources/atlases/AAL90/` (source/MATLAB archive) or `atlases/AAL90/`
@@ -44,6 +44,11 @@ Web supports a local single-user shared session. Source builds prefer a verified
 GPU when available and otherwise use CPU rendering; the released image uses CPU.
 Save a portable Scene before stopping or updating the container.
 Desktop/Python/Web compatibility notes describe the checked environments.
+
+Web requires one trusted user on a private local machine. Same-origin bootstrap
+is not OS-user authentication: another local process can forge request headers.
+Do not use shared-user hosts or public hosting. See [security guidance](SECURITY.md).
+Source changes do not upgrade existing release downloads or containers.
 
 ## Build from source
 

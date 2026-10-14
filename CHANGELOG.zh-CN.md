@@ -2,6 +2,12 @@
 
 ## 尚未发行
 
+- 分离Web命令启动试绘与库调用，嵌入/测试调用不再替换当前进程。
+- 保留WSL可选显卡选择、统一软件绘图识别，启动就绪等待延长至90秒。
+- 增加真实HTTP/WebSocket认证及GIfTI预检回归、仿射读取夹具和限定MATLAB读取CI。
+- wheel检查核对MATLAB/Python版本对应，Python包版本来源集中管理。
+- 补充受信任本机单用户安全模型及Compose资源限额配置。
+
 - Web的Scene File/Open及Save Scene/Import Settings布局与桌面版对齐。
 - 静止画面采用2倍采样，保持文字大小，避免Apply后采样叠加；交互期间降低传输分辨率及JPEG质量。
 - CPU交互临时降低曲面细节，静止、Inspect、Scene及导出恢复原几何；GPU始终使用完整几何。

@@ -182,6 +182,15 @@ endpoints and obtains a fresh key through a same-origin request. It has no user
 login and is not a public multi-user server. Do not expose it on the network or
 embed it in another site's iframe without a separately designed deployment.
 
+Only one trusted local user is supported. Local processes can forge Origin and
+obtain a key; this is not OS-user authentication. Do not use shared-user hosts,
+JupyterHub or untrusted shared network namespaces. See [security guidance](../../../SECURITY.md).
+Compose accepts `BNV_PORT` (default 1031), `BNV_CPUS` (2) and `BNV_MEM` (8g).
+On WSL, `MESA_D3D12_DEFAULT_ADAPTER_NAME` optionally chooses an adapter when supplied
+to the container environment; no vendor is forced by default. Do not set internal
+`BNV_WEB_BOOTSTRAPPED` loader state manually. Startup readiness allows 90 seconds
+for isolated graphics probes and the service; software rendering is not GPU success.
+
 Still frames use 2x sampling; moving frames use lower sampling/quality. CPU-only
 surface detail reduction is temporary; still frames, Inspect and export restore
 the original geometry. Export image dimensions are set by Export Figure.

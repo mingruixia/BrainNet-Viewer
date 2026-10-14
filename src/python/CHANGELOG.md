@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Separate standalone Web bootstrap from library calls; preserve configurable WSL adapter selection and consistent software-renderer detection.
+- Extend startup readiness, add HTTP/WebSocket and reader regression checks, and verify cross-edition version metadata.
+- Clarify trusted-local-user deployment and configurable Compose resource limits.
+
 - Align Web Scene/Open and Save Scene/Import Settings with the desktop editions.
 - Use 2x Web still-frame sampling and reduced interaction streaming; preserve label
   sizes, full still/export geometry and camera state. Use temporary CPU surface detail

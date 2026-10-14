@@ -45,6 +45,11 @@ GPU when available and otherwise use CPU rendering; the released image uses CPU.
 Save a portable Scene before stopping or updating the container.
 Desktop/Python/Web compatibility notes describe the checked environments.
 
+Web requires one trusted user on a private local machine. Same-origin bootstrap
+is not OS-user authentication: another local process can forge request headers.
+Do not use shared-user hosts or public hosting. See [security guidance](SECURITY.md).
+Source changes do not upgrade existing release downloads or containers.
+
 ## Build from source
 
 Python packaging and Docker build files are in src/python. For an isolated

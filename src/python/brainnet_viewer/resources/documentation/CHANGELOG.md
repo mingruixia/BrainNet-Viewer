@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Separate standalone Web graphics bootstrap from library calls; embedded/test calls no longer replace the calling process.
+- Preserve optional WSL adapter selection, recognize software renderers consistently, and extend startup readiness to 90 seconds.
+- Add live HTTP/WebSocket authentication and GIfTI preflight regression checks, affine-reader fixtures and a focused MATLAB reader CI job.
+- Check MATLAB/Python version agreement during wheel verification; centralize Python package version metadata.
+- Document the trusted-local-user security model and configurable Compose resource limits.
+
 - Align Web Scene File / Open and Save Scene / Import Settings with the desktop editions.
 - Sharpen Web still frames using 2x sampling without enlarging labels or compounding
   sampling on Apply. Reduce streamed resolution and JPEG quality during interaction.

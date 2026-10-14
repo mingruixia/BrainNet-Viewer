@@ -1,87 +1,72 @@
-BrainNet Viewer 2.0 — Installation
-Developer: Mingrui Xia
-Contact: mxia@bnu.edu.cn; mingruixia@gmail.com
+# BrainNet Viewer 2.0
 
-MATLAB INSTALLATION
-Extract the MATLAB archive into a new local writable folder. Do not overwrite
-an old installation. In MATLAB, change Current Folder to the extracted folder
-containing BrainNetViewer.m, then run:
-    app = BrainNetViewer;
-Avoid adding an old BrainNet Viewer installation to the MATLAB path at the
-same time. MATLAB is required; this is not a standalone application.
+[中文](README.zh-CN.md) · [Unified manual](docs/manual/en/index.md) · [Shared tutorials](docs/tutorials/unified/en/index.md)
 
-PYTHON REQUIREMENTS
-Python Desktop uses Python, Qt and VTK; MATLAB and SPM are not required.
-Apple Silicon macOS requires Python 3.11 or newer; Python 3.11 is verified.
-Windows, Linux and Intel macOS use Python 3.10 or 3.11. A local graphical desktop
-with working OpenGL and a writable user folder is required.
-Dependency installation needs network access unless the
-fixed dependencies are supplied separately. Do not copy environments between
-machines or silently change the wheel's fixed dependency constraints.
-The wheel contains the original surface library, atlas/network examples,
-real tutorial data, dual-atlas Inspect tables and resource notices.
+BrainNet Viewer 2.0.0-beta.1 visualizes brain surfaces, nodes, connections,
+surface maps and atlas ROIs. Choose MATLAB Desktop, Python Desktop, or the
+Docker-hosted Web edition. Developer: Mingrui Xia.
 
-PYTHON INSTALLATION — WINDOWS
-Extract the Python archive and open PowerShell in that folder. These commands
-create an independent environment without changing system Python:
-    py -3.10 -m venv .venv-bnv
-    $bnvPython = (Resolve-Path .venv-bnv/Scripts/python.exe).Path
-    $bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
-    $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).as_uri())" $bnvWheel
-    & $bnvPython -m pip install "brainnet-viewer[desktop] @ $bnvWheelUrl"
-    & $bnvPython -m pip check
-    & $bnvPython -m brainnet_viewer
-Use the supplied wheel's actual filename if it changes. If py is unavailable,
-replace py -3.10 with the full path to your Python 3.10 executable.
-After installation, double-click .venv-bnv/Scripts/brainnet-viewer.exe
-to launch without retaining a command window. For error output, launch with
-the environment's python -m brainnet_viewer instead.
+The default branch includes maintenance updates after the public beta. Download
+packages and the Docker Hub `2.0.0-beta.1` image remain tied to that release;
+they do not include these newer source changes. See [Changes](CHANGELOG.md)
+and the source-install sections below to use the updated code.
 
-PYTHON INSTALLATION — macOS
-On Apple Silicon, use Python 3.11. In a terminal in the extracted Python folder:
-    python3.11 -m venv .venv-bnv
-    source .venv-bnv/bin/activate
-    BNV_WHEEL_URL="$(python -c 'from pathlib import Path; print(Path("brainnet_viewer-2.0.0b1-py3-none-any.whl").resolve().as_uri())')"
-    python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
-    python -m pip check
-    brainnet-viewer
-Native ARM64 macOS selects SciPy 1.17.1, which requires Python 3.11 or newer.
-Intel macOS may use Python 3.10 for the first command and retains SciPy 1.15.3.
-Use the supplied wheel's actual filename if it changes. Do not copy a Windows
-virtual environment onto a Mac. This is a desktop package, not a standalone
-executable, offline installer, Docker image or browser application.
+## Install and launch
 
-LOCATE PYTHON RESOURCES
-Run with the installed environment's Python. In Windows PowerShell, substitute
-& $bnvPython for python in the following command:
-    python -c "from pathlib import Path; import brainnet_viewer; print(Path(brainnet_viewer.__file__).parent / 'resources')"
-The resource folder contains Data/SurfTemplate, Data/ExampleFiles and
-Data/Tutorials. File pickers default to the relevant bundled library. Copy
-examples into your own writable folder before editing them.
+- MATLAB: install and activate MATLAB, set Current Folder to this repository
+  root and run `app = BrainNetViewer;`. Do not recursively add another
+  BrainNet Viewer installation. See [getting started](docs/documentation/Getting_Started.en.md).
+- Python Desktop: follow [installation](docs/python/en/INSTALLATION.md), install
+  the wheel with its desktop extra and run `python -m brainnet_viewer`.
+  MATLAB is not required.
+- Web: follow [Docker installation](docs/web/en/INSTALLATION.md). The service
+  runs in the background and opens at http://127.0.0.1:1031/index.html.
+  Download the Web package and run its Compose pull/start commands; no source
+  build is required. Image: [mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer).
 
-GUIDES
-All three editions provide the unified English Word/PDF manual and shared
-illustrated tutorials. Open Help in the application. The MATLAB unified PDF
-is under docs/manual/en; the Python manual is in the installed resource folder
-under documentation/docs/manual/en. Retain GPL and resource/third-party notices.
+## Workflow
 
-INSTALLATION TROUBLESHOOTING — SOCKS PROXY
-"Missing dependencies for SOCKS support" indicates that pip is trying to use
-a SOCKS proxy without its optional SOCKS support. It is not a wheel-corruption
-message. If your local proxy also provides HTTP on port 10808, keep it running
-and retry the failed install in the same PowerShell window with:
-    & $bnvPython -m pip install --proxy "http://127.0.0.1:10808" "brainnet-viewer[desktop] @ $bnvWheelUrl"
-    & $bnvPython -m pip check
-This overrides the proxy for that command only; it does not change Windows
-proxy settings or fixed dependencies. Substitute your actual HTTP proxy port
-if different. Do not label a SOCKS-only port as HTTP. If this reports a refused
-connection or timeout, check the proxy service and HTTP listener first.
+Load files through Data Sources, configure Visualization Settings, Apply to
+render, interact with a selected view, then save/export. Save Scene preserves
+inputs and settings; presets store display settings. Follow the shared manual
+and tutorials for scientific inputs, edition differences and export options.
 
-DOCKER / WEB INSTALLATION
-Install and start Docker with Linux containers. Extract the Web package and
-open a terminal in the folder containing compose.web.release.yml, then run:
-    docker compose -f compose.web.release.yml pull
-    docker compose -f compose.web.release.yml up -d
-Open http://127.0.0.1:1031/index.html. MATLAB and local Python are not needed.
-Read docs/web/en/INSTALLATION.md for platform setup and troubleshooting.
-Save Scene before stopping Docker; uploads and unsaved sessions are temporary.
+The surface library, atlas-network examples and real tutorial inputs
+are included. [AtlasNetworks](src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/README.md)
+contains AAL90 and fourteen GroupFC pairs, including AAL116, Schaefer1000 and
+Brainnetome246. AAL90 volume and vertex-label inputs are in
+`resources/atlases/AAL90/` (source/MATLAB archive) or `atlases/AAL90/`
+(Python/Docker resource library). Inspect uses AAL/Brodmann lookup in an MNI-like space; verify
+registration and coordinate correspondence for your own data. The application
+interface is English and is not restricted to human-brain data.
+
+Web supports a local single-user shared session. Source builds prefer a verified
+GPU when available and otherwise use CPU rendering; the released image uses CPU.
+Save a portable Scene before stopping or updating the container.
+Desktop/Python/Web compatibility notes describe the checked environments.
+
+Web requires one trusted user on a private local machine. Same-origin bootstrap
+is not OS-user authentication: another local process can forge request headers.
+Do not use shared-user hosts or public hosting. See [security guidance](SECURITY.md).
+Source changes do not upgrade existing release downloads or containers.
+
+## Build from source
+
+Python packaging and Docker build files are in src/python. For an isolated
+development environment install that directory with the desktop or web extra.
+A local wheel can be built with `python -m pip wheel --no-deps ./src/python`.
+The [Docker guide](docs/web/en/INSTALLATION.md) provides source-build commands.
+The default container port is 1031.
+
+## Citation and support
+
+Xia M, Wang J, He Y (2013). BrainNet Viewer: A Network Visualization Tool for
+Human Brain Connectomics. PLoS ONE 8: e68910.
+https://doi.org/10.1371/journal.pone.0068910
+
+[GitHub](https://github.com/mingruixia/BrainNet-Viewer) ·
+[NITRC](https://www.nitrc.org/projects/bnv/) ·
+[Changes](CHANGELOG.md)
+
+Contact Mingrui Xia: mxia@bnu.edu.cn; mingruixia@gmail.com.
+Project code uses [GPL-3.0-or-later](LICENSE). Retain code and bundled-resource notices.
