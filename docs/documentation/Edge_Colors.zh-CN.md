@@ -47,14 +47,14 @@ Mapped采用64级颜色和旧版索引公式`round(weight*k+b)`，其中`k=63/(h
 
 Settings **1.8.0** 新增`edge.mapped_value_mode`。新建默认Absolute，旧1.0–1.7配置缺少此字段时迁移为Signed，以保留原来的符号处理，**不保证原颜色完全不变**。此前忽略的原EC符号、色表和固定范围不能恢复，有原EC时建议重新导入。Scene记录`edge_mapped_color_upgrade`，仅有效旧相机签名会重绑；迁移后应复核配色。Scene/预设外层版本不变。
 
-## 仍待处理的边界
+## 相关设置与限制
 
 ### 模块配色更新
 
-选择 **Node Module**，设置 **Inter-module Color**。比较连边两个端点：同模块使用**Nodes**模块色表，跨模块使用独立RGB。按**全部已载入节点**（包括孤立/隐藏节点）的模块编号排序确定色表行；筛选连边或改变方向不重新编号。编号21按普通模块处理，不再充当跨模块标记。专项验证起，同模块边继承Nodes colormap；若可见节点需同色，请选择Nodes → Modules。Edges自己的colormap字段不覆盖此模式。
+选择 **Node Module**，设置 **Inter-module Color**。比较连边两个端点：同模块使用**Nodes**模块色表，跨模块使用独立RGB。按**全部已载入节点**（包括孤立/隐藏节点）的模块编号排序确定色表行；筛选连边或改变方向不重新编号。编号21按普通模块处理，不再充当跨模块标记。同模块边继承Nodes colormap；若可见节点需同色，请选择Nodes → Modules。Edges自己的colormap字段不覆盖此模式。
 
 本版最多支持**20个不同模块**，超出时明确报错，不循环复用颜色；命名/自定义色图均采样为20行。旧EC color=5导入CM前20行及跨模块第21行，导出对应21行。CM缺失/过短/非法时拒绝。旧EC渲染等价要求模块不超过20且原标签没有21；旧渲染器的标记冲突无法由EC本身消除，App中此模式要求Modern Batch Renderer。
 
 Settings **1.10.0**新增`edge.inter_module_color`，旧配置默认灰色[0.5,0.5,0.5]并提示复核，不保留原错误的“只看起点”外观。Scene记录迁移提示，仅重绑有效旧相机签名；恢复原配色需重新导入原EC。继续共用全局Apply/Revert。
 
-这些改动不改变Uniform、Threshold和Length规则。现支持[Raw/Threshold大小及独立粗细符号](Edge_Sizes.zh-CN.md)。现支持[透明度独立符号](Edge_Opacity.zh-CN.md)。现支持[Custom矩阵配色与节点绑定](Custom_Edge_Colors.zh-CN.md)。现支持[Inter Hemi Only](Edge_Hemisphere.zh-CN.md)；现支持[稀疏度/并列规则](Edge_Sparsity.zh-CN.md)。不能据此关闭整个旧版兼容性问题。详见[已知限制](Migration.zh-CN.md#known-limitations)。
+Uniform、Threshold和Length的规则独立于这些设置。相关功能包括[Raw/Threshold大小及独立粗细符号](Edge_Sizes.zh-CN.md)。[透明度独立符号](Edge_Opacity.zh-CN.md)。[Custom矩阵配色与节点绑定](Custom_Edge_Colors.zh-CN.md)。[Inter Hemi Only](Edge_Hemisphere.zh-CN.md)；[稀疏度/并列规则](Edge_Sparsity.zh-CN.md)。导入旧配置时，还需核对其他显示设置。详见[已知限制](Migration.zh-CN.md#known-limitations)。

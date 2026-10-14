@@ -25,7 +25,7 @@ Click **Colors...** in Visualization Settings. In the editor choose **Target →
 
 ![Five-row custom Volume colormap in the English RGB editor](../assets/captures/tutorial09-preset/09-volume-colormap-editor.png)
 
-*Current-build editor capture. Project-authored RGB values are illustrative; blue/red hues are not an inference method, and a smooth preview does not guarantee perceptual uniformity or color-vision accessibility.*
+*MATLAB colormap editor. Project-authored RGB values are illustrative; blue/red hues are not an inference method, and a smooth preview does not guarantee perceptual uniformity or color-vision accessibility.*
 
 ![Four-view real T map after Apply with the custom signed palette](../assets/captures/tutorial09-preset/09-pcc-diverging-full-window.png)
 
@@ -37,7 +37,7 @@ Click **Save Preset** and choose a **new** `.preset.json` path. It saves setting
 
 ![Figure-only replay after loading the custom display preset](../assets/captures/tutorial09-preset/09-pcc-diverging-replay.png)
 
-*960 × 720 current-build output after preset reload. Compare the signed colorbar and areas to the prior screen; do not assume pixel-identical replay on another monitor or graphics driver.*
+*960 × 720 output after preset reload. Compare the signed colorbar and areas to the prior screen; do not assume pixel-identical replay on another monitor or graphics driver.*
 
 For an optional file-level check in MATLAB, after adding the BrainNet Viewer source folder to the path:
 

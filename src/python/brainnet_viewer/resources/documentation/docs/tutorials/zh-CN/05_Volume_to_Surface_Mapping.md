@@ -27,15 +27,15 @@
 
 ![真实T图与Volume设置的BrainNet Viewer完整窗体](../assets/captures/tutorial05-volume/05-volume-p-value-full-window.png)
 
-*当前构建的英文四视图完整窗体图；文档截图隐私模式仅在显示层隐藏本机路径。体图来源：Xia等（2014）的NIfTI统计图；曲面来源：Prof. Alan C. Evans（MNI）。红/蓝代表插值T统计量的正负号，不是疾病组间差异。*
+*MATLAB四视图截图，已隐藏本机路径。体图来源：Xia等（2014）的NIfTI统计图；曲面来源：Prof. Alan C. Evans（MNI）。红/蓝代表插值T统计量的正负号，不是疾病组间差异。*
 
 ![ICBM152曲面上的PCC亚区单样本功能连接T图](../assets/captures/tutorial05-volume/05-volume-p-value-render.png)
 
-*960×720当前构建四视图导出图。三线性插值在体素阈值化之后进行；观感更平滑不改变名义逐体素P阈值，也不提供多重比较校正。*
+*960×720四视图导出图。三线性插值在体素阈值化之后进行；观感更平滑不改变名义逐体素P阈值，也不提供多重比较校正。*
 
 ### Step 03
 
-使用**Save Scene**保存新的`.scene.json`，在新App实例中重新打开并**Validate and Load**/**Render Scene**。专项重放成功恢复四视图、算法5及`P Value = 0.001`，渲染并导出PNG，侧车记录两份输入。Scene JSON只引用文件，不内嵌2.17 MB NIfTI；转移Scene时须同时带上确切数据，分享前检查JSON/PNG侧车中是否有本机私有路径。
+使用**Save Scene**保存新的`.scene.json`，在新App实例中重新打开并**Validate and Load**/**Render Scene**。重放后应恢复四视图、算法5及`P Value = 0.001`；导出PNG的溯源记录应列出两份输入。Scene JSON只引用文件，不内嵌2.17 MB NIfTI；转移Scene时须同时带上确切数据，分享前检查JSON/PNG侧车中是否有本机私有路径。
 
 ## 常见问题与解释边界
 

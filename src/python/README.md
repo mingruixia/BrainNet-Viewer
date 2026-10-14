@@ -17,14 +17,12 @@ For development, install this directory with the desktop or web extra.
 The Dockerfile builds the Web edition from this source and bundled resources.
 Direct dependencies are pinned in pyproject.toml.
 
-Load data, configure, Apply, interact and export. Original surfaces, atlas
-examples, tutorial data and dual-atlas Inspect tables are included.
+Select input files, adjust the display settings and click **Apply** to render. You can then explore a view, export a figure or save a Scene. The installation includes surface templates, atlas examples, tutorial data and the AAL/Brodmann Inspect tables.
 Web supports one local shared session. Source builds select a verified GPU or
 fall back to CPU at startup; GPU allocation depends on the Docker host. Save a portable
 Scene before stopping/updating its container. Project code uses GPL-3.0-or-later;
 bundled resources retain accompanying terms.
 
-This requires one trusted local user; same-origin bootstrap is not OS-user
-authentication. Do not use shared-user hosts or public hosting.
+Run Web on a private computer used by one trusted user. Browser-origin checks do not authenticate operating-system users, so the local server is unsuitable for shared-user computers or public hosting.
 
 Developer: Mingrui Xia — mxia@bnu.edu.cn; mingruixia@gmail.com.

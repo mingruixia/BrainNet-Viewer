@@ -2,14 +2,14 @@
 
 [中文](README.zh-CN.md) · [Unified manual](docs/manual/en/index.md) · [Shared tutorials](docs/tutorials/unified/en/index.md)
 
-BrainNet Viewer 2.0.0-beta.1 visualizes brain surfaces, nodes, connections,
-surface maps and atlas ROIs. Choose MATLAB Desktop, Python Desktop, or the
-Docker-hosted Web edition. Developer: Mingrui Xia.
+BrainNet Viewer displays brain surfaces, networks, surface maps and atlas ROIs.
+Version 2.0.0-beta.1 is available as a MATLAB desktop application, an independent
+Python desktop application and a Web application hosted in Docker.
 
-The default branch includes maintenance updates after the public beta. Download
-packages and the Docker Hub `2.0.0-beta.1` image remain tied to that release;
-they do not include these newer source changes. See [Changes](CHANGELOG.md)
-and the source-install sections below to use the updated code.
+The default branch contains maintenance updates made after the public beta.
+The downloadable packages and Docker Hub `2.0.0-beta.1` image still contain the
+released code. To use the maintenance updates, follow the source-installation
+instructions. [Changes](CHANGELOG.md) lists the updates.
 
 ## Install and launch
 
@@ -26,13 +26,15 @@ and the source-install sections below to use the updated code.
 
 ## Workflow
 
-Load files through Data Sources, configure Visualization Settings, Apply to
-render, interact with a selected view, then save/export. Save Scene preserves
-inputs and settings; presets store display settings. Follow the shared manual
-and tutorials for scientific inputs, edition differences and export options.
+Select your inputs in **Data Sources** and adjust their appearance in
+**Visualization Settings**. Click **Apply** to render, then use the camera tools
+to explore a view or **Export Figure** to save it. **Save Scene** records the
+inputs and settings for later use; a preset stores display settings for reuse
+with other data. The shared manual and tutorials explain the file formats,
+scientific interpretation and differences between editions.
 
-The surface library, atlas-network examples and real tutorial inputs
-are included. [AtlasNetworks](src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/README.md)
+The installation includes a surface library, atlas-network examples and tutorial
+data. [AtlasNetworks](src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/README.md)
 contains AAL90 and fourteen GroupFC pairs, including AAL116, Schaefer1000 and
 Brainnetome246. AAL90 volume and vertex-label inputs are in
 `resources/atlases/AAL90/` (source/MATLAB archive) or `atlases/AAL90/`
@@ -40,20 +42,19 @@ Brainnetome246. AAL90 volume and vertex-label inputs are in
 registration and coordinate correspondence for your own data. The application
 interface is English and is not restricted to human-brain data.
 
-Web supports a local single-user shared session. Source builds prefer a verified
-GPU when available and otherwise use CPU rendering; the released image uses CPU.
-Save a portable Scene before stopping or updating the container.
-Desktop/Python/Web compatibility notes describe the checked environments.
+The Web edition has one shared session and is intended for a trusted user on a
+private local computer. Source builds test GPU rendering at startup and use the
+CPU if a GPU is unavailable; the released image uses the CPU. Save a portable
+Scene before stopping or updating the container.
 
-Web requires one trusted user on a private local machine. Same-origin bootstrap
-is not OS-user authentication: another local process can forge request headers.
-Do not use shared-user hosts or public hosting. See [security guidance](SECURITY.md).
-Source changes do not upgrade existing release downloads or containers.
+The local server checks browser requests but does not authenticate operating-system
+users. Another local process can forge request headers, so this configuration is
+unsuitable for shared-user computers or public hosting. See [security guidance](SECURITY.md).
 
 ## Build from source
 
-Python packaging and Docker build files are in src/python. For an isolated
-development environment install that directory with the desktop or web extra.
+Python packaging and Docker build files are in `src/python`. Create an isolated
+environment and install that directory with the `desktop` or `web` extra.
 A local wheel can be built with `python -m pip wheel --no-deps ./src/python`.
 The [Docker guide](docs/web/en/INSTALLATION.md) provides source-build commands.
 The default container port is 1031.

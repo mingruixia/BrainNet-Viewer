@@ -31,7 +31,7 @@ Open **Visualization Settings → Layout** and select **Lateral / Medial** (four
 
 ![Figure-only render of the one-sample PCC connectivity T map on the ICBM152 surface](../assets/captures/tutorial05-volume/05-volume-p-value-render.png)
 
-*960 × 720 current-build four-view render. Trilinear interpolation follows voxelwise thresholding; visible smoothness is a display property and does not change the nominal voxelwise P cutoff or provide multiple-comparison correction.*
+*960 × 720 four-view render. Trilinear interpolation follows voxelwise thresholding; visible smoothness is a display property and does not change the nominal voxelwise P cutoff or provide multiple-comparison correction.*
 
 ### Step 03
 

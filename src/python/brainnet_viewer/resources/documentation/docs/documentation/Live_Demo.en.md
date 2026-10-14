@@ -8,4 +8,4 @@ The demo is a non-blocking timer, not a busy loop. It stops automatically before
 
 The feature needs a rendered canvas. It is intentionally separate from **Rotate**, which enables manual mouse rotation, and **Export Animation...**, which creates a file rather than an interactive demonstration.
 
- It does not benchmark frame rates, certify every graphics driver, or run the complete regression suite.
+Live Demo is a presentation tool, not a performance benchmark.

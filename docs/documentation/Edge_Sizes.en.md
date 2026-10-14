@@ -48,4 +48,4 @@ Settings 1.0–1.6 upgrade to Mapped threshold basis and Absolute size values. *
 
 After changing radii or migrating an old Scene, use **Fit** explicitly if larger geometry extends beyond the retained view. A valid saved camera is preserved, not silently refitted.
 
-Related guides cover [mapped-color signs/ranges](Edge_Colors.en.md), [independent opacity signs](Edge_Opacity.en.md), [custom edge index matrices](Custom_Edge_Colors.en.md), [Inter Hemi Only](Edge_Hemisphere.en.md) and [sparsity/tie semantics](Edge_Sparsity.en.md). These features do not alter edge-selection logic or certify complete legacy parity.
+Related guides cover [mapped-color signs/ranges](Edge_Colors.en.md), [independent opacity signs](Edge_Opacity.en.md), [custom edge index matrices](Custom_Edge_Colors.en.md), [Inter Hemi Only](Edge_Hemisphere.en.md) and [sparsity/tie semantics](Edge_Sparsity.en.md). These controls do not alter edge selection. Review their individual rules when importing legacy settings.

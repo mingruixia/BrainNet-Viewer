@@ -11,10 +11,10 @@ Choose **Tools → Generate Nodes from Atlas...** in the English desktop App.
 5. **Save New .node...** writes a new file only. Existing destinations are rejected; cancellation writes nothing. Changed header/image sources require review again. Neither source atlas nor current Scene is modified.
 6. Load through **Node Coordinates**, configure, then render. An accompanying edge matrix must follow the selected region order.
 
-## Scientific meaning and limits
+## Interpretation and limitations
 
 For each label, the unweighted mean of **one-based voxel-centre indices** is transformed by the reader's corresponding one-based affine. This preserves the legacy centroid rule, including sheared/reflected affines, without an added half-voxel offset. The reader resolves the affine; the tool does not register data, infer MNI/mm, resample labels or snap centroids inside regions. A disconnected/concave region's centroid can lie outside it. The reader applies intensity scaling before integer-label validation.
 
-Each row is `X Y Z module size label`; label is the original numeric region ID. All nodes share the selected module/size constants. A `#` JSON comment records source paths/SHA-256 (both paired members), region order/counts, centroid rule, affine, declared space/units and timestamp. Review paths before sharing. Modern node import accepts comments; every external `.node` reader has not been certified.
+Each row is `X Y Z module size label`; label is the original numeric region ID. All nodes share the selected module/size constants. A `#` JSON comment records source paths/SHA-256 (both paired members), region order/counts, centroid rule, affine, declared space/units and timestamp. Review paths before sharing. Modern node import accepts comments; other `.node` readers may have different comment-handling rules.
 
-Voxel grouping uses million-element chunks instead of rescanning the atlas per region. Reading and initial unique-label detection still use the full atlas: this is not streaming, multi-core or GPU acceleration; no benchmark speedup is claimed. Up to 100,000 labels are accepted. The window previews the first 100 nodes but saves all reviewed nodes. No settings schema change or automatic Scene loading.
+Voxel grouping processes one million elements at a time, avoiding a separate atlas scan for each region. Reading the atlas and finding its unique labels still require the full volume in memory. The operation does not use streaming, multiple CPU cores or GPU acceleration. Up to 100,000 labels are accepted; the window previews the first 100 nodes and saves all reviewed nodes. Load the saved file explicitly to use it in a Scene.

@@ -123,7 +123,7 @@ docker compose -f src/python/compose.web.yml up -d --build
 
 源码镜像使用Python 3.12及固定应用依赖。Compose不分配GPU：Auto进行真实试绘，
 没有GPU访问权限时通常选择CPU。源码Compose上限为8核CPU、8 GiB内存及512 MiB临时存储。
-ARM64源码绘图尚未验证，模拟ARM64的图形探测失败，因此构建成功不代表可正常绘图；
+ARM64源码绘图尚未验证，模拟环境中的图形探测失败。使用源码构建的ARM64镜像前，请在目标机器上检查绘图；
 已发布的ARM64镜像未替换。
 
 ### Windows优先GPU的源码启动
@@ -149,8 +149,7 @@ powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Stop -Image br
 ```
 
 Windows WSL/NVIDIA路径已有本机绘图检查；Linux GPU及其他驱动需各平台独立配置。
-macOS Docker不会自动将Mac GPU提供给此Linux镜像。启动后的GPU进程崩溃或内存
-耗尽不属于会话内自动恢复保证。
+macOS Docker不会自动将Mac GPU提供给此Linux镜像。CPU自动回退仅适用于启动阶段；会话中GPU进程崩溃或内存耗尽时，可能需要重新启动。
 
 ### 源码Web会话及输入限制
 
@@ -162,7 +161,7 @@ Origin，通过同源请求获取每次启动的新key。它不提供用户登�
 用户认证；不要用于多用户共享主机、JupyterHub或不可信共享网络命名空间。参见
 [安全说明](../../../SECURITY.md)。Compose支持`BNV_PORT`（默认1031）、`BNV_CPUS`（2）
 及`BNV_MEM`（8g）。WSL容器环境可用`MESA_D3D12_DEFAULT_ADAPTER_NAME`选择显卡，
-默认不强制厂商。不要设置内部`BNV_WEB_BOOTSTRAPPED`；启动就绪等待90秒，软件试绘不算GPU通过。
+默认不强制厂商。不要设置内部`BNV_WEB_BOOTSTRAPPED`；启动允许90秒完成图形探测和服务初始化，请根据报告的后端区分硬件与软件绘图。
 
 静止画面使用2倍采样，移动画面降低采样及质量。CPU曲面细节简化仅用于交互期间，
 静止、Inspect及导出恢复原几何；输出图片尺寸仍由Export Figure设置。

@@ -2,23 +2,38 @@
 
 ## Unreleased
 
-- Separate standalone Web bootstrap from library calls; preserve configurable WSL adapter selection and consistent software-renderer detection.
-- Extend startup readiness, add HTTP/WebSocket and reader regression checks, and verify cross-edition version metadata.
-- Clarify trusted-local-user deployment and configurable Compose resource limits.
+### Web display and startup
 
-- Align Web Scene/Open and Save Scene/Import Settings with the desktop editions.
-- Use 2x Web still-frame sampling and reduced interaction streaming; preserve label
-  sizes, full still/export geometry and camera state. Use temporary CPU surface detail
-  reduction only during interaction; GPU retains original geometry.
-- Verify GPU rendering at startup with CPU fallback and explicit backend selection.
-- Update pypdf to 6.19.0 and add defusedxml 0.7.1 for XML entity protection.
-- Preserve word-internal `#` in node labels; separate Scene path syntax from actual
-  asset resolution, bound JSON reads, reject duplicate/nonfinite values and stage
-  portable assets before a no-overwrite Scene commit.
-- Enforce local Web Host/Origin checks and same-origin bootstrap with a per-start key.
-- Pin the Docker Python 3.12 base and add dependency/HTTP health checks. ARM64 source
-  rendering is unverified; existing released packages and images are unchanged.
-- Clarify GPL-3.0-or-later for project code; resource notices are retained.
+- Align the Scene File / Open and Save Scene / Import Settings controls with the desktop editions.
+- Use 2x sampling for sharper still images, while retaining label sizes and preventing
+  repeated sampling on Apply. Lower stream resolution and JPEG quality during interaction.
+- Reduce surface detail temporarily during CPU interaction. Restore the original geometry
+  for still images, Inspect, Scene operations and export. GPU rendering keeps the full geometry.
+- Test GPU rendering in a separate process at startup and use the CPU if it is unavailable.
+  The local launcher also offers explicit Auto, GPU and CPU choices.
+- Separate standalone Web startup from library calls so embedded use does not replace
+  the calling process. Allow 90 seconds for graphics probing and service initialization.
+- Retain optional WSL adapter selection and use consistent software-renderer detection.
+
+### Input handling and security
+
+- Update pypdf to 6.19.0 and use defusedxml for XML entity protection.
+- Preserve `#` within node labels in MATLAB and Python.
+- Validate Python Scene paths, bound JSON reads and reject duplicate keys or nonfinite values.
+  Check portable assets before saving a new Scene without replacing existing files.
+- Check local Web Host/Origin headers and obtain a random startup key through a
+  same-origin request. The server remains intended for one trusted local user.
+- Build source Docker images on a pinned Python 3.12 base, check dependencies and
+  report HTTP health. ARM64 source rendering remains unverified; released images are unchanged.
+- Clarify GPL-3.0-or-later for project code while retaining bundled-resource terms.
+
+### Documentation and development
+
+- Revise the English and Chinese guides, tutorials and illustrated manual for clearer instructions.
+- Explain the trusted-local-user security model and configurable Compose resource limits.
+- Add HTTP/WebSocket authentication, GIfTI preflight and affine-reader regression tests,
+  with a MATLAB reader job in continuous integration.
+- Use one source for Python version metadata and check its agreement with MATLAB during wheel verification.
 
 ## 2.0.0-beta.1
 

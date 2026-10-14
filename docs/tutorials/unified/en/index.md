@@ -1,6 +1,6 @@
 # BrainNet Viewer tutorials
 
-Use these shared tutorials with MATLAB Desktop, Python Desktop or Docker/Web. Installation and genuinely different behavior are labelled by edition; the scientific inputs and core workflow are shared. Start with the first lesson, then load a real surface and save your first Scene.
+These tutorials cover MATLAB Desktop, Python Desktop and Docker/Web. They use the same scientific inputs and core workflow, with separate instructions where installation or behavior differs. Start with lesson 01, then load a surface and save your first Scene.
 
 | Lesson | Goal | Input |
 | --- | --- | --- |
@@ -18,4 +18,4 @@ Use these shared tutorials with MATLAB Desktop, Python Desktop or Docker/Web. In
 | [12 Camera animation](12_Camera_Animation.md) | Inspect a short orbit before encoding a presentation movie | Real smoothed ICBM152 surface |
 | [13 Performance and reproducibility](13_Performance_and_Reproducibility.md) | Separate processing costs and preserve a repeatable figure | Real PCC map and explicitly identified ICBM152 mesh |
 
-Illustrations are reused with their original edition identity. No prebuilt Scene files are supplied by these lessons. Software installation and tutorial completion do not establish spatial registration or statistical validity.
+Each illustration identifies the edition shown. Create and save your own Scenes during the exercises. Before interpreting results from your own data, check spatial registration and the statistical method independently of these display operations.

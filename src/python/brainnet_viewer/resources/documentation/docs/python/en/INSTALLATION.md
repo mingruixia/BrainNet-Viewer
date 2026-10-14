@@ -9,9 +9,7 @@ supplied in a separate offline collection.
 Apple Silicon macOS requires Python 3.11 or newer; Python 3.11 is the verified
 configuration. Windows, Linux and Intel macOS use Python 3.10 or 3.11. A graphical
 desktop with working OpenGL and a writable folder is required.
-Windows x64 and Apple Silicon macOS have focused development checks;
-Linux Desktop and Intel Mac require their own validation. Preserve dependency
-pins and create a separate virtual environment.
+Selected desktop workflows have been tested on Windows x64 and Apple Silicon macOS. Linux Desktop and Intel Mac have not been verified. Install the pinned dependencies in a separate virtual environment.
 
 ## Windows
 
@@ -53,14 +51,11 @@ operating systems.
 
 ## First use
 
-Load inputs, configure Visualization Settings, then Apply. Rotate, Pan and Zoom
-operate on the selected view. Export Figure saves images and provenance.
-Save Scene preserves inputs and settings; a preset contains settings only.
+Select your input files, adjust **Visualization Settings** and click **Apply** to render. **Rotate**, **Pan** and **Zoom** affect the selected view. Use **Export Figure** to save an image with its provenance record, or **Save Scene** to reopen the inputs and settings later. A preset stores display settings only.
 Use the [shared tutorials](../../tutorials/unified/en/index.md) and
 [manual](../../manual/en/index.md).
 
-The wheel includes the original surfaces, atlas-network examples, real tutorial
-inputs and dual-atlas Inspect tables. Find resources with the installed Python:
+The wheel includes surface templates, atlas-network examples, tutorial data and the AAL/Brodmann Inspect tables. Use the installed Python environment to locate the resources:
 
 ```text
 python -c "from importlib.metadata import version; print(version('brainnet-viewer'))"
@@ -113,6 +108,4 @@ python -m pip check
 brainnet-viewer
 ```
 
-Keep the project's dependency pins. Source installation does not update any
-previously installed wheel or downloaded package. Platform/graphics requirements
-still apply; a successful installation alone does not verify rendering.
+Keep the pinned dependencies. Source installation leaves existing wheel installations and downloaded packages unchanged. After installation, launch the application and render an example to check the graphics environment.

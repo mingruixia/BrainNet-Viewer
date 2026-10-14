@@ -42,7 +42,7 @@ The existing [focused sample record](../../assets/performance/tutorial13-real-pc
 | Warm trilinear GPU mapping | Median 0.008836 s | Same kernel/input on the recorded GPU; CPU/GPU median ratio approximately 2.35 |
 | CPU–GPU mapped-value comparison | Maximum absolute difference 0 | This exact local input and operation only |
 
-The ratio is not a full-scene speedup, a Python result or a measurement of the currently installed candidate. The first draw's startup costs remain visible, and process/JIT/graphics caches can persist between trials. Mapping timings followed warm-up. The internal benchmark harness is not distributed, so the sample record is evidence of that historical run, not a one-command reproducibility package. Do not present it as a newly verified universal benchmark.
+The ratio describes this MATLAB mapping kernel only, not full-scene rendering or Python performance. Mapping timings were taken after warm-up. The first draw includes startup costs, and process, JIT and graphics caches may persist between trials. The benchmark script is not distributed; use these measurements as a reference for this run rather than as a prediction for another installation.
 
 ## Preserve a reproducible figure
 

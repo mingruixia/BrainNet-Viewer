@@ -42,7 +42,7 @@ T/R/Z P conversion is two-sided; F uses an upper-tail test. These are **uncorrec
 
 Positive & Negative uses the two halves of one diverging palette. The colorbar represents sampled T values. **Adjust Null** controls how zero/null values appear rather than changing statistical inference; Python uses the original surface color as its effective null color, while MATLAB has edition-specific null-color controls. Review the scientific background and ranges instead of using the interface theme as a figure-background setting.
 
-MATLAB's documented numerical GPU route is limited to supported operations, including algorithms 1 and 5 with fallback. Current Python numerical volume mapping is CPU-based; GPU graphics rendering is not GPU mapping acceleration. This lesson makes no shared speedup claim.
+MATLAB's documented numerical GPU route is limited to supported operations, including algorithms 1 and 5 with fallback. Current Python numerical volume mapping is CPU-based; GPU graphics rendering is not GPU mapping acceleration. Processing performance depends on the operation and backend.
 
 ## Save and review
 

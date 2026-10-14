@@ -29,7 +29,7 @@ Normalization uses the complete input, before visibility filtering or hemisphere
 
 ![Current Threshold node-size controls](../tutorials/assets/captures/topic-guides/node-size-threshold-panel.png)
 
-The focused panel capture shows the current controls; native color-picker/file-dialog mouse interaction is not certified by this screenshot.
+The screenshot shows the size controls. Review the rendered radii after applying the settings.
 
 ## EC and older development files
 
@@ -42,7 +42,7 @@ The focused panel capture shows the current controls; native color-picker/file-d
 | nod.size=3, size_value=2 | Threshold with Raw, Node Value |
 | nod.size_size / size_ratio / size_threshold | Base Size / Scale / Size Threshold |
 
-The implementation follows the frozen legacy renderer's processing order, not the old dialog's slider range. Uniform ignores the inactive size_value choice. A missing EC size_value retains the existing default Mapped interpretation; unknown enum codes fail validation. The source .node is never rewritten.
+The implementation follows the frozen legacy renderer's processing order, not the old dialog's slider range. Uniform ignores the inactive size_value choice. A missing EC size_value retains the existing default Mapped interpretation; unknown enum codes fail validation. The source `.node` file remains unchanged.
 
 Settings 1.0–1.3 upgrade to 1.4. A missing size_threshold_basis starts as Mapped. **Old Uniform settings with Scale other than 1 and old Threshold settings can render differently after correction. Review the output.** Existing saved module-source sizing remains module-source; an old mistaken EC import cannot be distinguished from deliberate module sizing. Reimport the untouched original EC to recover Raw intent. Do not automatically convert every module setting to Raw.
 

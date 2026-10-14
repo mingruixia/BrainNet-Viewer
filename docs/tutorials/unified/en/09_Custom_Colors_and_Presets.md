@@ -8,7 +8,7 @@ Edit a Volume palette on the real PCC map, apply it and save an appearance prese
 
 Complete the [PCC mapping lesson](06_Statistical_Volume_to_Surface.md) using your documented surface and `Data/Tutorials/OneSample_ROI11_NC.nii`. Choose four lateral/medial views, Surface Opacity 1, Positive & Negative display and a visible surface colorbar. Record the P value, mapping algorithm and color limits before editing colors; leave them unchanged for this exercise.
 
-The MATLAB images below retain the older smoothed ICBM152/algorithm 5/P=0.001 configuration. The Python starting lesson uses original ICBM152/algorithm 2/P=0.05. These images are not an identical-parameter or new-candidate comparison. Retain the PCC study citation and Evans/MNI surface credit from lesson 06.
+The MATLAB images below retain the older smoothed ICBM152/algorithm 5/P=0.001 configuration. The Python starting lesson uses original ICBM152/algorithm 2/P=0.05. The two illustrations use different parameters and should not be compared as identical configurations. Retain the PCC study citation and Evans/MNI surface credit from lesson 06.
 
 ## Import a five row palette
 

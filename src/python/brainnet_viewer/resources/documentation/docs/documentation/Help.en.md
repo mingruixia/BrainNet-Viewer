@@ -16,10 +16,9 @@ illustrated manual.
 
 For the current launch → select/load → Apply/render → interact/export path, use
 the [getting-started guide](Getting_Started.en.md). Its paired Chinese page is
-available from that guide. Applied display changes render immediately; the old
-historical manual describes a different interface.
+available from that guide. Click Apply after changing the settings to render the result.
 
-Source checkouts use the project `docs` directory. A relocated installation should
+Source installations use the project `docs` directory. A relocated installation should
 include `docs` beside the MATLAB entry point directory (with manuals, tutorials,
 topic guides and referenced assets); a missing page produces a local message,
 without silently switching to historical content or fetching a website. Existing

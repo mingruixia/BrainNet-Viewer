@@ -21,9 +21,9 @@
 
 四边拆分采用FreeSurfer当前C++实现的 `WHICH_FACE_SPLIT`，使用前两个零基顶点编号共同决定对角线。四边编码产生的重复索引退化三角面按该实现移除。它可能与NiBabel历史上的“首顶点奇偶”规则不同；独立NiBabel指纹用于**三角网格**标准样例，不用于判定四边拆分。
 
-本步主界面和Scene仅为该读取器接入 `.pial`；其他FreeSurfer后缀、ASCII曲面、patch及 `.pial.gz` 未接入/未声明支持。修改文件扩展名并不能转换不兼容内容。
+主界面和Scene通过该读取器支持 `.pial`；其他FreeSurfer后缀、ASCII曲面、patch及 `.pial.gz` 未接入/未声明支持。修改文件扩展名并不能转换不兼容内容。
 
-## 坐标及元数据边界
+## 坐标与元数据
 
 坐标按文件存储值保留。典型FreeSurfer皮层表面使用毫米单位的surface RAS，不能自动当作scanner RAS或MNI空间。读取器不执行配准、镜像、居中或附加标签中的变换。叠加节点、体数据或图谱之前须确认坐标一致；“成功读取”不等于“已经对齐”。参见[官方坐标说明](https://surfer.nmr.mgh.harvard.edu/fswiki/CoordinateSystems)。
 

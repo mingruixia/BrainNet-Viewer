@@ -20,7 +20,7 @@ For context, use the documented MATLAB smoothed ICBM152 surface or Python origin
 
 ![Bilateral insula in a transparent surface in Python](../../../python/en/assets/aal-insula-rois.png)
 
-*Existing Python Desktop illustration with the original surface, opacity 0.3 and historical AAL IDs 29/30. Neighboring IDs have similar gold hues in this palette; color similarity does not mean the two regions have identical labels. This is not a newly captured candidate result.*
+*Existing Python Desktop illustration with the original surface, opacity 0.3 and historical AAL IDs 29/30. Neighboring IDs have similar gold hues in this palette; color similarity does not mean the two regions have identical labels. *
 
 Expect two deep bilateral ROI meshes, not every atlas region. **Draw All ROIs** disables ROI Selection; turn it off before editing the ID list. On a single-hemisphere surface, corresponding-side geometry is displayed rather than relabelling the atlas as a bilateral surface.
 

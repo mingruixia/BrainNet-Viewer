@@ -15,8 +15,8 @@
 ## 需显式复核的差异
 
 - 独立NIfTI读取器支持NIfTI-1/2与成对NIfTI头/图像，不支持纯Analyze 7.5。MNI/BIC `.obj`不是Wavefront OBJ。BrainVISA `.mesh`保留原XYZ，不再整体取反。FreeSurfer/MNI文件名及Inspect显示的AAL/Brodmann脑区**不**证明配准；Inspect不做仿射变换。
-- Layout 2在可识别半球时使用分半总览，不可分网格有保守整体曲面回退。现代布局编号和相机控件见[M04](../manual/zh-CN/M04_Layout_Camera.md)；勿依据旧审计误标的行标题推断。
-- 节点/连边配色、大小、筛选和阈值端点，带符号体色图及ROI生成已做专项修正。旧开发Scene外观可能变化；判定迁移等价前，用[节点](../manual/zh-CN/M07_Nodes.md)、[连边](../manual/zh-CN/M08_Edges.md)、[体映射](../manual/zh-CN/M09_Volume_Mapping.md)、[ROI](../manual/zh-CN/M10_ROI_Inspection.md)章节及独立边界值样例复核。
+- Layout 2在可识别半球时使用分半总览，不可分网格有保守整体曲面回退。现代布局编号和相机控件见[M04](../manual/zh-CN/M04_Layout_Camera.md)；请按当前布局名称选择视图。
+- 节点/连边配色、大小、筛选和阈值端点，带符号体色图及ROI生成采用当前显示规则。旧Scene的外观可能变化；判定迁移等价前，用[节点](../manual/zh-CN/M07_Nodes.md)、[连边](../manual/zh-CN/M08_Edges.md)、[体映射](../manual/zh-CN/M09_Volume_Mapping.md)、[ROI](../manual/zh-CN/M10_ROI_Inspection.md)章节及独立边界值样例复核。
 - Surface Map及统计ROI的P值模式现可换算受支持的NIfTI统计元数据；图谱/统计自动分类、多重比较校正和簇水平显著性推断仍未提供。纤维绘制、任意Plot Edit、GIF/EPS/EMF输出和内置打印不是本版能力。本公测不提供MATLAB Runtime-only程序。Docker/Web部署见安装指南。
 
 Scene、图像和电影溯源可能含本地路径和元数据。哈希证明文件身份，不证明解剖配准、统计有效性或共享许可。按现象排查见[手册M15](../manual/zh-CN/M15_Migration_Troubleshooting.md#出现问题时)。

@@ -29,7 +29,7 @@
 
 ![BrainNet Viewer单脑顶视图中的AAL左右岛叶29和30](../assets/captures/tutorial06-roi/06-aal-bilateral-insula-full-window.png)
 
-*当前构建的英文完整窗体图，仅在显示层隐藏本机路径。R2025a专项确认两个本地图谱ID、单脑顶视图中恰好两个ROI和ID图例，未绘制连续标量色条。AAL来源：GIN/MNI，引用Tzourio-Mazoyer等（2002）；曲面来源：Prof. Alan C. Evans（MNI）。*
+*MATLAB单脑顶视图显示双侧岛叶及ROI编号图例，不使用连续数值色条。本机路径已在截图中隐藏。AAL来源：GIN/MNI，引用Tzourio-Mazoyer等（2002）；曲面由Prof. Alan C. Evans（MNI）提供。*
 
 ![两个AAL岛叶ROI的单脑顶视图导出](../assets/captures/tutorial06-roi/06-aal-bilateral-insula-render.png)
 

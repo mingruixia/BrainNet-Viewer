@@ -12,7 +12,7 @@
 
 **Cancel Export** stops after the current frame/codec operation, removes staging output and leaves the window open. Closing the window while exporting requests cancellation and closes it after cleanup. Input controls are disabled during export. Failure/cancellation never publishes a partial bundle.
 
-The exporter renders a private, full-quality copy of the prepared data once and reuses its geometry for every frame. It never rotates the main canvas or changes Scene/settings/export preferences. The main camera is therefore unchanged on success, cancellation and failure. Encoding and rendering are offline; the requested playback frame rate is not a promise of real-time export speed. No GPU video-encoder acceleration is claimed.
+The exporter renders a private, full-quality copy of the prepared data once and reuses its geometry for every frame. It never rotates the main canvas or changes Scene/settings/export preferences. The main camera is therefore unchanged on success, cancellation and failure. Encoding and rendering are offline; the requested playback frame rate is not a promise of real-time export speed. GPU video encoding is not provided.
 
 ## Angles, timing and framing
 

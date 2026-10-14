@@ -1,13 +1,21 @@
 # Contributing
 
-Include version/commit, platform/runtime, minimal steps and complete errors with
-shareable inputs. Sensitive issues follow [SECURITY.md](SECURITY.md).
-Keep changes focused. Preserve coordinates, values, provenance and applied versus
-pending settings; do not infer registration or silently replace nonfinite values.
-Separate formatting, dependency and resource migrations from functional fixes.
+When reporting a problem, include the software version or commit, operating
+system, runtime version, steps to reproduce it and the complete error message.
+Provide a small example if you can share it safely. Report security issues
+privately as described in [SECURITY.md](SECURITY.md).
 
-Use an isolated environment and pinned dependencies. Associated checks are in
+Keep each contribution focused on one change. Preserve scientific coordinates,
+values and provenance, and distinguish applied settings from pending edits.
+Registration must be explicit; invalid or nonfinite values must not be replaced
+silently. Submit formatting, dependency and resource changes separately from
+functional fixes whenever possible.
+
+Use an isolated environment with the project's pinned dependencies. Relevant tests are in
 `tests/python`, `tests/security/check_local_server.py` and
-`tests/matlab/runReviewNodeComments.m`. API/file tests are not GUI acceptance.
+`tests/matlab/runReviewNodeComments.m`. Report which tests you ran and distinguish
+automated checks from interactive testing.
+
 Retain GPL-3.0-or-later code identifiers and third-party notices. Submit only work
-you may appropriately license; do not relabel third-party data under the code license.
+you have the right to license. Third-party data retain their own terms even when
+distributed with GPL-licensed code.

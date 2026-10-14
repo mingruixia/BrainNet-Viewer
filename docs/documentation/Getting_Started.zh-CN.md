@@ -14,7 +14,7 @@
 app = BrainNetViewer;
 ```
 
-这个入口会自行加入`src/matlab/BrainNetViewer`。若从其他工作目录启动，先将**项目根目录**加入MATLAB搜索路径一次，再调用同一函数。不要递归加入全项目、冻结旧版或第二套BrainNet安装。目前没有MATLAB Compiler安装包。
+这个入口会自行加入`src/matlab/BrainNetViewer`。若从其他工作目录启动，先将**项目根目录**加入MATLAB搜索路径一次，再调用同一函数。不要递归加入全项目、另一套BrainNet Viewer安装目录。目前没有MATLAB Compiler安装包。
 
 ## 2. 选择和读取数据
 

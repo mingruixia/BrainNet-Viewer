@@ -40,7 +40,7 @@ Size Source的 **Node Value** 使用.node第5列；**Module** 使用第4列，�
 | nod.size=3、size_value=2 | Threshold / Raw，Node Value |
 | nod.size_size / size_ratio / size_threshold | Base Size / Scale / Size Threshold |
 
-本轮依据冻结旧渲染器的计算顺序，不沿用旧对话框滑块的取值范围。Uniform忽略不生效的size_value选项；EC缺少size_value时沿用默认Mapped解释，非法枚举编码拒绝。原始.node文件不改写。
+大小计算遵循所述顺序，而不是旧对话框滑块的取值范围。Uniform忽略不生效的size_value选项；EC缺少size_value时沿用默认Mapped解释，非法枚举编码拒绝。原始.node文件不改写。
 
 Settings 1.0–1.3升级到1.4，缺少size_threshold_basis时补Mapped。**旧Uniform在Scale不为1时，以及旧Threshold设置，纠正后可能呈现不同大小，必须复核图像。** 已保存的模块来源大小仍保留为Module；无法区分旧EC误导入与用户有意设置，需重新导入未改动的原EC才能恢复Raw意图，不能一律自动转换。
 

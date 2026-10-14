@@ -27,15 +27,15 @@ Length uses the coordinate units supplied in the node file. It is not a tract le
 
 ![Current Length edge-color controls](../tutorials/assets/captures/topic-guides/edge-color-length-panel.png)
 
-These focused captures show the current controls, not the appearance of a rendered network. Changing the UI theme does not redefine edge groups. The captures do not certify all dark-theme contrasts or label readability.
+The screenshots illustrate the color controls. Switching the interface theme leaves edge-group membership unchanged. Check the rendered network and label contrast at the intended output size.
 
 ## Legacy EC and older development files
 
-For full-window layout behavior, see [window layout](Window_Layout.en.md). These focused controls do not certify every display session or DPI setting.
+For resizing and display scaling, see [window layout](Window_Layout.en.md).
 
 Legacy EC.edg.color=3/4 maps to Threshold/Length. Both require a finite RGB EC.edg.CM with at least 64 rows: row 1 is High/Long, row 64 is Low/Short. Missing/short/invalid arrays are rejected instead of inventing colors. Export restores those rows and the respective color_threshold/color_distance. Threshold color_abs=0/1 maps to Signed/Absolute, independently of draw_abs; a missing color_abs uses the legacy default Absolute. Length does not use color_abs. Import reports retain other unmapped fields for review.
 
-Settings **1.6.0** adds edge.color_low, edge.color_high and edge.threshold_value_mode. The last field applies only to Threshold, not Mapped, size or opacity. Scene v0.1 and preset v1.0 envelopes are unchanged. Current-version documents missing required fields are rejected.
+Settings **1.6.0** adds edge.color_low, edge.color_high and edge.threshold_value_mode. The last field applies only to Threshold, not Mapped, size or opacity. Scene v0.1 and preset v1.0 envelopes are unchanged. Files that omit required fields are rejected.
 
 Settings 1.0–1.5 retain the previous base color as Low, use the previous colormap endpoint as High, and default Threshold Values to Absolute. This is a deterministic upgrade, **not recovery of the original EC or preservation of the previous continuous-color appearance**. Threshold equality and Length appearance can change. Review both colors or reimport the untouched original EC. Scene metadata includes edge_color_upgrade; camera rebinding occurs only if the old canonical input/settings signature matched. Stale cameras remain stale; presets do not carry cameras. Previous builds need not accept Settings 1.6.
 
@@ -49,9 +49,8 @@ Legacy Mapped EC (`edg.color=2`) imports `color_abs`, `color_map_type` (1 Auto /
 
 Settings **1.8.0** adds `edge.mapped_value_mode`. New settings default to Absolute; older 1.0–1.7 settings without this field migrate to Signed, preserving their former sign handling, **not their exact colors**. Previously ignored original EC sign/palette/range cannot be recovered: reimport the original EC when available. Scene metadata records `edge_mapped_color_upgrade`; valid old camera signatures alone are rebound. Review colors after migration. Scene/preset envelope versions remain unchanged.
 
-These are focused tests only, not a new full regression or a full visual/UI certification. The focused settings captures above do not certify the rendered network's appearance.
 
-## Remaining boundaries
+## Related settings and limitations
 
 ### Module colors
 
@@ -61,4 +60,4 @@ This version supports at most **20 distinct modules**; extra modules produce an 
 
 Settings **1.10.0** adds `edge.inter_module_color`. Older settings default to gray [0.5,0.5,0.5] and require color review; the former first-endpoint behavior is not preserved. Scene metadata records the upgrade and only rebinds valid old camera signatures. Reimport the original EC to recover its palette. Use the global Apply/Revert; no extra subpanel buttons.
 
-Uniform, Threshold and Length rules remain unchanged. Related guides cover [Raw/Threshold sizes and independent size signs](Edge_Sizes.en.md), [independent opacity signs](Edge_Opacity.en.md), [custom-matrix colors and node binding](Custom_Edge_Colors.en.md), [Inter Hemi Only](Edge_Hemisphere.en.md) and [sparsity/tie rules](Edge_Sparsity.en.md). This guide does not close every legacy-compatibility issue; see [known limitations](Migration.en.md#known-limitations).
+Uniform, Threshold and Length rules remain unchanged. Related guides cover [Raw/Threshold sizes and independent size signs](Edge_Sizes.en.md), [independent opacity signs](Edge_Opacity.en.md), [custom-matrix colors and node binding](Custom_Edge_Colors.en.md), [Inter Hemi Only](Edge_Hemisphere.en.md) and [sparsity/tie rules](Edge_Sparsity.en.md). For additional compatibility requirements, see [known limitations](Migration.en.md#known-limitations).

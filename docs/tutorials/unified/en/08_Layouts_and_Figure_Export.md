@@ -8,7 +8,7 @@ Choose complementary views of one real dataset, then save a figure at explicit p
 
 Start with the [real PCC volume lesson](06_Statistical_Volume_to_Surface.md), using its documented surface and `Data/Tutorials/OneSample_ROI11_NC.nii`. Keep threshold, mapping algorithm, sign handling, surface opacity and color limits fixed while comparing layouts. Select a layout and click **Apply** to commit and render directly.
 
-The gallery below reuses the **MATLAB Desktop** example: smoothed ICBM152, algorithm **5**, **P=0.001**, surface opacity **1** and a blue-white-red signed T scale. It is not the Python lesson's original surface/algorithm 2/P=0.05 example, and is not a new candidate capture. All panes display the same dataset rather than different subjects.
+The gallery below reuses the **MATLAB Desktop** example: smoothed ICBM152, algorithm **5**, **P=0.001**, surface opacity **1** and a blue-white-red signed T scale. It is not the Python lesson's original surface/algorithm 2/P=0.05 example. All panes display the same dataset rather than different subjects.
 
 ## Choose a layout
 
@@ -89,7 +89,7 @@ For a simple transparent exercise, choose PNG, **800×600 Pixels**, **200 DPI** 
 
 Keep `<image filename>.provenance.json` with the exported image. Review effective dimensions, settings, cameras, versions and input/output identities; verify the image hash if checking a copied pair. MATLAB records can contain local paths; Python figure records omit absolute input paths but may retain filenames and titles. Neither policy guarantees complete anonymization. Review metadata before sharing, and do not confuse figure sidecars with metadata written by separate data tools.
 
-After save or cancel, confirm that the interactive window, camera framing, colorbar/annotation size and display DPI remain appropriate. If export reports an error, retain the complete message and review the restored canvas before retrying. Do not manufacture permission failures or overwrite unrelated files as a test. A rendered screen and a saved file provide different evidence; check both.
+After saving or cancelling, check that the window, camera, colorbar and annotations have returned to their normal display. If export fails, keep the complete error message and inspect the canvas before retrying. Open the saved file to check its dimensions and appearance; the screen preview alone does not establish the exported result.
 
 Use a fresh destination when an existing image or sidecar must be preserved. Export requires a current render, not merely loaded files. Check all brain views, title, colorbar ticks, labels, dimensions and transparency at the final output size. If cropped, adjust Fit/layout/output aspect ratio and export again; do not infer that valid source coordinates are wrong solely from framing.
 

@@ -15,9 +15,11 @@ BrainNet Viewer 2.0.0-beta.1 对应 Python 包版本2.0.0b1。
 desktop或web附加依赖。Dockerfile从本源码及随包资源构建Web镜像；
 pyproject.toml固定直接依赖。
 
-读取文件、配置、Apply绘图、交互、导出。随包提供原曲面库、图谱示例、
-教程数据和双图谱Inspect表。Web支持本机单一共享会话，源码启动时优先核验GPU，
+选择输入文件、调整显示设置后，点击 **Apply** 绘图，随后可操作视图、导出图片或保存 Scene。安装包附带曲面模板、图谱示例、教程数据及 AAL/Brodmann Inspect 查询表。Web支持本机单一共享会话，源码启动时优先核验GPU，
 不可用则切回CPU；容器能否分配GPU取决于Docker主机。
 停止或更新容器前保存便携Scene。代码GPL-3.0-or-later，资源保留各自条款。
+
+Web应在一名受信任用户的个人电脑上运行。浏览器来源检查不提供操作系统用户认证，
+因此本地服务不适合多用户共享主机或公网部署。
 
 开发者Mingrui Xia：mxia@bnu.edu.cn；mingruixia@gmail.com。

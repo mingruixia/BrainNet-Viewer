@@ -6,7 +6,7 @@ BrainNet Viewer is a MATLAB desktop application for visualizing brain surfaces, 
 
 ## Supported starting point
 
-The primary tested desktop environment is **Windows with an installed, activated MATLAB R2025a Update 1** and a graphics-capable session. Focused app, layout, dialog and raster-export checks have also passed on macOS R2024a/R2026a, but a complete macOS package is not certified. MATLAB Runtime-only installation, Linux packaging and a standalone executable are not certified. The independent modern NIfTI/GIfTI readers do not require SPM, but individual optional features can need MATLAB toolboxes or GPU support. See the [project README](../../../README.md) and the [migration limits](../../documentation/Migration.en.md); a successful launch does not verify every optional feature.
+Use an installed, activated MATLAB with a working graphics session. Windows with **MATLAB R2025a Update 1** is the primary tested configuration. Selected app, layout, dialog and raster-export workflows have also been tested on macOS R2024a/R2026a; these checks do not cover every feature. A MATLAB Runtime-only package, Linux package and standalone executable are not supplied. The independent modern NIfTI/GIfTI readers do not require SPM, but individual optional features can need MATLAB toolboxes or GPU support. See the [project README](../../../README.md) and the [migration limits](../../documentation/Migration.en.md); optional features have their own requirements.
 
 Set MATLAB **Current Folder** to the installed software root, the directory containing the top-level `BrainNetViewer.m`, then run:
 
@@ -14,14 +14,14 @@ Set MATLAB **Current Folder** to the installed software root, the directory cont
 app = BrainNetViewer;
 ```
 
-The launcher adds `src/matlab/BrainNetViewer` itself. From elsewhere, add **only the installed software root** to MATLAB's path first. Do not use `addpath(genpath(...))`, mix different software versions, or assume that a different installed `BrainNetViewer` is the intended installation. In MATLAB, `which BrainNetViewer -all` helps diagnose a path collision. No installer is supplied by this chapter.
+The launcher adds `src/matlab/BrainNetViewer` itself. From elsewhere, add **only the installed software root** to MATLAB's path first. Do not use `addpath(genpath(...))`, mix different software versions, or assume that a different installed `BrainNetViewer` is the intended installation. In MATLAB, `which BrainNetViewer -all` helps diagnose a path collision. Start the application directly from its software directory.
 
 ## What should appear
 
-The English main window opens with its startup image/build information. Its three working areas support the intended sequence: **Data Sources → Visualization Settings → render in the main canvas → interact/export**. Use **Add Files** or role-specific slots, **Validate and Load**, change settings, then the shared **Apply**; Apply commits and renders. **Render Scene** is an explicit redraw.
+The English main window contains Data Sources, the render canvas and Visualization Settings. Select files with **Add Files** or the individual input controls, then click **Validate and Load**. Adjust the settings and click **Apply** to commit them and render the Scene. Use **Render Scene** when you need to redraw it.
 
-Start with the real [ICBM152 surface exercise](../../tutorials/en/00_First_Launch.md), not an arbitrary template found in a data directory. For file roles, coordinate cautions and data-root behavior, continue to [M02](M02_Data_Formats_Coordinates.md). For saving an analysis, use [M03](M03_Scenes_Presets_Legacy.md).
+For a first visualization, follow the [ICBM152 surface exercise](../../tutorials/en/00_First_Launch.md). For file roles, coordinate cautions and data-root behavior, continue to [M02](M02_Data_Formats_Coordinates.md). For saving an analysis, use [M03](M03_Scenes_Presets_Legacy.md).
 
 ## Before sharing an image or package
 
- A figure's provenance may contain local file paths. **Directory membership is not redistribution permission**; check source credits and package notices before sharing teaching data. Review the [changelog](../../../CHANGELOG.md) and the actual package contents before asserting version or compatibility claims.
+Review a figure's provenance for private file paths before sharing it. Check the source credits and resource notices before redistributing teaching data; inclusion in the software directory does not itself grant permission. The [changelog](../../../CHANGELOG.md) describes version changes.

@@ -25,19 +25,19 @@
 
 ![英文RGB编辑器内的五行自定义Volume色图](../assets/captures/tutorial09-preset/09-volume-colormap-editor.png)
 
-*当前构建编辑器截图。项目自制RGB值仅用于教学；蓝红颜色本身不是推断方法，平滑预览也不保证感知均匀或色觉可及。*
+*MATLAB色图编辑器截图。项目自制RGB值仅用于教学；蓝红颜色本身不是推断方法，平滑预览也不保证感知均匀或色觉可及。*
 
 ![Apply后使用自定义带符号色图的真实T图四视图](../assets/captures/tutorial09-preset/09-pcc-diverging-full-window.png)
 
-*R2025a当前构建英文完整窗体，路径仅在显示层隐藏。专项确认恰好一条色条、每个视图都使用导入RGB表。修改颜色未改变NIfTI、`P=0.001`或映射算法。*
+*MATLAB中的自定义RGB色图，各视图使用相同色表和一条色条。本机路径已在截图中隐藏。配色调整不改变NIfTI、`P=0.001`或映射算法。*
 
 ### Step 03 · 保存、扰动并重放预设
 
-点击 **Save Preset**，选择一个**新建**的`.preset.json`路径。它保存经 **Apply** 提交的设置，不保存待提交编辑。为检查重放，可暂把 **Volume / ROI → Colormap** 设为 **Blue-White-Red** 并点击 **Apply**；随后点击 **Load Preset** 选刚保存的文件（也可先查看附带示例），阅读兼容性提示并确认。加载预设会保留当前数据引用，但清除旧渲染/相机；再点击 **Render Scene**。五行自定义色图和四视图应恢复。R2025a专项确认重放后数值RGB表一致，输入引用未被替换。
+点击 **Save Preset**，选择一个**新建**的`.preset.json`路径。它保存经 **Apply** 提交的设置，不保存待提交编辑。为检查重放，可暂把 **Volume / ROI → Colormap** 设为 **Blue-White-Red** 并点击 **Apply**；随后点击 **Load Preset** 选刚保存的文件（也可先查看附带示例），阅读兼容性提示并确认。加载预设会保留当前数据引用，但清除旧渲染/相机；再点击 **Render Scene**。五行自定义色图和四视图应恢复。重放后应检查RGB表是否一致、输入引用是否保留。
 
 ![自定义显示预设加载后的仅含渲染图](../assets/captures/tutorial09-preset/09-pcc-diverging-replay.png)
 
-*当前构建重放后960×720图像。应核对带符号色条和分布，不应假定另一显示器或图形驱动产生逐像素一致的结果。*
+*重放后的960×720图像。应核对带符号色条和分布，不应假定另一显示器或图形驱动产生逐像素一致的结果。*
 
 可选MATLAB文件级核对：先将BrainNet Viewer源码目录加到路径，然后运行：
 

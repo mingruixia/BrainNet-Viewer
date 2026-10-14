@@ -23,7 +23,7 @@ Quad splitting follows the current FreeSurfer C++ `WHICH_FACE_SPLIT` decision us
 
 The desktop/Scene dispatch in this step accepts `.pial` only for this reader. Other FreeSurfer suffixes, ASCII surfaces, patch files and `.pial.gz` have not been added to the UI or advertised as supported. Do not rename a patch/ASCII/compressed file and assume it becomes compatible.
 
-## Coordinate and metadata boundary
+## Coordinates and metadata
 
 Coordinates are retained as stored. Typical FreeSurfer cortical surfaces use surface RAS in millimeters, which is not automatically scanner RAS or MNI space. No registration, reflection, centering, or footer transformation is applied. Confirm the coordinate system before combining a surface with nodes, volumes or atlases; successful loading is not proof of alignment. See the [official coordinate guide](https://surfer.nmr.mgh.harvard.edu/fswiki/CoordinateSystems).
 

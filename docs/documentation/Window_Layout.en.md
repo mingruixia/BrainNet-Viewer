@@ -2,7 +2,7 @@
 
 [中文](Window_Layout.zh-CN.md) · [Migration](Migration.en.md)
 
-The main interface now uses a top-level layout manager to fill the available client area. Responsive columns follow the root panel's available width, not repeated copies of the figure's requested size. Resize or maximize/restore normally; Apply/Revert and pending edits remain in the same workflow.
+The main window adjusts its columns to the available width. Resize, maximize or restore the window as needed; these actions retain pending settings and the Apply/Revert controls.
 
 Resizing does not reset, Fit or otherwise change the scientific camera. A changed aspect ratio can change what fits in view; use Fit explicitly when needed. The canvas keeps its existing normalized multi-view regions and independent resize policy.
 
@@ -16,4 +16,4 @@ If clipping occurs, record the whole-window image, Scene, window state, display 
 
 The fixed bottom Apply/Revert controls remain visible; the settings area scrolls independently. At narrow widths, some content requires scrolling.
 
- No automatic Fit is applied on resize. Saved camera states remain explicit: older overly zoomed scenes may still need Fit. Full glyph boxes crossing pane boundaries are temporarily hidden, not truncated; visibility is re-evaluated on camera and size changes. This does not solve collisions or certify every DPI/export format.
+Resizing preserves the saved camera. Use **Fit** if an older Scene opens too closely zoomed. Labels that cross a pane boundary are temporarily hidden and reappear when the camera or pane size permits. This prevents clipped text but does not prevent labels from overlapping each other.

@@ -1,6 +1,6 @@
 # 节点标签字体与位置
 
-在 **Visualization Settings → Nodes** 设置Label Mode、字体/字号、**Font Style**（Normal/Bold、Normal/Italic）、**Font Units**、Label Color及Keep Labels in Front。唯一全局Apply会提交并渲染；Revert放弃未提交编辑。标签按字面显示，下划线和反斜线不解释为TeX；单独`-`不显示。专项验证的可见性及严格阈值规则不变。
+在 **Visualization Settings → Nodes** 设置Label Mode、字体/字号、**Font Style**（Normal/Bold、Normal/Italic）、**Font Units**、Label Color及Keep Labels in Front。唯一全局Apply会提交并渲染；Revert放弃未提交编辑。标签按字面显示，下划线和反斜线不解释为TeX；单独`-`不显示。可见性和严格阈值规则见[节点选择](Node_Selection.zh-CN.md)。
 
 现在完整往返旧`EC.lbl_font.FontName/FontSize/FontWeight/FontAngle/FontUnits`。支持points、pixels、normalized、inches、centimeters；字号按所选单位必须大于0且不超过100。切换单位不换算原数值，尤其使用normalized或物理单位时需重新选择合适字号；实际字形依赖本机字体，论文图建议使用points。
 

@@ -15,4 +15,4 @@ This control changes node and edge geometry detail. It does not resample, smooth
 
 Legacy EC import maps numeric detail codes to Low, Moderate and High. Existing and new modern Scenes default to Adaptive so that they retain their prior workload-aware behavior. EC has no Adaptive code: exporting an Adaptive modern setting writes legacy High (3), the historical legacy default. Legacy numeric codes outside 1–3 follow the existing EC enum-clamping convention.
 
-18 migration, validation, Scene/preset replay, EC import/export mapping, policy selection, and both Settings editors. It did not run the full regression suite, benchmark all scene sizes, or certify visual equivalence on every GPU/driver.
+Higher detail increases geometry and memory use, especially for dense networks. Choose a lower level for exploration and check the result at the final export size.

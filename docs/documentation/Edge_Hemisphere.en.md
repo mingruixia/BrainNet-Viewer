@@ -8,4 +8,4 @@ Filtering occurs **after** All/Threshold/Sparsity selection. It preserves the se
 
 Settings **1.12.0** adds logical `edge.inter_hemisphere_only`, saved in Scene and presets and included in render-cache keys. EC `edg.interhemiedges` accepts only scalar 0/1 and round-trips the flag. Older settings default to off: earlier development EC imports ignored this field, so reimport the original EC to recover its intent. Scene migration flags review; only valid old camera signatures are rebound. No new data files are needed.
 
- This step does not certify full legacy parity, all UI layouts or coordinate registration.
+ Check the coordinate axes and origin before applying this filter to your data.

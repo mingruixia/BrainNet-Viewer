@@ -2,7 +2,7 @@
 
 [中文](../zh-CN/13_Performance_and_Reproducibility.md) · [Tutorial index](index.md) · [Command-line/provenance manual](../../manual/en/M14_Batch_Provenance.md) · [Real T-map interpretation](05_Volume_to_Surface_Mapping.md)
 
-This lesson describes a **specific operation on a pinned real dataset** and its reproducibility protocol. It does not promise a universal speedup. The [public-facing machine-readable focused result](../assets/performance/tutorial13-real-pcc-r2025a-public.json) uses the same PCC-subregion one-sample connectivity T map and smoothed ICBM152 surface as Tutorials 05 and 08. This result preserves the measured numbers but omits an internal task identifier; it records the original report's SHA-256 for traceability. The internal benchmark harness is **not included** in this documentation candidate; this page alone cannot rerun the identical benchmark. The T map is **not** an Alzheimer's-versus-control group contrast. Preserve the [statistical-source note](Resource_Attribution.md) and Prof. Alan C. Evans (MNI) surface credit when sharing images.
+This lesson explains how to measure rendering and mapping separately, using the PCC-subregion one-sample connectivity T map and smoothed ICBM152 surface from Tutorials 05 and 08. The [timing record](../assets/performance/tutorial13-real-pcc-r2025a-public.json) contains measurements for this dataset and hardware; it does not predict performance on other installations. The benchmark script is not included. The T map is **not** an Alzheimer's-versus-control contrast. Retain the [data citation](Resource_Attribution.md) and Prof. Alan C. Evans (MNI) surface credit when sharing figures.
 
 ## Step 01 · Pin inputs and the execution contract
 
@@ -16,13 +16,13 @@ The measured environment was **MATLAB R2025a Update 1 / Windows 64-bit**, AMD Ry
 
 ## Step 02 · Reproduce the focused measurement
 
-The reported run used a development-only MATLAB harness. To independently reproduce its method in a source checkout, first obtain the exact authorized Scene, surface and NIfTI and verify the SHA-256 values above. Use the normal loader; prepare twice on CPU with geometry cache disabled, recording coordinate/value fingerprints and the cache key. Create a fresh renderer for each of three CPU Publication Quality draws at 960 × 720, excluding loading, numeric preparation and file export. Warm the algorithm-5 trilinear mapping kernel, then time three CPU calls and, only if available, three GPU calls on the **same input**. Compare CPU/GPU mapped values before comparing medians. Record MATLAB release/update, OS, actual CPU/GPU models, backend status, cache state, individual timings and any GPU failure reason. Keep the resulting report beside input hashes and Scene; do not treat a missing GPU as a zero-second measurement.
+The reported run used a MATLAB benchmark script that is not included. To independently reproduce its method in a source checkout, first obtain the exact authorized Scene, surface and NIfTI and verify the SHA-256 values above. Use the normal loader; prepare twice on CPU with geometry cache disabled, recording coordinate/value fingerprints and the cache key. Create a fresh renderer for each of three CPU Publication Quality draws at 960 × 720, excluding loading, numeric preparation and file export. Warm the algorithm-5 trilinear mapping kernel, then time three CPU calls and, only if available, three GPU calls on the **same input**. Compare CPU/GPU mapped values before comparing medians. Record MATLAB release/update, OS, actual CPU/GPU models, backend status, cache state, individual timings and any GPU failure reason. Keep the resulting report beside input hashes and Scene; do not treat a missing GPU as a zero-second measurement.
 
-This protocol does **not** supply an executable benchmark command: the internal harness and its dependencies have not been packaged for publication. A source-release maintainer must ship and verify a self-contained runner before claiming one-command reproducibility.
+The benchmark script is not included. The measurements below describe the recorded run; to repeat them, use a script that measures the same stages with the same inputs and settings.
 
-## Step 03 · Read these results without overclaiming
+## Step 03 · Interpret the timing results
 
-The checked-in sample JSON records one focused run on the machine above:
+The sample JSON records the following measurements on the machine described above:
 
 | Measurement | Observed sample | Scope |
 |---|---:|---|

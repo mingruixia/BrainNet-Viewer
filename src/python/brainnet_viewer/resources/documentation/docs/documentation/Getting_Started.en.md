@@ -2,7 +2,7 @@
 
 [中文](Getting_Started.zh-CN.md) · [Manual](../manual/en/index.md) · [Scene and preset details](Scene_Workflows.en.md)
 
-For `2.0.0-beta.1`, build date **1 Oct 2026**. This MATLAB public beta is intended for evaluation and feedback. MATLAB is required; this is not a MATLAB Runtime standalone. See the README for validation scope and limitations.
+For `2.0.0-beta.1`, build date **1 Oct 2026**. This MATLAB public beta is intended for evaluation and feedback. MATLAB is required; this is not a MATLAB Runtime standalone. See the README for installation requirements and limitations.
 
 ## 1. Install and launch
 
@@ -18,7 +18,7 @@ That entry point adds `src/matlab/BrainNetViewer` itself. From another working f
 
 ## 2. Select and load data
 
-In **Data Sources**, use **Add Files** or the individual Surface, Nodes, Edges, Volume, and related slots. **Open Scene JSON** is for an existing saved Scene, not a NIfTI or mesh. Select compatible files, then click **Validate and Load** to read them and see input errors before visualizing. A surface can be used alone; other roles depend on the intended visualization. The current role/format boundaries are summarized in the [README](../../README.md#workflow) and [surface-format matrix](../compatibility/Surface_Format_Support.md).
+In **Data Sources**, use **Add Files** or the individual Surface, Nodes, Edges, Volume, and related slots. **Open Scene JSON** is for an existing saved Scene, not a NIfTI or mesh. Select compatible files, then click **Validate and Load** to read them and see input errors before visualizing. A surface can be used alone; other roles depend on the intended visualization. The input roles and supported formats are summarized in the [README](../../README.md#workflow) and [surface-format matrix](../compatibility/Surface_Format_Support.md).
 
 The App's default data root is `src/matlab/BrainNetViewer`. A file outside that root is not read by silent absolute-path reference: the App asks **Stage and Add** or **Cancel**. On approval, it verifies a copy under `user-data/imports/<hash>/` and stages supported local companion files such as paired NIfTI header/image files. The original is not changed. This import makes the Scene reference relative to the data root; it does **not** grant redistribution rights or independently validate spatial registration. Keep original and staged data private as required by their permissions.
 

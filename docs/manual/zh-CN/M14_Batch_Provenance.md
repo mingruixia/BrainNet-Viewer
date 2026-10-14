@@ -17,7 +17,7 @@ record = BrainNetRender("D:/results/scene.json", "D:/results/figure.png", ...
     Resolution=300, Overwrite=false);
 ```
 
-命令读取并校验输入文件、准备数据、隐藏窗口渲染现代图形，写图像和`figure.png.provenance.json`。输出后缀支持PNG、JPEG、TIFF、BMP、PDF、SVG；复杂PDF/SVG场景可能含栅格化三维内容。默认保护已有图像和侧车文件，不覆盖。每次使用独立文件名，或检查目标后显式设`Overwrite=true`。可以在MATLAB循环里对不同Scene/输出路径重复调用；本版不声称自带独立任务调度器或数据集自动发现。
+命令读取并校验输入文件、准备数据、隐藏窗口渲染现代图形，写图像和`figure.png.provenance.json`。输出后缀支持PNG、JPEG、TIFF、BMP、PDF、SVG；复杂PDF/SVG场景可能含栅格化三维内容。默认保护已有图像和侧车文件，不覆盖。每次使用独立文件名，或检查目标后显式设`Overwrite=true`。可以在MATLAB循环里对不同Scene/输出路径重复调用；批处理循环需由用户编写，软件不提供任务调度器或数据集自动发现功能。
 
 ## 每次运行需核对的选项
 

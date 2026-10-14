@@ -7,7 +7,7 @@
 3. The label shows the source node/vertex index, an assumed-MNI XYZ coordinate, available value/module information, a **Brodmann Area**, and an **AAL region**. Click another point to replace the label.
 4. Click **Inspect** again to leave picking mode and clear the label. Re-rendering or changing Scene also clears it. Pop-out views can be picked while Inspect is active.
 
-The label deliberately omits file paths, voxel indices, atlas IDs and internal lookup methods. Programmatic results still include detailed provenance and status fields.
+The canvas label shows the selected point and region names. File paths, voxel indices, atlas IDs and lookup details are available in programmatic results rather than in the label.
 
 ## Scientific limits
 

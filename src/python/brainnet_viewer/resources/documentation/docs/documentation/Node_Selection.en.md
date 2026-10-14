@@ -24,10 +24,10 @@ Connected node selection uses the endpoints of the displayed, filtered edges rat
 - Undirected mode uses nonzero upper-triangle entries; directed mode uses nonzero off-diagonal entries. A node may be either source or target. The raw matrix is not automatically symmetrized.
 - Diagonal entries do not make a node connected. No selected edges means no Connected nodes.
 - Edge Threshold retains values **>=** its threshold, after Signed/Absolute selection. This edge inequality is intentionally different from node/label **>**. Negative values can remain in All mode or when the configured threshold permits them.
-- Modern Sparsity uses its existing retained edge set. Its denominator and tie policy are not certified as a legacy equivalent here.
+- Sparsity uses the retained edge set described in [sparsity selection](Edge_Sparsity.en.md), including its denominator and treatment of ties.
 - Connectivity is evaluated globally before splitting hemispheres/views. A cross-hemisphere edge can make both nodes Connected even when that particular edge is not drawn in a hemisphere-only view.
 
-Connected is a display rule, not a claim that the raw network has zero degree for a hidden node. Changing edge filters can change Connected nodes and their labels. Node filtering does not itself delete input edges. Legacy Inter Hemi Edges remains an open compatibility item; do not infer support for it from this review.
+Connected refers to the displayed edge set. A hidden node may still have nonzero degree in the input matrix. Changing the edge filters can change which nodes and labels appear; filtering nodes does not delete input edges. For inter-hemisphere filtering, see [Inter Hemi Only](Edge_Hemisphere.en.md).
 
 ## Desktop workflow
 

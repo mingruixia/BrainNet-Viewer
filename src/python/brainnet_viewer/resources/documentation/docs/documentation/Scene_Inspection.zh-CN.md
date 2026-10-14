@@ -17,4 +17,4 @@
 
 旧的程序接口`brainnet.query.SceneInspector.query`仍可接受显式变换设置，供内部/旧版流程使用；**当前桌面Inspect界面不提供仿射设置或外部体图谱标签字典**。保存Scene可保留其已有Inspect元数据，但桌面直接查询以AAL/Brodmann两套区域名为主。
 
-如需可复现的程序查询，参见[英文专题的MATLAB API示例](Scene_Inspection.en.md#matlab-api)。发行版截图须另行用当前构建、脱敏数据拍摄；历史弹窗截图不再用于本页。
+如需可复现的程序查询，参见[英文专题的MATLAB API示例](Scene_Inspection.en.md#matlab-api)。

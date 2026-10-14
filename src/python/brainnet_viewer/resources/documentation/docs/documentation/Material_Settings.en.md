@@ -15,4 +15,4 @@ For **Custom**, set **Ambient Strength**, **Diffuse Strength**, and **Specular S
 
 Legacy EC import recognizes `dull`, `shiny`, `metal`, and the historical custom `([ka kd ks])` form without evaluating text. Export preserves those forms and writes the three legacy coefficient fields. Unsupported material strings or non-finite/out-of-range custom coefficients are rejected.
 
-19 migration, Scene/preset persistence, legacy mapping, a hidden-window renderer check of MATLAB's actual three patch strengths, and both Settings editors. It does not certify pixel identity across graphics drivers or run the full regression suite.
+Material settings affect appearance rather than scientific values. The result may differ between graphics drivers; inspect the exported figure as well as the canvas.

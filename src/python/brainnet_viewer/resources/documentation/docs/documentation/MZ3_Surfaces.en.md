@@ -51,7 +51,7 @@ Not supported by this surface entry point: overlay-only files, point clouds,
 ambient-occlusion flags, embedded JSON lookup flags, future flags, mixed float32
 and float64 flags, or big-endian MZ3. Single-member GZip is the validated scope;
 nested/multi-member containers are not advertised. Structural validation is not
-a topology, self-intersection, atlas-label or registration quality certificate.
+a check of topology, self-intersections, atlas labels or registration quality.
 
 See [Scene workflow](Scene_Workflows.en.md) and the
 [format matrix](../compatibility/Surface_Format_Support.md). Development tests

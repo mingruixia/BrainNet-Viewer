@@ -32,7 +32,7 @@ The original and smoothed surface resources are credited to **Prof. Alan C. Evan
 
 ![Historical AAL vertex labels and Automatic boundaries in four views](../../assets/captures/manual-revision/04-aal-four-views.png)
 
-*MATLAB Desktop illustration using the smoothed ICBM152 pair and jet palette. It is not a Python screenshot or a newly captured candidate result. Exact colors and boundary appearance depend on the edition, palette and applied settings.*
+*MATLAB Desktop illustration using the smoothed ICBM152 pair and jet palette. Colors and boundary appearance depend on the edition, palette and applied settings.*
 
 The colorbar reports numeric label IDs, not named brain regions, probabilities or effect sizes. ID `90` is not a stronger biological value than ID `10`. Changing a palette changes display colors, not labels. A plausible image alone does not prove mesh/map correspondence.
 

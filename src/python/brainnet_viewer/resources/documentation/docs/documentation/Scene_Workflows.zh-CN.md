@@ -1,6 +1,6 @@
 # Scene 保存、旧配置导入与命令行绘图
 
-专项验证新增[Clear Figure](Clear_Figure.zh-CN.md)：释放绘图而不删除输入或已应用配置，可通过Render Scene恢复主相机视图。
+[Clear Figure](Clear_Figure.zh-CN.md)：释放绘图而不删除输入或已应用配置，可通过Render Scene恢复主相机视图。
 
 可选且绑定输入的[坐标与图谱查询](Scene_Inspection.zh-CN.md)配置，随Save Scene保存；不属于显示预设，也不自动推断配准。
 

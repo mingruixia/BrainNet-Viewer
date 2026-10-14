@@ -9,7 +9,7 @@ extend half a voxel beyond its center and beyond the input center-coordinate ran
 Singleton dimensions are treated as one-voxel-thick slabs.
 
 Box/Gaussian smoothing still uses the configured odd kernel (even sizes round up;
-size 1 disables smoothing). focused check checks each original **26-connected component**:
+size 1 disables smoothing). The smoothing safeguard checks each original **26-connected component**:
 each must retain at least one original voxel with smoothed value strictly above
 0.5. Otherwise, the **whole ROI** falls back to its original unsmoothed 0.5 surface,
 including its large components. No component is dilated or separately patched in.
@@ -32,8 +32,6 @@ Inspect preparation provenance under `roi_geometry`:
 - `skipped_labels`: IDs still producing no mesh.
 
 Colors, ID selection, statistical thresholds and original arrays are unchanged.
-This is **not** legacy mesh/pixel equivalence. Smoothing can still shrink shapes,
-merge components, split them, or remove thin branches within a component even
-when the guard passes. This is not complete topology or volume preservation.
+Smoothed meshes may differ from those produced by older versions. Even when the component check passes, smoothing can shrink shapes, merge or split components, or remove thin branches. It does not preserve complete topology or volume.
 Old scenes may show newly closed boundaries or previously missing small ROIs;
 review their geometry after updating/restarting the app. Settings remain 1.16.

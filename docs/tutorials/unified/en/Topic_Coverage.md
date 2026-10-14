@@ -20,11 +20,11 @@ Use this map to find a shared workflow and its edition-specific instructions. Fo
 
 Both editions retain the core workflow: open the main window, select inputs, configure, Apply/render, interact, then save/export. Shared scientific examples do not imply interchangeable Scene schemas or pixel-identical rendering. Vertex order, coordinate frame and atlas version must be checked independently of successful loading.
 
-## Documentation and evidence boundaries
+## Further reading and supported features
 
-The [tutorial index](index.md) is the primary shared learning route. The [manual entry](../../../manual/en/index.md) provides the unified English Word/PDF and distinguishes existing edition-specific references.
+Start with the [tutorial index](index.md) for the shared workflow. The [manual](../../../manual/en/index.md) provides the illustrated English Word/PDF edition and links to edition-specific reference chapters.
 
-No prebuilt Scene files are supplied by the shared lessons. Docker/Web deployment is covered in lesson 01 and the linked installation guide. Time-varying connectivity, AI and fiber tracking are not features of this public beta. Installation guidance, compatibility statements and future features should not be inferred from this topic list.
+Create your own Scenes as you work through the lessons; prebuilt Scenes are not included. Lesson 01 and the installation guide cover Docker/Web deployment. This public beta does not provide time-varying connectivity, AI tools or fiber tracking.
 
 ## Docker/Web edition
 

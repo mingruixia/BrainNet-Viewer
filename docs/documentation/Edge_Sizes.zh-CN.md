@@ -48,4 +48,4 @@ Settings 1.0–1.6升级默认采用Mapped阈值基准与Absolute粗细取值。
 
 改变半径或迁移旧Scene后，若变大的几何超出保留视野，请主动使用 **Fit**。有效的已保存相机会保留，不会静默重新取景。
 
-Mapped配色符号/范围后续已在[专项验证](Edge_Colors.zh-CN.md)处理。现支持[透明度独立符号](Edge_Opacity.zh-CN.md)，现支持[自定义连边索引矩阵](Custom_Edge_Colors.zh-CN.md)。现支持[Inter Hemi Only](Edge_Hemisphere.zh-CN.md)；现支持[稀疏度/并列值](Edge_Sparsity.zh-CN.md)。这些改动不改变连边选择、配色或透明度规则，不认证全部旧功能对等。
+Mapped配色的符号和范围见[连边颜色](Edge_Colors.zh-CN.md)。[透明度独立符号](Edge_Opacity.zh-CN.md)，现支持[自定义连边索引矩阵](Custom_Edge_Colors.zh-CN.md)。[Inter Hemi Only](Edge_Hemisphere.zh-CN.md)；现支持[稀疏度/并列值](Edge_Sparsity.zh-CN.md)。这些改动不改变连边选择、配色或透明度规则，导入旧配置时，请核对相应显示规则。

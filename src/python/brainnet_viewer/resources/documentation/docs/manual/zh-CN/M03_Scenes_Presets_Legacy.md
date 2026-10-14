@@ -2,7 +2,7 @@
 
 [手册目录](index.md) · [English](../en/M03_Scenes_Presets_Legacy.md) · [上一章：数据与坐标](M02_Data_Formats_Coordinates.md)
 
-状态首批正文，2026-09-24；发行流程仍须与候选发行版核对。
+Scene用于恢复输入和显示设置，预设用于复用外观，Import Settings用于转换可信的旧配置。
 
 ## 选择合适的文件
 

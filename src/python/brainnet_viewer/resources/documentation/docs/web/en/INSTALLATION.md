@@ -141,8 +141,7 @@ service or the downloaded image on port 1031, not both at once.
 The source image uses Python 3.12 and fixed application dependencies. Compose
 does not allocate a GPU: Auto performs a real graphics probe and normally chooses
 CPU without GPU access. Source Compose allows up to 8 CPU cores, 8 GiB memory and
-512 MiB temporary storage. ARM64 source rendering is not yet verified: an emulated
-ARM64 graphics probe failed, so do not treat a successful build as a usable renderer.
+512 MiB temporary storage. ARM64 source rendering has not been verified; a graphics probe under emulation failed. Check rendering on the target machine before using a source-built ARM64 image.
 The existing released ARM64 image has not been replaced.
 
 ### Windows GPU-preferred source launch
@@ -171,8 +170,7 @@ powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Stop -Image br
 
 The Windows WSL/NVIDIA path has local rendering checks. Linux GPU deployment and
 other drivers require platform-specific configuration; macOS Docker does not
-automatically expose the Mac GPU to this Linux image. GPU process crashes or memory
-exhaustion after startup are not covered by an in-session recovery guarantee.
+automatically expose the Mac GPU to this Linux image. CPU fallback applies at startup. A GPU process crash or exhausted memory during a session may require a restart.
 
 ### Source Web session and input limits
 
@@ -188,8 +186,7 @@ JupyterHub or untrusted shared network namespaces. See [security guidance](../..
 Compose accepts `BNV_PORT` (default 1031), `BNV_CPUS` (2) and `BNV_MEM` (8g).
 On WSL, `MESA_D3D12_DEFAULT_ADAPTER_NAME` optionally chooses an adapter when supplied
 to the container environment; no vendor is forced by default. Do not set internal
-`BNV_WEB_BOOTSTRAPPED` loader state manually. Startup readiness allows 90 seconds
-for isolated graphics probes and the service; software rendering is not GPU success.
+`BNV_WEB_BOOTSTRAPPED` loader state manually. Startup allows 90 seconds for the graphics probe and service initialization. Check the reported backend to distinguish hardware rendering from software rendering.
 
 Still frames use 2x sampling; moving frames use lower sampling/quality. CPU-only
 surface detail reduction is temporary; still frames, Inspect and export restore

@@ -23,4 +23,4 @@ RGB TXT每行三个数值通道，不执行表达式；JSON采用`kind: brainnet
 
 **Save Scene** 不同：记录一次Scene的输入引用、设置以及现代App保存时的相机/导出偏好；输入文件仅引用，不打包。格式无效、未知版本或夹带输入/相机字段的预设会被拒绝。取消或校验失败不会替换当前设置。本版不提供纤维绘制；Surface Map和统计ROI的P值预设都须依赖所选NIfTI中有效的统计元数据。预设名称/标题可能含私人信息，共享前须核查。
 
-[真实数据图文练习](../../tutorials/zh-CN/09_Presets_and_Custom_Colormaps.md)现覆盖自定义Volume RGB暂存、Apply及预设重放，并有R2025a专项截图。
+[真实数据图文练习](../../tutorials/zh-CN/09_Presets_and_Custom_Colormaps.md)现覆盖自定义Volume RGB暂存、Apply及预设重放，并附MATLAB截图。

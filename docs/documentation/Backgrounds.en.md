@@ -14,7 +14,7 @@
   off returns to the previous opaque policy. JPEG/BMP cannot be transparent.
   On this R2025a backend PNG/TIFF transparency is replaced with white by MATLAB;
   the exporter now detects missing alpha and rejects the export without replacing
-  an existing image or sidecar. Transparency is not certified for every format.
+  an existing image or sidecar. Check whether the chosen format and backend preserve alpha.
 - Scene save/reload retains the policy. Previously saved explicit white/black
   preferences remain explicit: the software cannot infer whether an older build
   chose them automatically. Set current explicitly if that is your intention.
@@ -23,8 +23,4 @@
   (RGB, or `none`). The low-level FigureExporter API retains its historical white
   default; pass current explicitly when calling it directly.
 
-Focused verification covers custom-RGB embedded/window rendering, App/CLI replay,
-PNG/TIFF/BMP backgrounds, explicit white/black and safe rejection of unsupported raster transparency. It does not
-certify every vector format, all DPI environments, or annotation contrast against
-an overridden background; check exported labels before publication. No schema
-version change or new export-background panel is introduced.
+Before publishing a figure, check its exported background, transparency and label contrast. The result can vary with the graphics backend, output format and display scaling, especially when an export background overrides the canvas color.

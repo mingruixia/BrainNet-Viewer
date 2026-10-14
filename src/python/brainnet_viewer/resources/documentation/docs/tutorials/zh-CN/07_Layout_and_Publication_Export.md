@@ -16,7 +16,7 @@
 
 ### Step 01 · 恢复真实数据四视图Scene
 
-完成[教程05的Step 01–02](05_Volume_to_Surface_Mapping.md)，或打开该教程保存的Scene JSON，点击 **Validate and Load → Render Scene**。输入必须是教程05中的确切`BrainMesh_ICBM152_smoothed.nv`和`OneSample_ROI11_NC.nii`。保持P值、映射算法及色图不变，仅切换 **Layout Preset** 并点击共用 **Apply**。R2025a专项分别渲染出8、4、6、5个子视图，各有一条带符号色条。多视图预设自带相机方向，单视图 **View Direction** 在此不起作用。只有曲面能安全拆分成双半球（如本示例）时，Overview才显示**8视图**；不可拆分曲面回退为6个完整曲面视图。
+完成[教程05的Step 01–02](05_Volume_to_Surface_Mapping.md)，或打开该教程保存的Scene JSON，点击 **Validate and Load → Render Scene**。输入必须是教程05中的确切`BrainMesh_ICBM152_smoothed.nv`和`OneSample_ROI11_NC.nii`。保持P值、映射算法及色图不变，仅切换 **Layout Preset** 并点击共用 **Apply**。四种布局分别显示8、4、6、5个视图，各配一条带符号色条。多视图预设自带相机方向，单视图 **View Direction** 在此不起作用。只有曲面能安全拆分成双半球（如本示例）时，Overview才显示**8视图**；不可拆分曲面回退为6个完整曲面视图。
 
 ### 同一T图的多视图图库
 
@@ -36,7 +36,7 @@
 
 ![真实T图的五视图外侧面、内侧面和顶面](../assets/captures/tutorial07-export/07-layout-5-full-window.png)
 
-*四张图使用同一份单样本T图、平滑ICBM152曲面和带符号色阶，只更改布局预设。均为当前构建英文App完整窗体，路径仅在显示层隐藏。R2025a专项确认8/4/6/5个视图及各一条色条；没有进行定量图像等效或印刷尺寸比较。*
+*四张MATLAB截图使用相同的单样本T图、平滑ICBM152曲面和带符号色阶，仅布局不同，分别显示8、4、6、5个视图。截图中的本机路径已隐藏。*
 
 ### Step 02 · 设定输出尺寸
 
@@ -44,7 +44,7 @@
 
 ![真实T图四视图及TIFF、1800×1350像素、300 DPI导出设置](../assets/captures/tutorial07-export/07-four-view-export-full-window.png)
 
-*R2025a当前构建英文完整窗体截图，本机路径仅在屏幕显示层隐藏。专项导出的TIFF为精确**1800×1350像素**，并有相邻`.provenance.json`；此图是单样本连接T图，不是疾病组间差异。体图来源：Xia等（2014）；曲面来源署名：Prof. Alan C. Evans（MNI）。*
+*MATLAB导出设置示例：TIFF为**1800×1350像素**，同时生成`.provenance.json`。截图中的本机路径已隐藏。该图为单样本功能连接T图，不是疾病组间差异；数据来自Xia等（2014），曲面由Prof. Alan C. Evans（MNI）提供。*
 
 ### Step 03 · 投稿前核验
 
@@ -52,7 +52,7 @@
 
 ![AAL90四视图网络及红框标出的Export Figure设置](../assets/captures/manual-revision/07-export-highlight.png)
 
-用目标排版/投稿软件打开TIFF，确认预定版面尺寸下四个视图及色条可读，并检查像素尺寸。R2025a专项确认TIFF格式、**1800×1350**像素和输入身份记录；但**未**独立确认下游程序中的实际印刷尺寸、各程序对TIFF DPI元数据的解释、期刊特定颜色要求或跨平台字体完全一致。分享前检查`.provenance.json`，其中原始路径可能暴露本机信息。若期刊要求矢量图，须在目标工作流实际测试PDF/SVG：三维图即使包装在矢量格式中也可能被栅格化。
+用目标排版/投稿软件打开TIFF，确认预定版面尺寸下四个视图及色条可读，并检查像素尺寸。检查TIFF格式、**1800×1350**像素及输入记录，并在投稿或排版软件中确认实际印刷尺寸、DPI解释、颜色要求和字体显示。分享前检查`.provenance.json`，其中原始路径可能暴露本机信息。若期刊要求矢量图，须在目标工作流实际测试PDF/SVG：三维图即使包装在矢量格式中也可能被栅格化。
 
 ## 常见错误与限制
 

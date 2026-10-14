@@ -8,7 +8,7 @@ Choose MATLAB Desktop, Python Desktop in a separate environment, or Docker/Web i
 
 MATLAB Desktop needs installed, licensed MATLAB. Python Desktop uses Python, Qt and VTK and does not require MATLAB or SPM. The desktop editions need a local graphical desktop. Docker/Web runs in a background container and needs neither MATLAB nor a local Python environment. A standalone executable and MATLAB Runtime-only package are not supplied.
 
-Check the supplied package's compatibility notes and SHA256SUMS. The public beta is named 2.0.0-beta.1; its Python package version is 2.0.0b1. Windows x64 and Apple Silicon macOS have focused development checks; consult release notes for the actual public candidate. Intel Mac, Linux Desktop and other display arrangements require separate validation. For browser use follow the [Docker installation guide](../../../web/en/INSTALLATION.md).
+Check the supplied package's compatibility notes and SHA256SUMS. The public beta is named 2.0.0-beta.1; its Python package version is 2.0.0b1. Selected workflows have been tested on Windows x64 and Apple Silicon macOS. Consult the release notes for platform details; Intel Mac, Linux Desktop and other display arrangements have not been verified. For browser use follow the [Docker installation guide](../../../web/en/INSTALLATION.md).
 
 ## Launch MATLAB Desktop
 
@@ -25,7 +25,7 @@ The launcher locates the modern source tree; entering several `addpath` and `bra
 
 ## Install Python Desktop
 
-Obtain the exact supplied wheel and follow the [Python installation guide](../../../python/en/INSTALLATION.md), which contains separate Windows PowerShell and macOS commands, the candidate hash and fixed-dependency requirements. Create a fresh virtual environment rather than copying one between systems. Install the wheel with its `desktop` extra, run `pip check`, then launch with that environment's Python:
+Obtain the exact supplied wheel and follow the [Python installation guide](../../../python/en/INSTALLATION.md), which contains separate Windows PowerShell and macOS commands, the release checksum and fixed-dependency requirements. Create a fresh virtual environment rather than copying one between systems. Install the wheel with its `desktop` extra, run `pip check`, then launch with that environment's Python:
 
 ```text
 python -m brainnet_viewer

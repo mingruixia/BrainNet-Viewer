@@ -2,22 +2,30 @@
 
 ## 尚未发行
 
-- 分离Web命令启动试绘与库调用，嵌入/测试调用不再替换当前进程。
-- 保留WSL可选显卡选择、统一软件绘图识别，启动就绪等待延长至90秒。
-- 增加真实HTTP/WebSocket认证及GIfTI预检回归、仿射读取夹具和限定MATLAB读取CI。
-- wheel检查核对MATLAB/Python版本对应，Python包版本来源集中管理。
-- 补充受信任本机单用户安全模型及Compose资源限额配置。
+### Web显示与启动
 
-- Web的Scene File/Open及Save Scene/Import Settings布局与桌面版对齐。
-- 静止画面采用2倍采样，保持文字大小，避免Apply后采样叠加；交互期间降低传输分辨率及JPEG质量。
-- CPU交互临时降低曲面细节，静止、Inspect、Scene及导出恢复原几何；GPU始终使用完整几何。
-- 启动时通过隔离试绘核验GPU，不可用则回退CPU；本机启动工具支持Auto/GPU/CPU选择。
+- Scene File/Open及Save Scene/Import Settings控件与桌面版对齐。
+- 静止画面采用2倍采样，保持文字大小，避免重复Apply造成采样叠加；交互时降低传输分辨率和JPEG质量。
+- CPU交互时临时降低曲面细节，静止、Inspect、Scene操作及导出时恢复原几何；GPU保留完整几何。
+- 启动时在独立进程中测试GPU绘图，不可用时使用CPU；本机启动工具也可选择Auto、GPU或CPU。
+- 分离Web独立启动与库调用，嵌入使用时不再替换当前进程；图形探测和服务初始化允许90秒。
+- 保留WSL显卡选择选项，并统一软件绘图后端的识别方式。
+
+### 输入处理与安全
+
 - pypdf升级至6.19.0，XML使用defusedxml防止实体扩展。
 - MATLAB及Python节点读取保留标签内部的`#`。
-- Python Scene强化路径、重复键、非有限值及JSON大小检查；便携资产先暂存核验，再提交新Scene，避免覆盖已有文件。
-- 本机Web限制Host/Origin，通过同源请求取得每次启动的随机认证key；适用范围仍为本机单用户。
+- Python Scene检查路径和JSON大小，拒绝重复键及非有限值；保存新Scene前核对便携资产，不替换已有文件。
+- 本机Web检查Host/Origin请求头，通过同源请求获取每次启动的随机密钥；服务仍适合受信任用户在个人电脑上运行。
 - 源码Docker构建使用固定Python 3.12底座，增加依赖核验及HTTP健康检查；ARM64源码绘图尚未验证，已发布镜像不变。
 - 明确项目代码使用GPL-3.0-or-later，随附资源保留各自条款。
+
+### 文档与开发
+
+- 修订中英文指南、教程和图文手册，使操作说明更清晰。
+- 说明本机单用户安全限制及Compose资源限额配置。
+- 增加HTTP/WebSocket认证、GIfTI预检及仿射读取回归测试，并在持续集成中运行MATLAB读取测试。
+- 集中管理Python版本信息，在wheel检查中核对其与MATLAB版本的对应关系。
 
 ## 2.0.0-beta.1
 

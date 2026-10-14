@@ -30,7 +30,7 @@ Do not rename or hand-edit companion paths/hashes to suppress an error. Save to 
 
 *MATLAB Desktop illustration from the existing same-edition Scene exercise. Numbered controls show configuration, Apply and Save Scene. It does not demonstrate Python companion-folder packaging or cross-edition replay.*
 
-A compatible saved camera can be restored; a compatibility fallback may instead restore layout cameras. Record that warning rather than claiming a pixel-identical replay. Correct hashes establish identity, not registration accuracy. Screen size, drivers and renderers can change the image even when inputs/settings match.
+A compatible saved camera is restored on reopening. If it is incompatible, the application uses the layout cameras and displays a warning. Matching hashes confirm file identity; registration must be checked separately. Screen size, graphics drivers and renderers can affect the image even when inputs and settings match.
 
 ## Save appearance separately
 

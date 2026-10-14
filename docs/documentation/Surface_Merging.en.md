@@ -7,17 +7,17 @@ For one input, use [Convert Surface to NV](Surface_Conversion.en.md). Merge requ
 1. Open **Tools → Merge Surfaces...**. The separate, non-modal window does not change the active Scene.
 2. **Add Files...** selects 2–64 surfaces. **Remove / Move Up / Move Down** control membership and order. Duplicate canonical paths are rejected.
 3. Inputs are reviewed automatically after adding, removing or reordering files. Inspect full paths, vertex/triangle counts, resulting one-based index ranges, coordinate bounds and SHA-256. Review writes no output; fewer than two inputs cannot be saved.
-4. Optionally enter **Space**, **Units**, and **Note**. Blank space/units are recorded as `unknown`; no verification checkbox is required. No registration or unit conversion is applied: anatomical alignment remains the user's responsibility.
+4. Optionally enter **Space**, **Units**, and **Note**. Blank space/units are recorded as `unknown`; there is no verification checkbox. No registration or unit conversion is applied: anatomical alignment remains the user's responsibility.
 5. Select **Save New .nv...** and choose a new filename. Existing files cannot be overwritten, even if the system save dialog asks about replacement. Source files and GIfTI external arrays are rechecked before publication.
 6. To display the result, choose it through **Surface Mesh**, configure the visualization and **Render Scene**. The file must be inside the app's configured data root, as for all portable Scene inputs. Save under that root, or launch an app with an appropriate root (`brainnet.app.launch(dataRoot)`). Saving does not automatically replace data/settings or change the root.
 
-Confirming or cancelling Open/Save returns focus to the Merge window, not the MATLAB desktop. The following screenshot predates the simplified controls; counts and bounds are unchanged.
+Confirming or cancelling Open/Save returns focus to the Merge window, not the MATLAB desktop. The screenshot below shows the input information; control placement may differ in the current interface.
 
 ![Input review in the light theme](../tutorials/assets/captures/tutorial11-merge-boundary/11-merge-review.png)
 
-This screenshot deliberately mixes a FreeSurfer surface and a template for review only. It is **not a registered pair and is not saved**; do not use it as a scientific merge example.
+The screenshot illustrates input review using a FreeSurfer surface and a template. These inputs are **not registered to each other** and were not saved as a merged result. Use spatially aligned surfaces for an anatomical merge.
 
-## Formats and scientific boundaries
+## Formats and limitations
 
 Inputs reuse the independent `.nv`, `.pial`, `.mesh`, BYU `.g`, MNI/BIC `.obj`, `.mz3/.mz3.gz` and `.gii/.gii.gz` readers with their existing restrictions. Output is ASCII `.nv` only.
 
@@ -27,7 +27,7 @@ The second `#` comment line embeds versioned JSON provenance: source paths/hashe
 
 Coordinates use 17 significant digits and undergo exact double-array read-back checks before publication. Output is staged beside the destination and published with a no-replace move; handled failures clean temporary files. Changed inputs require review again. This is not a filesystem snapshot and cannot prevent changes after the final hash check.
 
-Default combined limits: 5 million vertices and 10 million faces. Limits are checked after each reader returns, before concatenation, not before each reader's allocation. Arrays and a read-back copy require additional RAM. No GPU acceleration is claimed for this file-oriented utility.
+The combined limits are 5 million vertices and 10 million faces. They are checked after reading each input and before concatenation, so individual readers can still allocate substantial memory. Allow additional RAM for the arrays and read-back copy. Merge does not use GPU acceleration.
 
 ## MATLAB API
 

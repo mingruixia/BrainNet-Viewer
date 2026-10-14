@@ -14,7 +14,7 @@ Open **Tools → Merge Surfaces...**. Click **Add Files...** and choose, in orde
 
 ## Step 02 · Save a new combined mesh
 
-For this exact pair, optionally enter **Space** `ICBM152 source template frame`, **Units** `mm`, and **Note** `Same template derivatives; no transform.` These fields may be left blank; no verification checkbox is required. Click **Save New .nv...** and select a **new** `.nv` path. This declaration records the source-template understanding; it does not independently validate registration. Load the new file explicitly through **Data Sources → Surface Mesh** if you want to view it; saving alone does not replace the current Scene. The screenshots predate this control simplification; the geometry and review information are unchanged.
+For this exact pair, optionally enter **Space** `ICBM152 source template frame`, **Units** `mm`, and **Note** `Same template derivatives; no transform.` These fields may be left blank; there is no verification checkbox. Click **Save New .nv...** and select a **new** `.nv` path. This declaration records the source-template understanding; it does not independently validate registration. Load the new file explicitly through **Data Sources → Surface Mesh** if you want to view it; saving alone does not replace the current Scene. The screenshots predate this control simplification; the geometry and review information are unchanged.
 
 The merged mesh has the **same set of vertex coordinates** as the original full smoothed mesh in this pair, but not the same vertex order. Merge does not weld vertices or transfer per-vertex labels, colors or maps. Do **not** attach `icbm_vertex_AAL_label.txt` to this newly merged `.nv` merely because both have 81,924 vertices: the table was prepared for the original full mesh's order. An explicit checked reindexing would be required.
 
@@ -24,7 +24,7 @@ In the main App, load `Data/SurfTemplate/BrainMesh_ICBM152_smoothed.nv` as **Sur
 
 ![AAL vertex labels with automatic boundaries on the matched smoothed ICBM152 mesh](../assets/captures/tutorial04-aal/04-aal-map-full-window.png)
 
-*Reused current-build Tutorial 04 capture of the exact matched pair; it does not depict the newly merged output.*
+*Tutorial 04 screenshot of the matched surface and vertex map; it does not depict the newly merged output.*
 
  The file includes provenance comments; inspect local paths before sharing. A boundary mask is tied to the original vertex order, not an atlas region list or a geometric isoline. The tool saves data without modifying the active Scene.
 

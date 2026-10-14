@@ -1,6 +1,6 @@
 # BrainVISA surfaces (.mesh)
 
-Select a `.mesh` under **Data Sources → Surface Mesh**, or use **Add Files**. The candidate geometry is validated before replacing the current input. Configure the right-hand sections and click the single **Apply** button at their bottom to commit **and render**; **Render Scene** can explicitly redraw. **Save Scene** and **BrainNetRender** use the same independent reader.
+Select a `.mesh` under **Data Sources → Surface Mesh**, or use **Add Files**. The selected geometry is checked before replacing the current input. Configure the right-hand sections and click the single **Apply** button at their bottom to commit **and render**; **Render Scene** can explicitly redraw. **Save Scene** and **BrainNetRender** use the same independent reader.
 
 ## Supported scope
 

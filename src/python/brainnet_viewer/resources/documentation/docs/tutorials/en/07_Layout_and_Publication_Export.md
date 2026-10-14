@@ -36,7 +36,7 @@ Complete [Tutorial 05 Steps 01–02](05_Volume_to_Surface_Mapping.md), or open a
 
 ![Five-view lateral, medial and dorsal real T map](../assets/captures/tutorial07-export/07-layout-5-full-window.png)
 
-*All four images use the same one-sample T map, smoothed ICBM152 mesh and signed color scale; only the preset changes. They are current-build English App captures with local paths hidden at display time. Their 8/4/6/5 pane counts and single colorbar passed a focused R2025a check; no quantitative image-equivalence or print-size comparison was performed.*
+*All four images use the same one-sample T map, smoothed ICBM152 mesh and signed color scale; only the preset changes. They are current-build English App captures with local paths hidden at display time. The layouts show 8, 4, 6 and 5 panes, each with one colorbar. Check readability at the final output size.*
 
 ### Step 02 · Choose the output dimensions
 

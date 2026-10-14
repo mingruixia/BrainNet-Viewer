@@ -15,8 +15,7 @@ the badges do not promise exact geometric clipping at the midline.
 
 After verifying that all displayed inputs share the intended coordinates, the
 anatomical midline is X=0, and the positive-X direction is known, seal the Scene's
-input hashes and explicitly confirm. This step currently uses the Scene/API,
-not a new graphical confirmation dialog:
+input hashes and explicitly confirm. Use the Scene/API to record this confirmation; the interface has no confirmation dialog:
 
 ```matlab
 sealed = app.saveSceneFile("scene-before-orientation.json");
@@ -51,7 +50,4 @@ declaration is missing/stale or positive X points left: use Modern Batch Rendere
 or disable Show Orientation Labels. The original legacy code and external legacy
 launch paths are unchanged. Legacy badge styling is not modernized here.
 
-No Scene/Settings schema bump, automatic coordinate inference, resampling or new
-registration is introduced. Animal datasets can use confirmed L/R under exactly
-the same checks; species alone is never evidence of orientation. All-DPI/vector
-Check label readability in the exported figure.
+The same orientation checks apply to animal data. Confirm the axes and midline rather than inferring them from the species or template name. Labels do not transform or resample the data. Check their readability in the exported figure.

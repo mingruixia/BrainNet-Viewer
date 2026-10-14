@@ -14,4 +14,4 @@ The old `BrainNet_MergeMesh` single-file `.mesh` branch applied fixed `91-X, 91-
 
 The second `#` comment stores JSON provenance: source/dependency paths and SHA-256, native metadata where available, counts/ranges/bounds, optional declarations and timestamp. Metadata in comments is not automatically activated by the NV reader or assigned to the Scene. Check absolute paths before sharing; conversion does not grant redistribution rights.
 
-Default limits: 5 million vertices / 10 million triangles, checked after input reading. Input geometry and read-back require memory; this is not streaming or GPU acceleration. Final hashing is not a filesystem snapshot. Settings/Scene schema is unchanged; no full regression or legacy GUI certification is claimed.
+The default limits are 5 million vertices and 10 million triangles, checked after reading the input. The geometry and read-back copy require memory; conversion does not use streaming or GPU acceleration. Source hashes are checked before saving, but cannot prevent changes made after the final check.

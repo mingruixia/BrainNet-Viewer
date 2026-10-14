@@ -36,7 +36,7 @@ info = imfinfo(pngPath);
 [info.Width info.Height]  % [960 720]
 ```
 
-The current-build focused R2025a check produced this image with four surface views and a signed colorbar, plus `pcc-four-view.png.provenance.json`. The CLI uses a hidden modern figure; it does not start the App. It checks referenced input hashes before rendering. The figure is visually comparable to the App example, but pixel-identical output across graphics drivers or versions is not promised.
+The image below shows four surface views and a signed colorbar. Export also produces `pcc-four-view.png.provenance.json`. The CLI uses a hidden modern figure; it does not start the App. It checks referenced input hashes before rendering. The figure is visually comparable to the App example, but pixel-identical output across graphics drivers or versions is not promised.
 
 ![Figure-only CLI render of the real one-sample T map in four views](../assets/captures/tutorial08-cli/08-pcc-four-view-cli.png)
 
@@ -44,7 +44,7 @@ The current-build focused R2025a check produced this image with four surface vie
 
 ### Step 03 · Reuse the Scene for a second output
 
-Use a **different** output name for a 1200 × 900 TIFF. The focused check confirmed its format, dimensions and neighboring provenance sidecar.
+Use a **different** output name for a 1200 × 900 TIFF. Check the saved format, dimensions and accompanying provenance sidecar.
 
 ```matlab
 tifPath = fullfile(outputDir,"pcc-four-view-1200x900.tif");
@@ -55,7 +55,7 @@ BrainNetRender(scenePath,tifPath, ...
 imfinfo(tifPath)  % check Width, Height and Format
 ```
 
-These two calls illustrate a small batch with one frozen scientific Scene and two *output* specifications. The `300` DPI request is not independent validation of physical print size in every downstream tool. For several different analyses, save and verify a separate Scene for each input set rather than editing the JSON paths by hand.
+These two calls illustrate a small batch with one unchanged scientific Scene and two *output* specifications. The `300` DPI request is not independent validation of physical print size in every downstream tool. For several different analyses, save and verify a separate Scene for each input set rather than editing the JSON paths by hand.
 
 ### Step 04 · Inspect provenance and replay rules
 
@@ -71,5 +71,5 @@ sidecar.export.actual_width_pixels
 ## Troubleshooting
 
 - **Input not found / hash mismatch:** point `DataRoot` at the `BrainNetViewer` source folder with the exact two files and directory structure. Do not point it at the JSON file's folder or replace a changed file silently.
-- **Output exists:** choose another file name, or explicitly approve an overwrite after inspecting both image and sidecar. The tutorial check deliberately verified default overwrite protection.
+- **Output exists:** choose another file name, or explicitly approve an overwrite after inspecting both image and sidecar. Existing outputs are protected by default.
 - **Render/graphics error:** a desktop App window is unnecessary, but MATLAB still needs a working graphics environment. Check graphics support before using a headless server.

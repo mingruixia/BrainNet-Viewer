@@ -14,7 +14,7 @@ Use these files from your edition's resource library. See [installation and reso
 | Nodes | `Data/ExampleFiles/AtlasNetworks/Schaefer100Yeo7_GroupFC.node` |
 | Edges | `Data/ExampleFiles/AtlasNetworks/Schaefer100Yeo7_GroupFC.edge` |
 
-The node file contains **100 rows**; its companion edge matrix is **100 × 100** in the same region order. Do not pair these nodes with Schaefer200/400 or another atlas's edges. Keep coordinates unchanged. The historical ICBM152 surface supplies anatomical context; its visible folds are not exact parcel boundaries or proof of registration.
+The node file contains **100 rows**; its companion edge matrix is **100 × 100** in the same region order. Do not pair these nodes with Schaefer200/400 or another atlas's edges. Keep coordinates unchanged. The ICBM152 surface provides anatomical context. Its folds do not define the atlas parcel boundaries; check registration before interpreting their spatial relationship.
 
 The edge example is a group-level connectivity matrix generated from resting-state fMRI data from a group of healthy adults. It is a visualization example, not a normative reference. Node coordinates are atlas-derived volume centroids; module identifiers represent network assignments, and node-size values encode connection strength. The application displays these supplied fields rather than recomputing modules or strength when files are loaded.
 

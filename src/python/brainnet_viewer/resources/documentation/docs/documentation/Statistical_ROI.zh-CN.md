@@ -24,7 +24,7 @@ ROI Selection选择此时的簇编号；Draw All选择全部保留簇。
 
 - 复现旧统计ROI的数值＋簇大小过滤，应选 **Cluster**，数值阈值为0时也一样。
   EC配置不包含旧版运行时的 `surf.test` 标志；导入EC后须核对数据类型及所有参数。
-  本步未增加根据元数据自动识别统计图的功能。
+  软件不会根据元数据自动判断输入是否为统计图。
 - 旧配置ROI分支忽略阈值设置；已有Value/Cluster场景本次会有意改变输出，
   图谱应选None。序列化字段和Settings 1.14版本号不变。
 - ROI P Value现与Surface Map共用NIfTI描述/intent换算，并按旧版ROI顺序在逐体素筛选后

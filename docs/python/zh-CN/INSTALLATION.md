@@ -8,8 +8,7 @@ BrainNet Viewer 2.0.0-beta.1 对应 Python 包版本 **2.0.0b1**。
 Apple Silicon macOS 要求 Python 3.11 或更新版本，已验证配置为 Python 3.11。
 Windows、Linux 和 Intel macOS 使用 Python 3.10 或 3.11。
 需要支持 OpenGL 的图形桌面和可写目录。
-Windows x64 和 Apple Silicon macOS 有开发专项检查；Linux Desktop 和
-Intel Mac 需独立验证。保留固定依赖，每次使用独立虚拟环境。
+部分桌面工作流程已在 Windows x64 和 Apple Silicon macOS 上测试，Linux Desktop 和 Intel Mac 尚未验证。请在独立虚拟环境中安装项目指定的依赖版本。
 
 ## Windows
 
@@ -49,12 +48,10 @@ SciPy 1.17.1，该依赖要求 Python 3.11 或更新版本。Linux 或 Intel mac
 
 ## 首次使用
 
-读取文件、配置 Visualization Settings 并 Apply 绘图。Rotate、Pan、Zoom
-操作所选子图。Export Figure 保存图片及溯源记录；Save Scene 保存输入和设置，
-Preset 只保存配置。使用[统一教程（英文）](../../tutorials/unified/en/index.md)
+选择输入文件，在 **Visualization Settings** 中调整设置，点击 **Apply** 绘图。**Rotate**、**Pan** 和 **Zoom** 操作所选视图。**Export Figure** 保存图片和溯源记录；**Save Scene** 保存输入与设置，便于再次打开。Preset 只保存显示设置。使用[统一教程（英文）](../../tutorials/unified/en/index.md)
 和[手册](../../manual/en/index.md)。
 
-wheel 包含原曲面库、图谱网络示例、真实教程数据和双图谱 Inspect 表。
+wheel 包含曲面模板、图谱网络示例、教程数据及 AAL/Brodmann Inspect 查询表。
 使用已安装环境的 Python 查询版本和资源：
 
 ```text
@@ -102,5 +99,4 @@ python -m pip check
 brainnet-viewer
 ```
 
-保留项目固定依赖。安装源码不会更新已有wheel或已下载的安装包。
-各平台及图形驱动要求仍然适用，安装成功本身不代表绘图已验证。
+请保留项目指定的依赖版本。源码安装不会修改已有 wheel 环境或下载包。安装后应启动软件并绘制一个示例，检查图形环境是否可用。

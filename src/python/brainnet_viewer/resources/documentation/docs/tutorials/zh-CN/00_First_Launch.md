@@ -8,7 +8,7 @@
 
 使用项目中现有的[`BrainMesh_ICBM152.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv)，路径为`src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`，SHA-256为`471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`。这是真实人脑曲面模板，**81,924顶点、163,840三角面**，不是被试扫描。分发时保留 **Prof. Alan C. Evans（MNI）** 署名；见[来源与坐标说明](Resource_Attribution.md)。
 
-当前内部构建使用Windows及MATLAB R2025a Update 1和项目工作目录。仅MATLAB Runtime及其他平台尚未认证；所需时间与峰值内存**尚未实测**。从干净MATLAB路径开始，不要加入冻结的旧版目录或另一套BrainNet。
+本教程使用Windows、MATLAB R2025a Update 1及项目根目录。软件不提供仅依赖MATLAB Runtime的安装包；其他平台的要求见安装指南。从干净MATLAB路径开始，不要同时加载另一套BrainNet Viewer安装目录。
 
 ## 操作步骤
 
@@ -36,7 +36,7 @@ app = BrainNetViewer;
 
 ![BrainNet Viewer主窗口以左矢状单视图渲染Evans署名的MNI ICBM152脑曲面](../assets/captures/real-icbm152/00-ICBM152-first-render.png)
 
-*当前构建完整窗体截图；App文档截图模式只隐藏本机路径和机器信息，不改数据或渲染。曲面由Prof. Alan C. Evans（MNI）提供。*
+*MATLAB完整窗口截图，已隐藏本机路径和机器信息。曲面由Prof. Alan C. Evans（MNI）提供。*
 
 ### Step 05
 

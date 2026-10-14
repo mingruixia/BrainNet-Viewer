@@ -2,7 +2,7 @@
 
 [Tutorial index](index.md) · [Previous lesson](01_Installation_and_First_Launch.md) · [Next lesson](03_Scenes_and_Presets.md)
 
-Load the original real ICBM152 surface, render an opaque gray view, change its camera and export a PNG. These are display operations; they do not alter the mesh coordinates or validate registration.
+Load the original real ICBM152 surface, render an opaque gray view, change its camera and export a PNG. These operations change the display without altering the mesh coordinates. Spatial registration must be checked separately.
 
 ## Input and settings
 
@@ -34,7 +34,7 @@ Use `Data/SurfTemplate/BrainMesh_ICBM152.nv` from your edition's resource librar
 
 ![Opaque gray original ICBM152 surface and Surface controls](../../assets/captures/manual-revision/02-gray-surface.png)
 
-*MATLAB Desktop illustration. It shows the real original surface and the shared exercise values, Lighting and exact pixels may differ by edition and graphics environment.*
+*MATLAB Desktop illustration. The surface and settings match this exercise. Lighting and rendering may differ between editions and graphics environments.*
 
 Expect one complete opaque gray brain. A Uniform surface has no statistical scalar colorbar; enabling the surface colorbar does not invent mapped values. To try transparency, change Opacity to `0.3`, Apply, inspect the result, then restore `1` and Apply before the next lesson.
 
@@ -55,4 +55,4 @@ These dimensions specify pixels; DPI records output density and is not a promise
 
 ## Check the result
 
-Confirm the expected mesh counts, one complete brain, applied Uniform/Opacity values and a saved PNG plus sidecar. Treat exact pixel differences as rendering differences unless a specific data/configuration mismatch is established. If a file is missing or changed, resolve it rather than silently swapping templates. Proceed to [Save and reopen a Scene](03_Scenes_and_Presets.md).
+Check the mesh counts, complete brain view and applied Uniform/Opacity settings, then confirm that both the PNG and its sidecar were saved. Rendering can differ between graphics environments. If an input is missing or has changed, restore the intended file before continuing. Proceed to [Save and reopen a Scene](03_Scenes_and_Presets.md).

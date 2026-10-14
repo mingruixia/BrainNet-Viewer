@@ -10,8 +10,8 @@ Choose **Tools → Subdivide Surface to NV...** to make a new, denser ASCII `.nv
 4. Space, units and note are optional. Blank remains `unknown`; no MNI/mm inference or transformation occurs. Confirm that colors, scalar maps, materials, normals, labels and active GIfTI transforms are not transferred.
 5. **Save New .nv...** writes only a new file. It uses 17-significant-digit geometry, exact read-back validation, source/external-array fingerprints and no-overwrite publication. Load the result through **Surface Mesh** when ready.
 
-## Scope and legacy status
+## Method and compatibility
 
-This is a modern, explicitly defined linear subdivision utility. The old capability audit rendering-detail requirements concerns rendering-detail controls and their persistence; no original saved-subdivision algorithm was found. Accordingly, this tool is not claimed to recreate an old rendering quality mode or to preserve scalar/attribute correspondence. Existing mesh nodes/edges/volume maps can become misaligned with the new geometry unless you establish correspondence separately.
+Subdivision adds vertices and faces by linear interpolation. It is separate from the Render Detail setting and does not preserve per-vertex scalar or attribute correspondence. Establish a new correspondence before combining the result with existing nodes, edges or volume maps.
 
-The second `#` line contains JSON provenance: source/dependency hashes, input/output counts, level-by-level counts, method, optional declarations and timestamp. Review absolute paths before sharing. Final source fingerprint checks cannot make a filesystem snapshot. No GPU/multicore speed claim, settings/Scene-schema change, full regression or cross-platform certification is made.
+The second `#` line contains JSON provenance: source and dependency hashes, input and output counts, counts at each level, method, optional declarations and timestamp. Review absolute paths before sharing. The source is checked before saving, but can still change after the final check. This utility does not provide GPU or multicore acceleration.

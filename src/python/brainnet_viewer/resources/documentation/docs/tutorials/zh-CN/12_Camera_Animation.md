@@ -4,7 +4,7 @@
 
 本教程是**围绕静态曲面旋转相机**，并非脑活动或连接随时间变化。使用真实`BrainMesh_ICBM152_smoothed.nv`（SHA-256 `aff1920baef51956971b8c1de068e8eee2d1279f21fc90452bcd0dba2794fdc5`）。分发曲面或衍生图时保留Prof. Alan C. Evans（MNI）署名。先用仅4帧的PNG序列核对流程；需要流畅展示时，检查结果和耗时后再增加帧数。
 
-| 控件 | 本次专项参数 | 含义 |
+| 控件 | 练习参数 | 含义 |
 |---|---|---|
 | Layout → Preset / View Direction | Single View / Isometric | 一个三维相机；绕世界轴旋转不改变解剖坐标。 |
 | Surface → Color Mode / Opacity | Uniform / 1 | 不透明中性曲面，无标量映射或色条。 |
@@ -21,13 +21,13 @@
 
 选择 **Tools → Export Animation...**，按表格设置。该窗口把*当前已渲染Scene*导出为**新文件夹**，不是单个`.png`，也不会替换主画布。点 **Export...**，在已有父目录下选一个新名称，如`icbm-orbit-check`。再次运行须另选新名称，已有结果文件夹会被拒绝。
 
-![真实ICBM152四帧PNG专项所用英文动画设置窗口](../assets/captures/tutorial12-animation/12-animation-controls.png)
+![真实ICBM152四帧PNG练习所用英文动画设置窗口](../assets/captures/tutorial12-animation/12-animation-controls.png)
 
-*当前构建动画窗口。Safe Fit可减少旋转期间的裁切，但导出的脑可能比交互画布中小。*
+*MATLAB动画窗口。Safe Fit可减少旋转期间的裁切，但导出的脑可能比交互画布中小。*
 
 ## 步骤 03 · 检查帧和溯源
 
-结果文件夹应包含`frame-000001.png`至`frame-000004.png`、`preview.png`和`provenance.json`。四帧是同一静态曲面的连续观察角度，不是神经影像数据的四个时间点。R2025a专项核对640 × 480像素、四个不同帧哈希、四帧清单、固定曲面哈希、防覆盖和主画布相机不变。
+结果文件夹应包含`frame-000001.png`至`frame-000004.png`、`preview.png`和`provenance.json`。四帧是同一静态曲面的连续观察角度，不是神经影像数据的四个时间点。导出后检查640 × 480像素、四帧清单、各帧及源曲面哈希，并确认主画布相机保持不变。
 
 ![绕行第1帧](../assets/captures/tutorial12-animation/12-orbit-1.png) ![绕行第2帧](../assets/captures/tutorial12-animation/12-orbit-2.png)
 

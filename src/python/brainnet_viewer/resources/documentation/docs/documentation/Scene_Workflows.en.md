@@ -32,7 +32,7 @@ The Scene contains file references, input SHA-256 hashes, coordinate-space and r
 
 The supported minimum window size is 960×680. The canvas toolbar wraps into one, two or three rows based on the available canvas width, including when the settings column is collapsed. **Render Scene** and **Pop Out** remain directly accessible without horizontal scrolling. The single **Revert / Apply** footer remains below the scrollable settings categories; resizing does not discard pending edits.
 
-Axes keep their normalized layout regions during window-size changes. Resizing does **not** silently invoke Fit or Reset: it preserves camera orientation, target, distance and zoom, including deliberate off-center views. A different canvas aspect ratio can change the visible field; use **Fit** explicitly if you want to recenter and fully frame the geometry. These are framing controls, not scientific-coordinate transformations.
+Axes keep their normalized layout regions during window-size changes. Resizing does **not** silently invoke Fit or Reset: it preserves camera orientation, target, distance and zoom, including deliberate off-center views. A different canvas aspect ratio can change the visible field; use **Fit** explicitly if you want to recenter and fully frame the geometry. These are framing controls, not transformations of the input coordinates.
 
 ## Data-root rule
 
@@ -103,4 +103,4 @@ BrainVISA `.mesh` inputs use the independent single-frame triangle reader. See [
 
 MNI/BIC `.obj` inputs use the independent single-object triangle reader (ASCII and binary). See [MNI/BIC surfaces](MNI_BIC_Surfaces.en.md) for byte-order, appearance and registration boundaries; Wavefront OBJ is not supported.
 
-MZ3 `.mz3` / `.mz3.gz` surface geometry is supported in raw/GZip form. See [MZ3 surfaces](MZ3_Surfaces.en.md): embedded RGBA/scalars are validated, not automatically applied as visualization settings or maps; overlay-only MZ3 is not routed to Surface Map.
+MZ3 `.mz3` / `.mz3.gz` surface geometry is supported in raw/GZip form. See [MZ3 surfaces](MZ3_Surfaces.en.md): embedded RGBA/scalars are validated, not automatically applied as visualization settings or maps; overlay-only MZ3 is not supported as a Surface Map.

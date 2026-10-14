@@ -2,28 +2,38 @@
 
 ## Unreleased
 
-- Separate standalone Web graphics bootstrap from library calls; embedded/test calls no longer replace the calling process.
-- Preserve optional WSL adapter selection, recognize software renderers consistently, and extend startup readiness to 90 seconds.
-- Add live HTTP/WebSocket authentication and GIfTI preflight regression checks, affine-reader fixtures and a focused MATLAB reader CI job.
-- Check MATLAB/Python version agreement during wheel verification; centralize Python package version metadata.
-- Document the trusted-local-user security model and configurable Compose resource limits.
+### Web display and startup
 
-- Align Web Scene File / Open and Save Scene / Import Settings with the desktop editions.
-- Sharpen Web still frames using 2x sampling without enlarging labels or compounding
-  sampling on Apply. Reduce streamed resolution and JPEG quality during interaction.
-- Temporarily reduce surface detail for CPU interaction, restoring original geometry
-  for still frames, Inspect, Scene operations and export; GPU rendering retains full geometry.
-- Prefer a GPU verified by an isolated graphics probe; use CPU at startup when GPU
-  rendering is unavailable. Add explicit Auto/GPU/CPU selection to the local launcher.
+- Align the Scene File / Open and Save Scene / Import Settings controls with the desktop editions.
+- Use 2x sampling for sharper still images, while retaining label sizes and preventing
+  repeated sampling on Apply. Lower stream resolution and JPEG quality during interaction.
+- Reduce surface detail temporarily during CPU interaction. Restore the original geometry
+  for still images, Inspect, Scene operations and export. GPU rendering keeps the full geometry.
+- Test GPU rendering in a separate process at startup and use the CPU if it is unavailable.
+  The local launcher also offers explicit Auto, GPU and CPU choices.
+- Separate standalone Web startup from library calls so embedded use does not replace
+  the calling process. Allow 90 seconds for graphics probing and service initialization.
+- Retain optional WSL adapter selection and use consistent software-renderer detection.
+
+### Input handling and security
+
 - Update pypdf to 6.19.0 and use defusedxml for XML entity protection.
 - Preserve `#` within node labels in MATLAB and Python.
-- Harden Python Scene paths, duplicate-key/nonfinite checks and bounded JSON input;
-  stage and verify portable assets before committing a new Scene without overwriting files.
-- Restrict local Web Host/Origin and bootstrap authentication through a same-origin
-  request using a random per-start key. Keep the local single-user deployment scope.
+- Validate Python Scene paths, bound JSON reads and reject duplicate keys or nonfinite values.
+  Check portable assets before saving a new Scene without replacing existing files.
+- Check local Web Host/Origin headers and obtain a random startup key through a
+  same-origin request. The server remains intended for one trusted local user.
 - Build source Docker images on a pinned Python 3.12 base, check dependencies and
   report HTTP health. ARM64 source rendering remains unverified; released images are unchanged.
 - Clarify GPL-3.0-or-later for project code while retaining bundled-resource terms.
+
+### Documentation and development
+
+- Revise the English and Chinese guides, tutorials and illustrated manual for clearer instructions.
+- Explain the trusted-local-user security model and configurable Compose resource limits.
+- Add HTTP/WebSocket authentication, GIfTI preflight and affine-reader regression tests,
+  with a MATLAB reader job in continuous integration.
+- Use one source for Python version metadata and check its agreement with MATLAB during wheel verification.
 
 ## 2.0.0-beta.1
 
