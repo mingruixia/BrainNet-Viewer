@@ -10,6 +10,10 @@ BrainNet Viewer Web 在 Docker 后台运行，通过浏览器
 已发布镜像保持不变。默认源码分支的维护更新需要本机源码构建，拉取原公测标签
 不会安装这些更新。GPU选择与CPU回退见末尾的源码构建部分。
 
+团队通过 IP 访问 Linux 服务器时，请使用独立的[服务器部署说明](SERVER_DEPLOYMENT.md)，
+其中包含认证及浏览器会话隔离，需要当前源码构建。不要仅修改本机配置的回环绑定
+来开放局域网访问。
+
 ## 1. 安装并启动 Docker
 
 - **Windows：**安装 [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)，

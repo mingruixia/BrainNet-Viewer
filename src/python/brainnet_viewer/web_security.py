@@ -4,6 +4,8 @@ from pathlib import Path
 import secrets
 from urllib.parse import urlsplit
 from importlib.metadata import version
+import hmac
+import os
 
 
 CLIENT_VERSIONS = {'trame': '4.0.0', 'trame-vtk': '2.11.17'}
@@ -50,10 +52,17 @@ def install(server):
     require_client_versions()
     from aiohttp import web
     token = secrets.token_urlsafe(32)
+    worker_token = os.environ.get('BNV_GATEWAY_TOKEN')
+    if worker_token is not None and len(worker_token) < 32:
+        raise RuntimeError('Invalid private worker credential; refusing startup.')
     server.cli.set_defaults(authKey=token, authKeyFile="")
 
     @web.middleware
     async def guard(request, handler):
+        if worker_token is not None and not hmac.compare_digest(
+                request.headers.get('X-BNV-Worker-Token', '').encode('utf-8'),
+                worker_token.encode('utf-8')):
+            raise web.HTTPForbidden(text='Private browser worker.')
         sensitive = request.method not in ("GET", "HEAD") or request.headers.get("Upgrade", "").lower() == "websocket"
         if not permitted(request.headers.get("Host", ""), request.headers.get("Origin"),
                          scheme=request.scheme, require_origin=sensitive):

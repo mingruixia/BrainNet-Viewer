@@ -1,5 +1,7 @@
 # Security and supported deployment
 
+## Local Web mode
+
 The Web edition is intended for **one trusted user on a private local computer**.
 Publish its port on the loopback interface only. Shared-user computers,
 JupyterHub, shared network namespaces and public hosting require authentication
@@ -10,6 +12,31 @@ Host and Origin checks, together with a new random WebSocket secret at each
 startup, protect against cross-site browser requests. They do not authenticate
 operating-system users: a local process can forge an Origin header and obtain a
 key. Binding to loopback does not resolve this limitation.
+
+## Linux server mode
+
+The current source includes a separate [Linux LAN server recipe](docs/web/en/SERVER_DEPLOYMENT.md).
+It requires HTTPS and an administrator-managed team access password. Each browser
+cookie session owns a separate loopback worker process, startup credentials and
+temporary workspace. Workers require an additional private gateway credential;
+their ports must never be published. Browser cookies are HttpOnly, SameSite Strict
+and Secure on HTTPS. Only the configured origin is accepted; forwarded headers
+are not trusted. Sign-in attempts, concurrent sessions and disconnected-session
+lifetimes are bounded. Sign-out or server shutdown ends the owned workers.
+
+Use this mode only for trusted team members on a restricted LAN. It does not
+provide named accounts, individual access revocation, role permissions or a
+security boundary against hostile OS users. Processes run as the same non-root
+container user and share container resource limits and any allocated GPU. A
+resource-intensive session can affect other users. It is not an anonymous public
+hosting service, and it does not make confidential clinical data safe to upload
+without your institution's authorization and deployment controls.
+
+The existing public-beta image does not include server mode. Source builds are
+required until a release explicitly includes it. Never enable LAN access simply
+by changing the local recipe's port binding.
+
+## Dependencies and reporting
 
 Use the pinned dependencies and run `pip check` after installation. The server
 rejects unsupported Web clients. Source updates do not upgrade previously

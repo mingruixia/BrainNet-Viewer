@@ -17,6 +17,10 @@
 
 ### Input handling and security
 
+- Add a Linux LAN server mode with HTTPS, a team access password and a separate
+  application process for each browser session. Bound concurrent sessions and
+  sign-in attempts; remove disconnected workers after the configured idle period.
+  Keep the local single-user recipe unchanged.
 - Update pypdf to 6.19.0 and use defusedxml for XML entity protection.
 - Preserve `#` within node labels in MATLAB and Python.
 - Validate Python Scene paths, bound JSON reads and reject duplicate keys or nonfinite values.

@@ -42,6 +42,8 @@ Brainnetome246. AAL90 volume and vertex-label inputs are in
 registration and coordinate correspondence for your own data. The application
 interface is English and is not restricted to human-brain data.
 
+For trusted teams on Linux, [server mode](docs/web/en/SERVER_DEPLOYMENT.md) uses HTTPS, an access password and a separate process per browser session. It requires a current source build; the published beta image is unchanged.
+
 The Web edition has one shared session and is intended for a trusted user on a
 private local computer. Source builds test GPU rendering at startup and use the
 CPU if a GPU is unavailable; the released image uses the CPU. Save a portable

@@ -14,3 +14,5 @@ htmlcov/
 .ruff_cache/
 .idea/
 .vscode/
+.server-secrets/
+*.server.env

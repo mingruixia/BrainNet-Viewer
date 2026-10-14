@@ -1,0 +1,60 @@
+services:
+  brainnet-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: brainnet-viewer:server-local
+    entrypoint: ["python", "-m", "brainnet_viewer.web_server"]
+    command:
+      - --public-origin
+      - ${BNV_SERVER_ORIGIN:?Set BNV_SERVER_ORIGIN to https://SERVER_IP:1031}
+      - --password-file
+      - /run/secrets/access_password
+      - --cert
+      - /run/secrets/server_certificate
+      - --key
+      - /run/secrets/server_key
+      - --max-sessions
+      - ${BNV_MAX_SESSIONS:-4}
+      - --idle-seconds
+      - ${BNV_IDLE_SECONDS:-1800}
+      - --worker-threads
+      - ${BNV_WORKER_THREADS:-2}
+    ports:
+      - "${BNV_SERVER_BIND:-0.0.0.0}:${BNV_PORT:-1031}:1031"
+    environment:
+      BNV_SERVER_ORIGIN: ${BNV_SERVER_ORIGIN:?Set BNV_SERVER_ORIGIN}
+      BNV_RENDER_BACKEND: ${BNV_RENDER_BACKEND:-auto}
+    secrets:
+      - access_password
+      - server_certificate
+      - server_key
+    read_only: true
+    tmpfs:
+      - /tmp:size=${BNV_TMP_SIZE:-2g},mode=1777
+    mem_limit: ${BNV_MEM:-16g}
+    cpus: ${BNV_CPUS:-8}
+    pids_limit: 512
+    init: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os,ssl,urllib.request,urllib.parse; origin=os.environ['BNV_SERVER_ORIGIN']; req=urllib.request.Request('https://127.0.0.1:1031/_bnv/health',headers={'Host':urllib.parse.urlsplit(origin).netloc}); urllib.request.urlopen(req,context=ssl._create_unverified_context(),timeout=3).close()"
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+secrets:
+  access_password:
+    file: ${BNV_SERVER_SECRETS_DIR:-./.server-secrets}/access_password.txt
+  server_certificate:
+    file: ${BNV_SERVER_SECRETS_DIR:-./.server-secrets}/server.crt
+  server_key:
+    file: ${BNV_SERVER_SECRETS_DIR:-./.server-secrets}/server.key

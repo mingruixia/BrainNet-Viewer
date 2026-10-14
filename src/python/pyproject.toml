@@ -27,7 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 desktop = ["PySide6==6.11.2", "pyvistaqt==0.13.1", "imageio-ffmpeg==0.6.0"]
-web = ["trame==4.0.0", "trame-vtk==2.11.17", "trame-vuetify==3.3.0", "imageio-ffmpeg==0.6.0"]
+web = ["trame==4.0.0", "trame-vtk==2.11.17", "trame-vuetify==3.3.0", "aiohttp==3.14.5", "imageio-ffmpeg==0.6.0"]
 
 [project.gui-scripts]
 brainnet-viewer = "brainnet_viewer.desktop:main"
@@ -35,6 +35,7 @@ brainnet-viewer = "brainnet_viewer.desktop:main"
 [project.scripts]
 brainnet-render = "brainnet_viewer.cli:main"
 brainnet-web = "brainnet_viewer.web_app:cli"
+brainnet-web-server = "brainnet_viewer.web_server:main"
 
 [tool.setuptools.dynamic]
 version = {attr = "brainnet_viewer.__version__"}

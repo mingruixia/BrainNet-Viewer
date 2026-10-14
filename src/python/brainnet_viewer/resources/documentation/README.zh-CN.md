@@ -28,6 +28,8 @@ BrainNet Viewer 用于显示脑曲面、网络、曲面映射和图谱 ROI。
 **Save Scene** 保存输入与设置，便于再次打开；Preset 只保存显示设置，供其他数据复用。
 统一手册和教程介绍文件格式、科学解释、导出方法及各版本的差异。
 
+当前源码提供[Linux服务器模式](docs/web/zh-CN/SERVER_DEPLOYMENT.md)，采用HTTPS与访问密码，为每个浏览器会话分配独立进程。此模式需要源码构建，已发布公测镜像保持不变。
+
 安装包附带曲面库、图谱网络示例和教程数据。[AtlasNetworks](../Data/ExampleFiles/AtlasNetworks/README.md)
 保留AAL90，并提供14套GroupFC配对文件，包含AAL116、Schaefer1000和Brainnetome246。
 AAL90体积和顶点标签位于源码/MATLAB包根目录的`resources/atlases/AAL90/`；

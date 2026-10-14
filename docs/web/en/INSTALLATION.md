@@ -121,6 +121,11 @@ for normal installation.
 
 ## Deployment scope
 
+For a trusted team accessing a Linux server by IP, use the separate
+[server deployment guide](SERVER_DEPLOYMENT.md). It provides authenticated,
+independent browser sessions and requires a current source build. Do not expose
+the local recipe below to the LAN by changing its loopback binding.
+
 The released-image configuration binds only to this computer, uses one shared
 session and renders with the CPU. CPU quotas are limits, not the host's total
 core count. The presence of a graphics card does not enable container GPU

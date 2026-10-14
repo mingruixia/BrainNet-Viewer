@@ -42,14 +42,20 @@ Brainnetome246. AAL90 volume and vertex-label inputs are in
 registration and coordinate correspondence for your own data. The application
 interface is English and is not restricted to human-brain data.
 
-The Web edition has one shared session and is intended for a trusted user on a
+The local Web mode has one shared session and is intended for a trusted user on a
 private local computer. Source builds test GPU rendering at startup and use the
 CPU if a GPU is unavailable; the released image uses the CPU. Save a portable
 Scene before stopping or updating the container.
 
+For a trusted team on a Linux LAN server, the current source also provides
+[server mode](docs/web/en/SERVER_DEPLOYMENT.md), with HTTPS, an access password
+and one application process per browser session. This requires a source build;
+the published beta image has not changed.
+
 The local server checks browser requests but does not authenticate operating-system
 users. Another local process can forge request headers, so this configuration is
-unsuitable for shared-user computers or public hosting. See [security guidance](SECURITY.md).
+unsuitable for shared-user computers or public hosting without a separately
+configured deployment. See [security guidance](SECURITY.md).
 
 ## Build from source
 
