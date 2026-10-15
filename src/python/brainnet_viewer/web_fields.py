@@ -341,6 +341,7 @@ def volume_panel(state,v3,html):
     number('volume_statistical_threshold','Statistical Threshold',off+" || !['value','cluster'].includes(volume_threshold_mode)")
     number('volume_p_value','P Value',off+" || volume_threshold_mode !== 'p-value'",min=0,max=1)
     number('volume_cluster_size','Cluster Size',off+" || !(volume_threshold_mode === 'cluster' || (volume_mode === 'roi' && volume_threshold_mode === 'p-value'))",min=0)
+    html.P('Cluster size is used only in Cluster mode and P Value ROIs. Adjacent positive and negative voxels count together.',classes='bnv-pending')
     v3.VSelect(v_model=('volume_voxel_connectivity',18),label='Voxel Connectivity',items=('volume_connectivity',[6,18,26]),disabled=(off+" || !(volume_threshold_mode === 'cluster' || (volume_mode === 'roi' && ['value','p-value'].includes(volume_threshold_mode)))",))
     html.P('P values use supported NIfTI intent or SPM/REST/DPABI statistical metadata. Missing or conflicting metadata is rejected.',v_if="volume_threshold_mode === 'p-value'",classes='bnv-pending')
     html.H4('Surface Mapping')

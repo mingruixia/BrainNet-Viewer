@@ -3,11 +3,9 @@
 import asyncio
 import contextlib
 import io
-import os
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
 
 from aiohttp import ClientSession, ClientTimeout, CookieJar, web
 from aiohttp.test_utils import TestServer
@@ -67,12 +65,22 @@ class ServerConfigTests(unittest.TestCase):
             with self.assertRaises(ValueError): create_server(ServerConfig('https://192.168.1.10'), value)
 
     def test_bounded_login_attempts(self):
-        limiter = LoginLimiter()
-        self.assertTrue(all(limiter.accept('one', now=0) for _ in range(5)))
-        self.assertFalse(limiter.accept('one', now=1))
-        self.assertTrue(limiter.accept('one', now=61))
+        limiter = LoginLimiter(5)
+        self.assertTrue(all(limiter.accept('192.0.2.1', now=0) for _ in range(5)))
+        self.assertFalse(limiter.accept('192.0.2.1', now=1))
+        self.assertTrue(limiter.accept('192.0.2.1', now=61))
         for i in range(400): limiter.accept(str(i), now=62)
         self.assertLessEqual(len(limiter.peers), 256)
+
+    def test_ipv6_group_and_quota_free_admission(self):
+        limiter = LoginLimiter(attempts=2)
+        self.assertTrue(limiter.accept('2001:db8::1', now=0))
+        self.assertTrue(limiter.accept('2001:db8::2', now=1))
+        self.assertFalse(limiter.accept('2001:db8::ffff', now=2, record=False))
+        for _ in range(50): self.assertTrue(limiter.accept('192.0.2.3', now=2, record=False))
+        self.assertEqual(len(limiter.global_attempts), 2)
+        self.assertTrue(limiter.report_limit('192.0.2.3'))
+        self.assertFalse(limiter.report_limit('192.0.2.3'))
 
 
 class GatewayProcessTests(unittest.IsolatedAsyncioTestCase):
@@ -180,7 +188,7 @@ class GatewayProcessTests(unittest.IsolatedAsyncioTestCase):
         key = await self.login(self.a)
         a = await self.index(self.a)
         item = self.pool.find(key)
-        item.touched = 0
+        item.activity = 0
         await self.pool.reap(now=31)
         self.assertIsNone(self.pool.find(key))
         self.assertIsNotNone(item.worker.process.returncode)
@@ -222,7 +230,7 @@ class GatewayProcessTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(response.status, 502)
         self.assertEqual(len(self.pool.sessions), 0)
 
-    async def test_connected_session_is_not_reaped_and_shutdown_closes_it(self):
+    async def test_activity_keeps_connected_session_and_shutdown_closes_it(self):
         key = await self.login(self.a)
         a = await self.index(self.a)
         secret = await self.bootstrap(self.a)
@@ -230,13 +238,88 @@ class GatewayProcessTests(unittest.IsolatedAsyncioTestCase):
         await ws.send_str(secret)
         await ws.receive()
         item = self.pool.find(key)
-        item.touched = 0
+        item.activity = 0
+        async with self.a.post(self.origin + '/_bnv/activity', headers={'Origin': self.origin}) as response:
+            self.assertEqual(response.status, 204)
         await self.pool.reap(now=31)
         self.assertIs(self.pool.find(key), item)
         await self.pool.close()
         self.assertFalse(Path(a['cwd']).exists())
         self.assertIsNotNone(item.worker.process.returncode)
         await ws.close()
+
+    async def test_idle_connected_socket_expires_despite_transport(self):
+        key = await self.login(self.a)
+        await self.index(self.a)
+        secret = await self.bootstrap(self.a)
+        async with self.a.ws_connect(self.origin + '/ws', headers={'Origin': self.origin}) as ws:
+            await ws.send_str(secret)
+            await ws.receive()
+            await ws.send_str('7')
+            await ws.receive()
+            item = self.pool.find(key)
+            self.assertEqual(item.requests, 0)
+            item.activity = 0
+            await self.pool.reap(now=31)
+            self.assertIsNone(self.pool.find(key))
+            self.assertIsNotNone(item.worker.process.returncode)
+        async with self.a.get(self.origin + '/_bnv/status') as response:
+            self.assertEqual(response.status, 401)
+
+    async def test_successful_logins_do_not_consume_failure_quota(self):
+        await self.login(self.a)
+        key = next(iter(self.pool.sessions))
+        for _ in range(12):
+            async with self.a.post(self.origin + '/_bnv/session', headers={'Origin': self.origin},
+                                   allow_redirects=False): pass
+            await self.login(self.a)
+        self.assertEqual(len(self.pool.sessions), 1)
+        self.assertIsNone(self.pool.find(key))
+
+    async def test_audit_does_not_log_cookie_or_password(self):
+        with self.assertLogs('brainnet_viewer', level='INFO') as log:
+            key = await self.login(self.a)
+            async with self.a.post(self.origin + '/_bnv/session', headers={'Origin': self.origin},
+                                   allow_redirects=False): pass
+        text = '\n'.join(log.output)
+        self.assertIn('session created audit=', text)
+        self.assertIn('reason=signout', text)
+        self.assertNotIn(key, text)
+        self.assertNotIn(PASSWORD, text)
+
+    async def test_activity_guards_and_busy_grace(self):
+        key = await self.login(self.a)
+        item = self.pool.find(key)
+        async with self.a.post(self.origin + '/_bnv/activity', headers={'Origin': 'http://evil.invalid'}) as response:
+            self.assertEqual(response.status, 403)
+        item.activity = 0
+        item.busy_until = 100
+        await self.pool.reap(now=31)
+        self.assertIs(self.pool.find(key), item)
+        await self.pool.reap(now=101)
+        self.assertIsNone(self.pool.find(key))
+
+    async def test_static_cache_and_conditional_requests(self):
+        await self.login(self.a)
+        await self.index(self.a)
+        async with self.a.get(self.origin + '/fixture.js') as response:
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.headers['Cache-Control'], 'private, max-age=3600')
+            tag = response.headers['ETag']
+        async with self.a.get(self.origin + '/fixture.js', headers={'If-None-Match': tag}) as response:
+            self.assertEqual(response.status, 304)
+            self.assertEqual(response.headers['ETag'], tag)
+        async with self.b.get(self.origin + '/fixture.js', allow_redirects=False) as response:
+            self.assertEqual(response.status, 303)
+            self.assertEqual(response.headers['Cache-Control'], 'no-store')
+
+    async def test_chunked_bootstrap_is_complete_and_injected(self):
+        await self.login(self.a)
+        async with self.a.get(self.origin + '/index.html?chunks=1') as response:
+            self.assertEqual(response.status, 200)
+            text = await response.text()
+            self.assertIn('<script src="/_bnv/activity.js" defer></script></head>', text)
+            self.assertTrue(text.endswith('<body>Complete bootstrap</body></html>'))
 
     async def test_worker_crash_with_connected_socket_is_cleaned(self):
         key = await self.login(self.a)

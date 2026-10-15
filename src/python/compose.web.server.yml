@@ -6,6 +6,8 @@ services:
     image: brainnet-viewer:server-local
     entrypoint: ["python", "-m", "brainnet_viewer.web_server"]
     command:
+      - --host
+      - 0.0.0.0
       - --public-origin
       - ${BNV_SERVER_ORIGIN:?Set BNV_SERVER_ORIGIN to https://SERVER_IP:1031}
       - --password-file
@@ -20,6 +22,10 @@ services:
       - ${BNV_IDLE_SECONDS:-1800}
       - --worker-threads
       - ${BNV_WORKER_THREADS:-2}
+      - --login-attempts
+      - ${BNV_LOGIN_ATTEMPTS:-10}
+      - --login-window
+      - ${BNV_LOGIN_WINDOW:-60}
     ports:
       - "${BNV_SERVER_BIND:-0.0.0.0}:${BNV_PORT:-1031}:1031"
     environment:

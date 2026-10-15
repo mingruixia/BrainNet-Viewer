@@ -1,5 +1,13 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Ported node/edge numerical rules, preserving MATLAB column-major ordering."""
 import numpy as np
+import warnings
+
+
+def edge_diagnostics(matrix, settings):
+    if not settings['directed'] and not np.allclose(matrix, np.asarray(matrix).T):
+        return ['Undirected edge matrix is asymmetric; only the upper triangle is used.']
+    return []
 
 
 def select_edges(matrix, settings, positions=None):
@@ -7,6 +15,8 @@ def select_edges(matrix, settings, positions=None):
     if matrix.ndim != 2 or not len(matrix) or matrix.shape[0] != matrix.shape[1] or not np.isfinite(matrix).all():
         raise ValueError("Edge data must be a finite nonempty square matrix.")
     candidate = matrix != 0
+    for message in edge_diagnostics(matrix, settings):
+        warnings.warn(message, UserWarning, stacklevel=2)
     np.fill_diagonal(candidate, False)
     if not settings["directed"]: candidate = np.triu(candidate, 1)
     measure = np.abs(matrix) if settings["value_mode"] == "absolute" else matrix

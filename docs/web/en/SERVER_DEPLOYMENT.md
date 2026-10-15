@@ -28,6 +28,12 @@ Do not bypass certificate warnings or transmit passwords over plain HTTP.
 
 Create `src/python/.server-secrets/` and place these three files inside it:
 
+Generate the access password locally, for example with `openssl rand -base64 24`.
+Save its output in `access_password.txt` and share it through your institution's
+approved private channel, not a public issue or repository. Everyone using this
+password has the same access identity; browser sessions isolate workspaces but
+do not identify individual people.
+
 | File | Content |
 | --- | --- |
 | `server.crt` | PEM certificate and intermediate chain, if needed |
@@ -77,9 +83,13 @@ are occupied, another sign-in returns a capacity message without disturbing
 existing users. A failed or crashed worker is removed; the user signs in again
 to start a new workspace.
 
-Close every tab using the application to disconnect. After 30 minutes without
-an active application connection or request, the server removes that session's
-process and temporary files. An open, connected tab keeps its session active.
+After 30 minutes without user activity, the server removes the session's process
+and temporary files, even if an inactive tab remains connected. Mouse, keyboard
+and touch input renew activity; transport heartbeats and server-rendered frames
+do not. A warning appears before expiration with a **Keep session** button.
+Scientific commands receive a bounded five-minute grace period; this is not an
+unlimited exemption for a stalled operation. Closing all application tabs also
+leaves the session subject to the same idle timeout.
 For immediate cleanup, open `https://SERVER_IP:1031/_bnv/session` and select
 **Sign out and end session**. Save a Scene before doing so.
 
@@ -88,6 +98,8 @@ For immediate cleanup, open `https://SERVER_IP:1031/_bnv/session` and select
 | `BNV_MAX_SESSIONS` | `4` | Maximum signed-in browser sessions, 1–32 |
 | `BNV_IDLE_SECONDS` | `1800` | Disconnected-session lifetime, 30–86400 seconds |
 | `BNV_WORKER_THREADS` | `2` | Scientific-library thread setting per worker, 1–64 |
+| `BNV_LOGIN_ATTEMPTS` | `10` | Failed sign-ins per source group per window, 1–100 |
+| `BNV_LOGIN_WINDOW` | `60` | Sign-in failure window, 10–3600 seconds |
 | `BNV_MEM` | `16g` | Memory limit for the whole container |
 | `BNV_CPUS` | `8` | CPU quota for the whole container |
 | `BNV_TMP_SIZE` | `2g` | Shared temporary-storage limit |
@@ -103,6 +115,26 @@ Separate processes isolate application state, not hostile operating-system users
 This deployment is for trusted team members, not anonymous public hosting.
 The shared password controls entry but does not provide named accounts, roles,
 individual revocation or an institutional identity provider.
+
+Successful sign-ins do not consume failure quota. An already authenticated
+browser can return to its session without another password check. Failed sign-ins
+are limited by socket peer, with IPv6 addresses grouped by /64; there is also a
+global failure limit of ten times the per-source allowance. A blocked source
+must wait for the failure window to expire. Forwarded addresses are not trusted.
+
+The gateway records sign-in outcomes and session creation/termination reasons.
+Audit identifiers are independent random values, not cookie prefixes. Passwords,
+session cookies, worker credentials and scientific filenames are not logged.
+Logs include peer IPs; apply your institution's access and retention policy.
+The command-line `--log-level` option accepts INFO, WARNING or ERROR. Static
+JavaScript, CSS and fonts use private browser caching; session and data responses
+remain uncached.
+
+HTTP form bodies are limited to 4 KiB. Scientific uploads use bounded WebSocket
+messages, up to 72 MiB per message, with existing per-file and workspace limits
+still enforced by the application. The gateway relays messages rather than
+decoding scientific arrays; allow for simultaneous incoming/outgoing buffers
+when planning memory. This is not a constant-memory file-streaming interface.
 
 ## CPU and GPU rendering
 

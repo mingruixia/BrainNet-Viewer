@@ -9,7 +9,7 @@ from scipy.sparse.csgraph import connected_components
 from matplotlib.colors import ListedColormap
 from .palettes import PALETTES, palette
 from .io import read_surface, read_nodes, read_edges, read_surface_map, read_volume
-from .network import select_edges, node_radii, edge_radii
+from .network import select_edges, node_radii, edge_radii, edge_diagnostics
 from .volume import map_volume, threshold_volume, roi_labels, gaussian_kernel
 from .montage import pack, boundary_mask
 from .appearance import material, apply_material
@@ -136,6 +136,7 @@ class Prepared:
     display_transform: object = None
     input_hashes: object = None
     input_paths: object = None
+    diagnostics: tuple = ()
 
 
 def prepare(paths, settings):
@@ -148,12 +149,17 @@ def prepare(paths, settings):
     matrix = read_edges(paths["edge"],len(nodes.positions)) if "edge" in paths and nodes else None
     if "edge" in paths and nodes is None: raise ValueError("Add nodes before rendering edges.")
     pairs, values = select_edges(matrix,settings["edge"],nodes.positions) if matrix is not None else (np.empty((0,2),int),np.empty(0))
+    diagnostics = edge_diagnostics(matrix, settings['edge']) if matrix is not None else []
     mapped, rois = None, []
     if "surface_map" in paths:
         if surface is None: raise ValueError("A vertex map requires a surface.")
         mapped = read_surface_map(paths["surface_map"],len(surface.points))
     if "volume" in paths and settings["volume"]["display"]:
         volume = read_volume(paths["volume"])
+        options = settings['volume']
+        if options['cluster_size'] > 1 and not (options['threshold_mode'] == 'cluster' or
+                options['threshold_mode'] == 'p-value' and options['type'] == 'roi'):
+            diagnostics.append('Cluster size is not applied in the selected threshold mode.')
         if settings["volume"]["type"] == "roi": rois = roi_meshes(volume, settings["volume"],settings["roi"])
         else:
             if surface is None: raise ValueError("Volume to surface mapping requires a surface.")
@@ -175,7 +181,7 @@ def prepare(paths, settings):
         if settings["surface"]["vertex_colors_mesh_sha256"]!=geometry_signature(surface.points,surface.faces): raise ValueError("Vertex RGB is unbound or belongs to different ordered geometry.")
     if content_hashes(paths) != hashes: raise ValueError("An input or its external data changed while being read. Reload the files.")
     return Prepared(surface,nodes,matrix,mapped,rois,pairs,values,settings,hemispheres(surface) if surface else None,
-                    boundary,transform,hashes,{role:Path(path).resolve() for role,path in paths.items()})
+                    boundary,transform,hashes,{role:Path(path).resolve() for role,path in paths.items()},tuple(diagnostics))
 
 
 def layout(settings, split):

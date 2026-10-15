@@ -629,6 +629,7 @@ def create_app(server=None, workspace=None):
             set_interaction(state.interaction)
             state.inspect_text='Click a surface vertex (default MNI coordinates).' if state.inspect_on else ''
             state.rendered=True; state.error=''; state.status=f'Rendered {len(workspace.renderer.viewports)} view(s).'
+            state.status += ' ' + ' '.join(workspace.renderer.prepared.diagnostics) if workspace.renderer.prepared.diagnostics else ''
             state.boundary_ready=workspace.renderer.prepared.boundary is not None
             navigation.refresh()
         except Exception as error:

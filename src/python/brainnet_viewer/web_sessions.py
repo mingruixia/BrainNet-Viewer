@@ -22,6 +22,9 @@ LOG = logging.getLogger(__name__)
 class BrowserSession:
     key: str = field(repr=False)
     touched: float = field(default_factory=time.monotonic)
+    activity: float = field(default_factory=time.monotonic)
+    busy_until: float = 0
+    audit_id: str = field(default_factory=lambda: secrets.token_hex(6))
     task: object = None
     worker: object = None
     requests: int = 0
@@ -103,7 +106,7 @@ class ProcessLauncher:
                        XDG_CACHE_HOME=str(Path(directory.name) / 'cache'),
                        PYVISTA_OFF_SCREEN='true')
             for name in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS',
-                         'NUMEXPR_NUM_THREADS', 'VTK_SMP_MAX_THREADS'):
+                         'NUMEXPR_NUM_THREADS', 'VTK_SMP_MAX_THREADS', 'LP_NUM_THREADS'):
                 env[name] = str(self.threads)
             env.pop('BNV_WEB_BOOTSTRAPPED', None)
             spawning = asyncio.create_task(asyncio.create_subprocess_exec(
@@ -138,6 +141,7 @@ class SessionPool:
             raise RuntimeError('All browser sessions are in use. Please try again later.')
         item = BrowserSession(secrets.token_urlsafe(32))
         self.sessions[item.key] = item
+        LOG.info('session created audit=%s', item.audit_id)
         return item
 
     def find(self, key):
@@ -183,16 +187,17 @@ class SessionPool:
         except asyncio.CancelledError:
             raise
         except Exception:
-            await self.remove(item)
+            await self.remove(item, reason='startup-failed')
             raise
 
-    async def remove(self, item):
+    async def remove(self, item, *, reason='signout'):
         if item.closed:
             return
         item.closed = True
         # Retain the slot until the old process is gone, including failed startup.
         try:
-            await asyncio.gather(*(ws.close() for ws in tuple(item.upstreams)),
+            await asyncio.gather(*(ws.close(code=1001, message=b'Idle session ended' if reason == 'idle' else b'Session ended')
+                                   for ws in tuple(item.upstreams)),
                                  return_exceptions=True)
             await asyncio.gather(*(ws.close(code=1001, message=b'Session ended')
                                    for ws in tuple(item.sockets)), return_exceptions=True)
@@ -204,15 +209,18 @@ class SessionPool:
                 await item.worker.close()
         finally:
             self.sessions.pop(item.key, None)
+            LOG.info('session ended audit=%s reason=%s', item.audit_id, reason)
 
     async def reap(self, now=None):
         now = time.monotonic() if now is None else now
         for item in tuple(self.sessions.values()):
             dead = item.worker is not None and item.worker.process.returncode is not None
-            idle = not item.sockets and not item.requests and now - item.touched >= self.idle_seconds
+            starting = item.task is not None and not item.task.done()
+            idle = (not starting and not item.requests and now >= item.busy_until
+                    and now - item.activity >= self.idle_seconds)
             if dead or idle:
-                await self.remove(item)
+                await self.remove(item, reason='crashed' if dead else 'idle')
 
     async def close(self):
         self.closing = True
-        await asyncio.gather(*(self.remove(item) for item in tuple(self.sessions.values())))
+        await asyncio.gather(*(self.remove(item, reason='shutdown') for item in tuple(self.sessions.values())))

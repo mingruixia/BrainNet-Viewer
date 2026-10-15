@@ -81,6 +81,7 @@ def configure_backend(mode=None, *, run=subprocess.run):
         else: os.environ.pop(key,None)
     record={'requested':mode,'selected':selected,'device':chosen['device'],'fallback':fallback}
     os.environ['BNV_RENDER_BACKEND_SELECTED']=selected
+    os.environ['BNV_RENDER_BACKEND_DEVICE']=chosen['device']
     print('BrainNet render backend: '+json.dumps(record),flush=True)
     return record
 

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Image provenance without machine-specific absolute source paths."""
 from datetime import datetime, timezone
 from copy import deepcopy
@@ -52,5 +53,10 @@ def build_provenance(renderer, paths, export, context=None):
                       'roi_labels':[int(roi[0]) for roi in renderer.prepared.rois]},
             'privacy':{'absolute_input_paths_included':False,'source_annotations_reduced_to_filenames':redacted},
             'export':export,'context':context or {},
+            'diagnostics':list(getattr(renderer.prepared, 'diagnostics', ())),
+            'volume_cluster_policy':{'connectivity':settings['volume']['voxel_connectivity'],
+                                     'signs':'combined-nonzero',
+                                     'size_eligible': settings['volume']['threshold_mode'] == 'cluster' or
+                                         settings['volume']['threshold_mode'] == 'p-value' and settings['volume']['type'] == 'roi'},
             'limitations':['Provenance is a reproducibility record, not a digital signature or scientific validation.',
                           'Pixel-identical results across operating systems or GPU drivers are not guaranteed.']}

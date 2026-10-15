@@ -21,8 +21,15 @@ cookie session owns a separate loopback worker process, startup credentials and
 temporary workspace. Workers require an additional private gateway credential;
 their ports must never be published. Browser cookies are HttpOnly, SameSite Strict
 and Secure on HTTPS. Only the configured origin is accepted; forwarded headers
-are not trusted. Sign-in attempts, concurrent sessions and disconnected-session
+are not trusted. Sign-in attempts, concurrent sessions and inactive-session
 lifetimes are bounded. Sign-out or server shutdown ends the owned workers.
+
+Inactivity is measured from user activity, not the existence of a WebSocket or
+transport heartbeats. Server frames do not renew it. Browser warnings and the
+keep-session action help users save work before expiry; scientific commands have
+a bounded grace period. Failed sign-ins, rather than successful access, consume
+rate-limit quota. Audit logs contain peer IPs and independent random audit IDs,
+not passwords, session cookies, worker credentials or scientific filenames.
 
 Use this mode only for trusted team members on a restricted LAN. It does not
 provide named accounts, individual access revocation, role permissions or a

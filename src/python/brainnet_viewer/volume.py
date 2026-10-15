@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """CPU mapping and threshold rules ported from the current MATLAB core."""
 from dataclasses import replace
 import re
@@ -51,6 +52,10 @@ def threshold_volume(volume, settings):
     data = volume.data.copy()
     mode = settings["threshold_mode"]
     information = {"mode":mode, "statistic":{}, "removed_cluster_count":0}
+    cluster_eligible = mode == 'cluster' or mode == 'p-value' and settings['type'] == 'roi'
+    information.update(cluster_size_ignored=settings['cluster_size'] > 1 and not cluster_eligible,
+                       cluster_size_applied=settings['cluster_size'] > 1 and cluster_eligible,
+                       voxel_connectivity=settings['voxel_connectivity'], cluster_sign_policy='combined-nonzero')
     if mode not in ("none", "value", "cluster", "p-value"): raise ValueError("Unsupported threshold mode.")
     threshold = settings["statistical_threshold"]
     if mode == "p-value":

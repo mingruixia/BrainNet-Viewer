@@ -795,6 +795,7 @@ class BrainNetWindow(W.QMainWindow):
             self.show_summary(details); self.update_resources()
             message = "Rendered. Rotate/Pan/Zoom acts on the current subplot."
             if camera_status: message += f" Saved camera: {camera_status}."
+            if prepared.diagnostics: message += ' ' + ' '.join(prepared.diagnostics)
             self.statusBar().showMessage(message)
         try: self.guarded(render)
         finally: self.busy=False; self.render_button.setEnabled(True)
