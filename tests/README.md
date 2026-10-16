@@ -18,6 +18,15 @@ GitHub Actions runs the Python checks on Python 3.10 and 3.12, verifies wheel
 payloads and performs a CPU-container HTTP/bootstrap check. These checks do not
 replace graphical-desktop, hardware-driver or platform acceptance testing.
 
+The Ubuntu Python jobs install Mesa/EGL and use `vtkEGLRenderWindow` with
+llvmpipe for off-screen CPU drawing. Before test discovery,
+`python tests/ci/check_native_rendering.py --require-software` draws and reads
+back a native frame and reports the window backend and device. Each Python
+matrix entry runs independently; a failure in one does not cancel the other.
+For the same checks on a Linux machine without a display, install the libraries
+listed in the workflow and use its rendering environment variables. Setting
+`off_screen=True` alone does not install a graphics implementation.
+
 For remote-view lifetime changes, run `test_web_view_lifecycle.py`. It checks
 native VTK objects and the class-level RPC registration used by wslink, including
 late events after a view is retired, context reuse, layout changes, Clear,
