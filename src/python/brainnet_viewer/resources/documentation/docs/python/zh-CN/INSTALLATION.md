@@ -6,7 +6,9 @@ BrainNet Viewer 2.0.0-beta.1 对应 Python 包版本 **2.0.0b1**。
 除非另备离线依赖集合，安装依赖需要联网。
 
 Apple Silicon macOS 要求 Python 3.11 或更新版本，已验证配置为 Python 3.11。
-Windows、Linux 和 Intel macOS 使用 Python 3.10 或 3.11。
+新安装应选择仍受维护的版本：
+公测版建议使用 Python 3.11，当前 Windows 源码建议使用 Python 3.12。
+Python 3.10 已于 2026 年 10 月 1 日停止支持，见 [Python 发行计划](https://peps.python.org/pep-0619/)。
 需要支持 OpenGL 的图形桌面和可写目录。
 部分桌面工作流程已在 Windows x64 和 Apple Silicon macOS 上测试，Linux Desktop 和 Intel Mac 尚未验证。请在独立虚拟环境中安装项目指定的依赖版本。
 
@@ -15,7 +17,7 @@ Windows、Linux 和 Intel macOS 使用 Python 3.10 或 3.11。
 在 wheel 目录打开 PowerShell：
 
 ```powershell
-py -3.10 -m venv .venv-bnv
+py -3.11 -m venv .venv-bnv
 $bnvPython = (Resolve-Path .venv-bnv/Scripts/python.exe).Path
 $bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
 $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())" $bnvWheel
@@ -24,7 +26,7 @@ $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path
 & $bnvPython -m brainnet_viewer
 ```
 
-如无 py 启动器，第一行使用 Python 3.10 完整路径。
+如无 py 启动器，第一行使用 Python 3.11 完整路径。
 安装后可运行 .venv-bnv/Scripts/brainnet-viewer.exe，不会新建控制台；
 排查错误时使用上面的模块启动命令。
 
@@ -43,8 +45,8 @@ brainnet-viewer
 ```
 
 Apple Silicon macOS 请使用上面的 Python 3.11 命令。原生 ARM64 macOS 自动选择
-SciPy 1.17.1，该依赖要求 Python 3.11 或更新版本。Linux 或 Intel macOS
-第一行也可使用 Python 3.10；这些平台保留 SciPy 1.15.3。不要跨系统复制虚拟环境。
+SciPy 1.17.1，该依赖要求 Python 3.11 或更新版本。Linux 和 Intel macOS
+保留 SciPy 1.15.3。不要跨系统复制虚拟环境。
 
 ## 首次使用
 

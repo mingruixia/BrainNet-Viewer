@@ -355,7 +355,7 @@ class SettingsPanel(W.QWidget):
             return widget,widget.currentData
         if section=="volume" and key=="p_value":
             widget=W.QLineEdit(repr(value)); widget.setPlaceholderText("0.05 or 1e-8")
-            widget.setToolTip("A finite P value; use 0 < P < 1 in P-value threshold mode. Scientific notation is accepted.")
+            widget.setToolTip("Voxelwise, uncorrected P value (0 < P < 1). Cluster size is an extent filter, not a corrected cluster P value. Scientific notation is accepted.")
             widget.textChanged.connect(self.changed)
             def read_p():
                 try: result=float(widget.text())

@@ -33,6 +33,9 @@ inputs and settings for later use; a preset stores display settings for reuse
 with other data. The shared manual and tutorials explain the file formats,
 scientific interpretation and differences between editions.
 
+Read [display and statistical interpretation](docs/documentation/Scientific_Interpretation.en.md)
+when choosing thresholds, size mappings and anatomical overlays.
+
 The installation includes a surface library, atlas-network examples and tutorial
 data. [AtlasNetworks](../Data/ExampleFiles/AtlasNetworks/README.md)
 contains AAL90 and fourteen GroupFC pairs, including AAL116, Schaefer1000 and
@@ -42,16 +45,20 @@ Brainnetome246. AAL90 volume and vertex-label inputs are in
 registration and coordinate correspondence for your own data. The application
 interface is English and is not restricted to human-brain data.
 
-For trusted teams on Linux, [server mode](docs/web/en/SERVER_DEPLOYMENT.md) uses HTTPS, an access password and a separate process per browser session. It requires a current source build; the published beta image is unchanged.
-
-The Web edition has one shared session and is intended for a trusted user on a
+The local Web mode has one shared session and is intended for a trusted user on a
 private local computer. Source builds test GPU rendering at startup and use the
 CPU if a GPU is unavailable; the released image uses the CPU. Save a portable
 Scene before stopping or updating the container.
 
+For a trusted team on a Linux LAN server, the current source also provides
+[server mode](docs/web/en/SERVER_DEPLOYMENT.md), with HTTPS, an access password
+and one application process per browser session. This requires a source build;
+the published beta image has not changed.
+
 The local server checks browser requests but does not authenticate operating-system
 users. Another local process can forge request headers, so this configuration is
-unsuitable for shared-user computers or public hosting. See [security guidance](SECURITY.md).
+unsuitable for shared-user computers or public hosting without a separately
+configured deployment. See [security guidance](SECURITY.md).
 
 ## Build from source
 

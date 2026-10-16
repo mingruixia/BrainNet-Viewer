@@ -595,7 +595,7 @@ def create_app(server=None, workspace=None):
     def clear():
         detail.clear()
         navigation.stop()
-        view.replace_view(initial.render_window); workspace.close_render()
+        view.replace_view(initial.render_window); workspace.close_render(preserve_window=True)
         state.inspect_on=False; state.inspect_text=''
         state.rendered=False; state.boundary_ready=False; state.error=''; state.status='Figure cleared. Input files retained.'
     def apply():
@@ -624,7 +624,8 @@ def create_app(server=None, workspace=None):
             bindings.clear(); edge_bindings.clear(); view.replace_view(workspace.plotter.render_window)
             # A new native view subscription otherwise starts at ratio=1; the
             # client only re-sends unchanged stillRatio props after interaction.
-            state.view_generation+=1
+            if current_window is not workspace.plotter.render_window:
+                state.view_generation+=1
             pending_base=None
             set_interaction(state.interaction)
             state.inspect_text='Click a surface vertex (default MNI coordinates).' if state.inspect_on else ''
@@ -808,11 +809,16 @@ def create_app(server=None, workspace=None):
         if changed: view.update()  # Always push original geometry after the last proxy frame.
     actions['stream_end']=finish_detail
     view=build_shell(server,workspace,initial,actions)
+    from .web_view_lifecycle import RemoteViewLifecycle
+    view_lifecycle=RemoteViewLifecycle(server)
+    workspace.retire_view=view_lifecycle.retire
     navigation.refresh()
     def close(*_,**__):
         navigation.stop()
         if animation_job is not None: animation_job.close()
-        view.release_resources(); workspace.close(); initial.close()
+        view.release_resources(); workspace.close()
+        view_lifecycle.retire(initial.render_window) if not initial._closed else None
+        initial.close()
     ctrl.on_server_exited.add(close)
     actions.update(download=download,download_zip=download_zip,export_files=export_files,close=close,
                    merge_export=merge_export,merge_tool=merge_tool,merge_upload=merge_upload,
@@ -832,7 +838,7 @@ def _arguments(argv=None):
     parser.add_argument('--container',action='store_true',help='Permit wildcard bind inside a locally published container only.')
     args=parser.parse_args(argv)
     if args.host not in ('127.0.0.1','localhost','::1') and not (args.container and args.host=='0.0.0.0'):
-        parser.error('Only loopback is supported; server multi-user deployment is not implemented.')
+        parser.error('This local entry point requires loopback. Use brainnet-web-server for authenticated multi-session deployment.')
     if not 1 <= args.port <= 65535:
         parser.error('Port must be between 1 and 65535.')
     return args

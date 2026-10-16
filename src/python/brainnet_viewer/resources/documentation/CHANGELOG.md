@@ -4,6 +4,10 @@
 
 ### Web display and startup
 
+- Reuse the native drawing window across Apply, layout changes and Clear Figure,
+  releasing the previous scene's geometry without repeatedly creating GPU contexts.
+  Prepare new scenes before replacing the canvas; release remote-view subscriptions
+  and image caches on retirement and reject late events for retired views.
 - Align the Scene File / Open and Save Scene / Import Settings controls with the desktop editions.
 - Use 2x sampling for sharper still images, while retaining label sizes and preventing
   repeated sampling on Apply. Lower stream resolution and JPEG quality during interaction.
@@ -17,6 +21,10 @@
 
 ### Input handling and security
 
+- Keep small nonzero surface-map values in the selected colormap. Only exact zero
+  and nonfinite values use the base surface color; the scalar legend stays continuous.
+- Label statistical P values as voxelwise and uncorrected in the controls and
+  export metadata. Statistical cutoffs and cluster-extent filtering are unchanged.
 - Reclaim inactive server sessions even when a browser connection remains open,
   with an advance warning and an option to keep the session. Count failed sign-ins
   separately from successful access, add bounded audit records and cache static

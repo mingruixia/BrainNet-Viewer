@@ -45,6 +45,8 @@ class WebWorkspace:
         self.assets=Path(self._assets_temp.name)
         self.pending_session=None
         self._resize_observer=None
+        self.retire_view=None
+        self._retained_window=None
 
     def select(self, selections):
         if not isinstance(selections,dict) or set(selections)-set(self.catalog):
@@ -108,15 +110,36 @@ class WebWorkspace:
         _,views=layout(self.settings['layout'],prepared.split)
         plot=pv.Plotter(shape=(1,len(views)),border=False,off_screen=True,window_size=(1200,900))
         renderer=SceneRenderer(plot)
-        try: renderer.render(prepared)
+        try:
+            renderer.render(prepared)
+            if self.pending_session: renderer.restore_session(self.pending_session)
         except Exception:
-            renderer.dispose(); plot.close(); raise
-        self.close_render()
+            renderer.dispose(); plot.close(); plot.deep_clean(); raise
+        # Build a complete scene before replacing the visible one. A fresh
+        # off-screen Plotter has not rendered yet, so its staging window owns
+        # no GPU framebuffer. Keep one native drawing context per session:
+        # repeated context destruction retains memory in some Mesa drivers.
+        staging=plot.render_window
+        if not staging.GetNeverRendered():
+            renderer.dispose(); plot.close(); plot.deep_clean()
+            raise RuntimeError('Scene staging unexpectedly rendered before commit.')
+        self.close_render(preserve_window=True)
+        if self._retained_window is not None:
+            window=self._retained_window
+            layers=list(staging.GetRenderers())
+            size=staging.GetSize(); dpi=staging.GetDPI(); count=staging.GetNumberOfLayers()
+            plot.iren.interactor.SetRenderWindow(None)
+            for layer in layers: staging.RemoveRenderer(layer)
+            staging.Finalize()
+            plot.ren_win=window
+            window.SetNumberOfLayers(count); window.SetSize(*size); window.SetDPI(dpi)
+            for layer in layers: window.AddRenderer(layer)
+            plot.iren.set_render_window(window)
+        self._retained_window=None
         self.plotter,self.renderer=plot,renderer
         self.render_settings=deepcopy(self.settings)
         self.render_paths=dict(self.paths)
-        if self.pending_session:
-            renderer.restore_session(self.pending_session); self.pending_session=None
+        self.pending_session=None
         # Trame changes the native render-window size to the browser canvas.
         # Refit on size modification, before VTK/Web captures projection/image
         # state. A Render StartEvent is too late for the first resized frame.
@@ -175,14 +198,33 @@ class WebWorkspace:
             for path in folder.iterdir(): path.unlink()
             folder.rmdir()
 
-    def close_render(self):
+    def close_render(self, *, preserve_window=False):
         if getattr(self,'interaction_detail',None): self.interaction_detail.clear()
         if self._resize_observer is not None and self.plotter is not None:
             self.plotter.render_window.RemoveObserver(self._resize_observer)
         self._resize_observer=None
         if self.renderer is not None: self.renderer.dispose()
-        if self.plotter is not None: self.plotter.close()
+        if self.plotter is not None:
+            window=self.plotter.render_window
+            if not preserve_window and self.retire_view is not None: self.retire_view(window)
+            # SceneRenderer owns background/annotation layers outside PyVista's
+            # renderer collection. Release their geometry as well as subplots.
+            for layer in list(window.GetRenderers()):
+                # Finalize cannot visit a renderer after it has been detached.
+                # Release its GPU objects while the original context is alive.
+                layer.ReleaseGraphicsResources(window)
+                layer.RemoveAllViewProps()
+                window.RemoveRenderer(layer)
+            if preserve_window:
+                self.plotter.iren.interactor.SetRenderWindow(None)
+                self.plotter.ren_win=None
+                self._retained_window=window
+            self.plotter.close()
+            self.plotter.deep_clean()
         self.renderer=None; self.plotter=None
+        if not preserve_window and self._retained_window is not None:
+            if self.retire_view is not None: self.retire_view(self._retained_window)
+            self._retained_window.Finalize(); self._retained_window=None
 
     def close(self):
         self.close_render(); self._temp.cleanup(); self._assets_temp.cleanup()

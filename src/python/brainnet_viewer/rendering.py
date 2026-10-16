@@ -217,14 +217,11 @@ def layout(settings, split):
 
 
 def surface_map_palette(values, surface):
-    """Keep original scalar values; represent zero/missing data by surface RGB."""
+    """Continuous scalar legend; exact zero/missing colors are applied per vertex."""
     finite=np.asarray(values)[np.isfinite(values)]
     limits=surface["color_limits"] or ([float(finite.min()),float(finite.max())] if finite.size else [0.,1.])
     if limits[0]==limits[1]: limits=[limits[0],limits[0]+1]
     table=np.asarray(palette(surface["colormap"])).copy()
-    if limits[0]<=0<=limits[1]:
-        index=int(np.clip(np.floor(len(table)*(0-limits[0])/(limits[1]-limits[0])),0,len(table)-1))
-        table[index]=surface["color"]
     return ListedColormap(table),limits
 
 

@@ -7,7 +7,10 @@ MATLAB and SPM are not required. Dependencies need Internet access unless
 supplied in a separate offline collection.
 
 Apple Silicon macOS requires Python 3.11 or newer; Python 3.11 is the verified
-configuration. Windows, Linux and Intel macOS use Python 3.10 or 3.11. A graphical
+configuration. For new installations, use a supported Python version:
+3.11 for the beta, or 3.12 for the
+current Windows source. Python 3.10 reached end of support on 1 October 2026
+([Python release schedule](https://peps.python.org/pep-0619/)). A graphical
 desktop with working OpenGL and a writable folder is required.
 Selected desktop workflows have been tested on Windows x64 and Apple Silicon macOS. Linux Desktop and Intel Mac have not been verified. Install the pinned dependencies in a separate virtual environment.
 
@@ -16,7 +19,7 @@ Selected desktop workflows have been tested on Windows x64 and Apple Silicon mac
 Open PowerShell in the wheel directory:
 
 ```powershell
-py -3.10 -m venv .venv-bnv
+py -3.11 -m venv .venv-bnv
 $bnvPython = (Resolve-Path .venv-bnv/Scripts/python.exe).Path
 $bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
 $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())" $bnvWheel
@@ -25,7 +28,7 @@ $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path
 & $bnvPython -m brainnet_viewer
 ```
 
-If py is unavailable, use the full Python 3.10 path for the first command.
+If py is unavailable, use the full Python 3.11 path for the first command.
 After installation, .venv-bnv/Scripts/brainnet-viewer.exe starts the graphical
 app without a new console. The module command above shows startup errors.
 
@@ -45,8 +48,7 @@ brainnet-viewer
 
 On Apple Silicon macOS, use the Python 3.11 command above. The package selects
 SciPy 1.17.1 for native ARM64 macOS; this dependency requires Python 3.11 or newer.
-On Linux or Intel macOS, Python 3.10 may be used instead for the first command;
-these platforms retain SciPy 1.15.3. Never copy virtual environments between
+Linux and Intel macOS retain SciPy 1.15.3. Never copy virtual environments between
 operating systems.
 
 ## First use

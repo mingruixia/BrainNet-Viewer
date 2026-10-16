@@ -966,7 +966,7 @@ classdef VisualizationSettingsAccordion < handle
             obj.addLabel(grid, 'Statistical Threshold', 4);
             obj.VolumeThresholdField = obj.numericField(grid, 4, [-inf inf], '%.4g');
             obj.VolumeThresholdField.Tag = 'VolumeStatisticalThreshold';
-            obj.addLabel(grid, 'P Value', 5);
+            obj.addLabel(grid, 'P Value (Uncorrected)', 5);
             obj.VolumePValueField = obj.numericField(grid, 5, [0 1], '%.4g');
             obj.VolumePValueField.Tag = 'VolumePValue';
             obj.addLabel(grid, 'Cluster Size', 6);

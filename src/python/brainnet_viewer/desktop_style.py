@@ -219,7 +219,9 @@ def style_dialog(dialog,width=650,height=500):
     for field in dialog.findChildren(W.QLabel): field.setWordWrap(True)
 
 
-def field_label(section,key): return LABELS.get(section+"."+key,LABELS.get(key,key.replace("_"," ").title()))
+def field_label(section,key):
+    if section == 'volume' and key == 'p_value': return 'P Value (Uncorrected)'
+    return LABELS.get(section+"."+key,LABELS.get(key,key.replace("_"," ").title()))
 
 
 def choice_label(value):

@@ -40,7 +40,8 @@ def p_cutoff(volume, p):
     else: cutoff = stats.norm.isf(p/2)
     if not np.isfinite(cutoff) or cutoff <= 0: raise ValueError("Invalid statistical cutoff.")
     return {"statistic":kind, "degrees_of_freedom":degrees, "cutoff":float(cutoff),
-            "tail":"upper" if kind == "F" else "two-sided", "source":source, "p_value":p}
+            "tail":"upper" if kind == "F" else "two-sided", "source":source, "p_value":p,
+            "inference_level":"voxel", "multiple_comparison_correction":"none"}
 
 
 def connectivity(value):

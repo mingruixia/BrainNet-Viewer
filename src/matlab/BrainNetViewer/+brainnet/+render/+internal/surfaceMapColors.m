@@ -7,10 +7,7 @@ indices=floor(count*(values-limits(1))/span)+1;
 indices(~isfinite(indices))=1;
 indices=max(1,min(count,indices));
 rgb=map(indices,:);
-null=values==0 | isnan(values);
+null=values==0 | ~isfinite(values);
 rgb(null,:)=repmat(surfaceColor,nnz(null),1);
-if limits(1)<=0 && limits(2)>=0
-    zeroIndex=max(1,min(count,floor(count*(0-limits(1))/span)+1));
-    map(zeroIndex,:)=surfaceColor;
-end
+% Do not recolor a whole legend bin: it also represents nonzero values.
 end

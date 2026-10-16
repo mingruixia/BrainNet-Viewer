@@ -24,7 +24,7 @@ class EntryBackendTests(unittest.TestCase):
             boot.assert_not_called()
 
     def test_inherited_bootstrap_marker_does_not_skip_probe(self):
-        with patch.object(backend.sys,'platform','linux'),patch.dict(os.environ,{'BNV_WEB_BOOTSTRAPPED':'1'}),patch.object(backend,'configure_backend') as configure,patch.object(os,'execvpe') as execute:
+        with patch.object(backend.sys,'platform','linux'),patch.dict(os.environ,{'BNV_WEB_BOOTSTRAPPED':str(os.getpid()+1)}),patch.object(backend,'configure_backend') as configure,patch.object(os,'execvpe') as execute:
             backend.bootstrap('brainnet_viewer.web_app',[])
             configure.assert_called_once();execute.assert_called_once()
             self.assertEqual(execute.call_args.args[2]['BNV_WEB_BOOTSTRAPPED'],str(os.getpid()))
@@ -32,7 +32,7 @@ class EntryBackendTests(unittest.TestCase):
             backend.bootstrap('brainnet_viewer.web_app',[]);configure.assert_not_called()
 
     def test_nonlinux_cli_does_not_reexec(self):
-        with patch.object(backend.sys,'platform','win32'),patch.dict(os.environ,{'BNV_WEB_BOOTSTRAPPED':'1'}),patch.object(backend,'configure_backend') as configure,patch.object(os,'execvpe') as execute:
+        with patch.object(backend.sys,'platform','win32'),patch.dict(os.environ,{'BNV_WEB_BOOTSTRAPPED':str(os.getpid()+1)}),patch.object(backend,'configure_backend') as configure,patch.object(os,'execvpe') as execute:
             backend.bootstrap('brainnet_viewer.web_app',[])
             configure.assert_called_once();execute.assert_not_called()
 

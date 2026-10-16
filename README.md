@@ -33,6 +33,9 @@ inputs and settings for later use; a preset stores display settings for reuse
 with other data. The shared manual and tutorials explain the file formats,
 scientific interpretation and differences between editions.
 
+Read [display and statistical interpretation](docs/documentation/Scientific_Interpretation.en.md)
+when choosing thresholds, size mappings and anatomical overlays.
+
 The installation includes a surface library, atlas-network examples and tutorial
 data. [AtlasNetworks](src/matlab/BrainNetViewer/Data/ExampleFiles/AtlasNetworks/README.md)
 contains AAL90 and fourteen GroupFC pairs, including AAL116, Schaefer1000 and
