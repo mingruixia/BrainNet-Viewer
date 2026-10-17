@@ -21,6 +21,10 @@
 
 ### Input handling and security
 
+- Record the surface scalar display rule in export metadata. Exact zero and nonfinite
+  values use the base surface color; small nonzero values retain the selected colormap.
+  Python and Web also record a separate hash of the display rules. These fields
+  distinguish the corrected rendering behavior from earlier beta exports.
 - Keep small nonzero surface-map values in the selected colormap. Only exact zero
   and nonfinite values use the base surface color; the scalar legend stays continuous.
 - Label statistical P values as voxelwise and uncorrected in the controls and

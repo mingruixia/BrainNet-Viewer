@@ -11,6 +11,11 @@ from . import __version__
 from .io import sha256, gifti_dependencies
 from .session import signature, digest
 
+DISPLAY_RULES = {
+    'version': '1.0',
+    'surface_scalar_null_color_rule': 'exact-zero-or-nonfinite',
+    'surface_scalar_legend': 'continuous-colormap',
+}
 
 def sidecar_path(filename):
     return Path(str(filename)+'.provenance.json')
@@ -45,6 +50,8 @@ def build_provenance(renderer, paths, export, context=None):
                         'platform':platform.system(),'libraries':versions},
             'inputs':assets,'render_signature':signature(renderer.prepared.input_hashes,renderer.prepared.settings),
             'settings':settings,'settings_sha256':digest(settings),'camera':renderer.capture_camera(),
+            'display_rules':deepcopy(DISPLAY_RULES),
+            'display_rules_sha256':digest(DISPLAY_RULES),
             'render':{'detail_policy':asdict(renderer.detail_policy),'material':renderer.appearance,
                       'surface_vertices':len(renderer.prepared.surface.points) if renderer.prepared.surface else 0,
                       'surface_faces':len(renderer.prepared.surface.faces) if renderer.prepared.surface else 0,

@@ -219,6 +219,9 @@ classdef FigureExporter
                 actualWidth, actualHeight, actualUnits)
             record = struct;
             record.schema_version = '1.0';
+            record.display_rules = struct('version', '1.0', ...
+                'surface_scalar_null_color_rule', 'exact-zero-or-nonfinite', ...
+                'surface_scalar_legend', 'continuous-colormap');
             record.kind = 'brainnet-viewer-export-provenance';
             record.generated_at = char(datetime('now', 'TimeZone', 'local', ...
                 'Format', 'yyyy-MM-dd''T''HH:mm:ssXXX'));
