@@ -19,6 +19,7 @@ classdef MatlabBatchRenderer < handle
         CameraSyncSuspended logical = false
         InspectCallback = []
         InspectInteractions cell = {}
+        TitleAxes = []
     end
 
     methods
@@ -295,6 +296,7 @@ classdef MatlabBatchRenderer < handle
                 packingLayout=2;
             end
             brainnet.render.internal.packLegacyMontage(axesHandles,packingLayout);
+            obj.drawTitle(target,axesHandles,renderOptions.section("image"),backgroundColor,embedded);
             drawnow;
             % Equal pixels per data unit, including panes of different heights.
             brainnet.render.CameraState.fit(axesHandles);
@@ -558,6 +560,8 @@ classdef MatlabBatchRenderer < handle
                 delete(listener{1});
             end
             obj.CameraListeners = {};
+            if isgraphics(obj.TitleAxes), delete(obj.TitleAxes); end
+            obj.TitleAxes = [];
             if ~isempty(obj.ActiveFigure) && isgraphics(obj.ActiveFigure)
                 close(obj.ActiveFigure);
             end
@@ -578,6 +582,35 @@ classdef MatlabBatchRenderer < handle
     end
 
     methods (Access = private)
+        function drawTitle(obj,target,axesHandles,settings,background,embedded)
+            if strlength(string(settings.title))==0, return; end
+            % Reserve one shared title strip, independent of scientific axes.
+            % Empty titles preserve the established montage positions exactly.
+            for ax=reshape(axesHandles,1,[])
+                position=ax.Position; position([2 4])=position([2 4])*.925;
+                ax.Position=position;
+            end
+            for bar=reshape(findall(target,'Type','ColorBar'),1,[])
+                position=bar.Position; position([2 4])=position([2 4])*.925;
+                bar.Position=position;
+            end
+            if embedded
+                titleAxes=uiaxes('Parent',target,'Toolbar',[]);
+                titleAxes.Interactions=[];
+            else
+                titleAxes=axes('Parent',target);
+            end
+            set(titleAxes,'Units','normalized','Position',[.015 .932 .97 .06], ...
+                'Visible','off','Color','none','XLim',[0 1],'YLim',[0 1], ...
+                'HitTest','off','PickableParts','none','Tag','brainnet-title-axes');
+            text(titleAxes,.5,.5,settings.title,'Units','normalized', ...
+                'HorizontalAlignment','center','VerticalAlignment','middle', ...
+                'FontName','Arial','FontSize',12,'FontWeight','bold', ...
+                'Color',obj.contrastColor(background),'Interpreter','none', ...
+                'HitTest','off','PickableParts','none','Tag','brainnet-image-title');
+            obj.TitleAxes=titleAxes;
+        end
+
         function onInspect(obj,source,event)
             if obj.InspectEnabled && ~isempty(obj.InspectCallback)
                 obj.InspectCallback(source,reshape(event.IntersectionPoint,1,3));

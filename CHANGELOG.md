@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### MATLAB rendering
+
+- Display the configured figure title above the brain views in embedded and
+  separate windows, and include it in image exports. Empty titles retain the
+  existing layout.
+- Allow the application to close cleanly after its drawing target has been cleared.
+
 ### Web display and startup
 
 - Clear a failed drawing-window transfer and restore a usable canvas for retrying

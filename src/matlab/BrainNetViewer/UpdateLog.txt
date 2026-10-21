@@ -1,5 +1,8 @@
 BrainNet Viewer source maintenance updates
 
+- Display configured figure titles in embedded and separate drawing windows and image exports.
+- Close cleanly after the drawing target has been cleared.
+
 - Preserve word-internal # in node labels.
 - Clarify GPL-3.0-or-later for project code; bundled-resource terms are unchanged.
 
