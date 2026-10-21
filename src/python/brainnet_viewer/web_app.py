@@ -635,6 +635,13 @@ def create_app(server=None, workspace=None):
             navigation.refresh()
         except Exception as error:
             state.error=str(error); state.status='Apply failed; correct the inputs/settings.'
+            if workspace.renderer is None:
+                # A failed native-window handoff has retired the old actors.
+                # Rebind the empty view instead of leaving a stale remote ID.
+                view.replace_view(initial.render_window)
+                state.view_generation+=1
+                state.rendered=False; state.boundary_ready=False; state.inspect_text=''
+                state.status='Apply failed; canvas cleared. Inputs and settings retained for retry.'
     def reset():
         detail.finish()
         navigation.stop()

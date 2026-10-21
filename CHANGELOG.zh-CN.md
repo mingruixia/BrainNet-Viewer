@@ -4,6 +4,8 @@
 
 ### Web显示与启动
 
+- 绘图窗口转移失败时清理无效状态，恢复可再次Apply的画布，并保留输入选择。
+
 - Scene File/Open及Save Scene/Import Settings控件与桌面版对齐。
 - 静止画面采用2倍采样，保持文字大小，避免重复Apply造成采样叠加；交互时降低传输分辨率和JPEG质量。
 - CPU交互时临时降低曲面细节，静止、Inspect、Scene操作及导出时恢复原几何；GPU保留完整几何。

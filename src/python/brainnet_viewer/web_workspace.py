@@ -123,23 +123,6 @@ class WebWorkspace:
         if not staging.GetNeverRendered():
             renderer.dispose(); plot.close(); plot.deep_clean()
             raise RuntimeError('Scene staging unexpectedly rendered before commit.')
-        self.close_render(preserve_window=True)
-        if self._retained_window is not None:
-            window=self._retained_window
-            layers=list(staging.GetRenderers())
-            size=staging.GetSize(); dpi=staging.GetDPI(); count=staging.GetNumberOfLayers()
-            plot.iren.interactor.SetRenderWindow(None)
-            for layer in layers: staging.RemoveRenderer(layer)
-            staging.Finalize()
-            plot.ren_win=window
-            window.SetNumberOfLayers(count); window.SetSize(*size); window.SetDPI(dpi)
-            for layer in layers: window.AddRenderer(layer)
-            plot.iren.set_render_window(window)
-        self._retained_window=None
-        self.plotter,self.renderer=plot,renderer
-        self.render_settings=deepcopy(self.settings)
-        self.render_paths=dict(self.paths)
-        self.pending_session=None
         # Trame changes the native render-window size to the browser canvas.
         # Refit on size modification, before VTK/Web captures projection/image
         # state. A Render StartEvent is too late for the first resized frame.
@@ -154,7 +137,38 @@ class WebWorkspace:
                 renderer.resize_fit(*window.GetSize())
                 renderer.update_annotation_fonts(window.GetDPI()/getattr(self,'screen_ratio',1))
             finally: fitting=False
-        self._resize_observer=plot.render_window.AddObserver('ModifiedEvent',fit_canvas,1.)
+        try:
+            self.close_render(preserve_window=True)
+            if self._retained_window is not None:
+                window=self._retained_window
+                layers=list(staging.GetRenderers())
+                size=staging.GetSize(); dpi=staging.GetDPI(); count=staging.GetNumberOfLayers()
+                plot.iren.interactor.SetRenderWindow(None)
+                for layer in layers: staging.RemoveRenderer(layer)
+                staging.Finalize()
+                plot.ren_win=window
+                window.SetNumberOfLayers(count); window.SetSize(*size); window.SetDPI(dpi)
+                for layer in layers: window.AddRenderer(layer)
+                plot.iren.set_render_window(window)
+            self._retained_window=None
+            self.plotter,self.renderer=plot,renderer
+            self.render_settings=deepcopy(self.settings)
+            self.render_paths=dict(self.paths)
+            self._resize_observer=plot.render_window.AddObserver('ModifiedEvent',fit_canvas,1.)
+        except Exception:
+            # Old actors have already been released. Do not expose a partially
+            # committed scene or leave two Python owners of the same window.
+            # Retire it through the usual protocol/cache cleanup; retry will
+            # create a fresh context. Draft inputs and pending camera survive.
+            if self._retained_window is plot.render_window:
+                self._retained_window=None
+            self.plotter,self.renderer=plot,renderer
+            try:
+                self.close_render()
+            finally:
+                self.render_settings=None; self.render_paths=None
+            raise
+        self.pending_session=None
         return renderer
 
     def set_screen_ratio(self, ratio):

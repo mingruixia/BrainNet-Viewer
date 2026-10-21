@@ -4,6 +4,9 @@
 
 ### Web display and startup
 
+- Clear a failed drawing-window transfer and restore a usable canvas for retrying
+  Apply, with input selections retained.
+
 - Reuse the native drawing window across Apply, layout changes and Clear Figure,
   releasing the previous scene's geometry without repeatedly creating GPU contexts.
   Prepare new scenes before replacing the canvas; release remote-view subscriptions
