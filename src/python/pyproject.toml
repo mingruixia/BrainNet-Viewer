@@ -46,6 +46,7 @@ include = ["brainnet_viewer*"]
 
 [tool.setuptools.package-data]
 brainnet_viewer = [
+    "resources/fonts/*.ttf", "resources/fonts/*.json", "resources/fonts/*.txt",
     "web_session_client.js",
     "data/*.npz", "data/*.json",
     "resources/Help.en.md", "resources/*.mat",

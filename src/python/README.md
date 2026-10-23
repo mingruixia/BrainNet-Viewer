@@ -28,4 +28,17 @@ bundled resources retain accompanying terms.
 
 Run Web on a private computer used by one trusted user. Browser-origin checks do not authenticate operating-system users, so the local server is unsuitable for shared-user computers or public hosting.
 
+## Annotation text
+
+Current source builds include portable fonts for Chinese and supported Unicode
+titles, node labels and scalar-bar titles. ASCII node labels keep the chosen
+Arial, Times or Courier family; mixed Unicode labels use the bundled fallback.
+Characters outside its coverage produce an error rather than disappearing.
+This is not a claim of support for every writing system.
+
+Titles fit within the reserved heading strip without changing their text. Use a
+wider canvas or a shorter title if it cannot fit legibly. PDF exports that need
+the fallback use glyph outlines, so those annotations are not searchable text.
+The fonts retain their [OFL notices](brainnet_viewer/resources/fonts/NOTICE.txt).
+
 Developer: Mingrui Xia — mxia@bnu.edu.cn; mingruixia@gmail.com.

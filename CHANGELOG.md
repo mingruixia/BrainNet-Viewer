@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Annotation text
+
+- Use bundled fonts for Chinese and supported Unicode titles, node labels and
+  scalar-bar titles. Report missing glyphs before rendering rather than silently
+  dropping characters. ASCII node labels retain their selected font family.
+- Fit complete titles to the available canvas width. Keep annotation fonts and
+  cameras unchanged after export, and preserve Unicode glyph outlines in PDF.
+
 ### MATLAB rendering
 
 - Display the configured figure title above the brain views in embedded and

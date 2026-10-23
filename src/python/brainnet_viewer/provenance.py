@@ -58,6 +58,10 @@ def build_provenance(renderer, paths, export, context=None):
                       'nodes':len(renderer.prepared.nodes.positions) if renderer.prepared.nodes else 0,
                       'selected_edges':len(renderer.prepared.pairs),
                       'roi_labels':[int(roi[0]) for roi in renderer.prepared.rois]},
+            'text_rendering': {'rules_version':'1.0', 'title_layout':'bounded-single-line-fit',
+                               'font_assets':list(getattr(renderer, 'text_fonts', {}).values()),
+                               'title_font_points':renderer.title_actor.GetTextProperty().GetFontSize()
+                                   if getattr(renderer, 'title_actor', None) is not None else None},
             'privacy':{'absolute_input_paths_included':False,'source_annotations_reduced_to_filenames':redacted},
             'export':export,'context':context or {},
             'diagnostics':list(getattr(renderer.prepared, 'diagnostics', ())),

@@ -1,0 +1,33 @@
+BrainNet Sans 1.0
+
+These modified fonts combine Noto Sans SC with glyphs missing from that font
+and present in Noto Sans. They retain the SIL Open Font License 1.1. The
+application code's GPL license does not replace the fonts' OFL license.
+
+Noto Sans SC:
+Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'
+https://github.com/google/fonts/tree/main/ofl/notosanssc
+Original file: NotoSansSC[wght].ttf (variable font, Version 2.004-H2)
+License: OFL-NotoSansSC.txt
+
+Noto Sans:
+Copyright 2018 The Noto Project Authors (github.com/googlei18n/noto-fonts)
+https://github.com/notofonts/noto-fonts/tree/main/hinted/ttf/NotoSans
+Original files: NotoSans-Regular.ttf and NotoSans-Bold.ttf
+License: OFL-NotoSans.txt
+
+The modified family and PostScript names are BrainNet Sans / BrainNetSans.
+The build uses static weights 400/700, adds missing glyphs from Noto Sans,
+and omits vertical-layout tables; it is for horizontal annotations, not a
+claim of complete Unicode or writing-system support. Legacy ASCII font
+choices are retained when no Unicode fallback is required.
+
+coverage.json records source SHA256, build-tool version, output SHA256 and
+cmap coverage. Rebuild from the original files with fontTools 4.66.1:
+python tools/build_annotation_fonts.py --input /path/to/originals --output /new/fonts
+The input directory must contain the three original font filenames listed
+as keys in coverage.json's sources section, plus their original license
+files named SC-OFL.txt and Latin-OFL.txt. This is a build tool, not an
+application dependency; users do not need fontTools or installed CJK fonts.
+
+Redistribution must retain this notice and both supplied OFL notices.

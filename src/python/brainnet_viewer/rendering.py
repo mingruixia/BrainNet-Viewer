@@ -17,6 +17,7 @@ from .binding import geometry_signature, custom_edge_colors
 from .display import double_brain, label_positions, label_font
 from .session import content_hashes, signature, validate_session
 from .render_detail import resolve_detail
+from .text_rendering import font_for_strings, use_font, fit_title
 
 
 def _is_mac_qt_plotter(plotter):
@@ -237,6 +238,8 @@ class SceneRenderer:
         self.exporting = False
         self.label_records = []
         self.label_observers = []
+        self.title_actor = None
+        self.text_fonts = {}
         # A full-window background fills the intentional gaps between viewports.
         from vtkmodules.vtkRenderingCore import vtkRenderer
         self.background = vtkRenderer()
@@ -249,6 +252,20 @@ class SceneRenderer:
         self.plotter.render_window.AddRenderer(self.annotations)
 
     def render(self, prepared, *, orientation_labels=True):
+        # Check glyph coverage before clearing a previously valid canvas.
+        font_for_strings([prepared.settings['image']['title']], bold=True)
+        font_for_strings([prepared.settings['image']['colorbar_label']])
+        if prepared.nodes is not None and prepared.settings['node']['label_mode'] != 'none':
+            scopes = {view[2] for view in layout(prepared.settings['layout'], prepared.split)[1]}
+            visible = np.zeros(len(prepared.nodes.positions), dtype=bool)
+            node = prepared.settings['node']
+            for scope in scopes:
+                visible |= self.node_mask(prepared, scope)
+            if node['label_mode'] == 'threshold':
+                basis = prepared.nodes.modules if node['label_basis'] == 'module' else prepared.nodes.values
+                visible &= basis > node['label_threshold']
+            font_for_strings([prepared.nodes.labels[i] for i in np.flatnonzero(visible)],
+                             bold=node['label_font_weight'] == 'bold')
         appearance=material(prepared.settings["global"])
         for camera, tag in self.label_observers: camera.RemoveObserver(tag)
         self.label_observers, self.label_records = [], []
@@ -259,6 +276,8 @@ class SceneRenderer:
         self.colorbars = []
         self.legends = []
         self.annotation_text_props = []
+        self.title_actor = None
+        self.text_fonts = {}
         settings = prepared.settings
         self.appearance=appearance
         self.detail_policy = resolve_detail(settings["global"]["render_detail"],
@@ -410,6 +429,7 @@ class SceneRenderer:
             self.initial_cameras.append((camera.position,camera.focal_point,camera.up,camera.parallel_scale,
                                          camera.parallel_projection,camera.view_angle))
         self.plotter.subplot(0,0)
+        self.update_annotation_fonts(self.plotter.render_window.GetDPI())
         self.update_label_records()
         for renderer in self.plotter.renderers:
             if any(record[0] is renderer for record in self.label_records):
@@ -511,6 +531,8 @@ class SceneRenderer:
 
     def resize_fit(self, width, height):
         """Adapt aspect ratio without resetting each subplot's pan, rotation or zoom."""
+        if self.title_actor is not None and width > 0 and height > 0:
+            fit_title(self.title_actor, width, height, self.plotter.render_window.GetDPI())
         if not self.initial_cameras or width<=0 or height<=0 or self.fit_size==(width,height): return
         old_width,old_height=self.fit_size
         old_pixel=self.pixel_scale(old_width,old_height); new_pixel=self.pixel_scale(width,height)
@@ -567,11 +589,10 @@ class SceneRenderer:
         apply_material(actor,self.appearance)
         return actor
 
-    def draw_network(self, prepared, scope):
+    @staticmethod
+    def node_mask(prepared, scope):
         nodes=prepared.nodes
-        if nodes is None: return
         node,edge=prepared.settings["node"],prepared.settings["edge"]
-        node_positions = self.node_positions(prepared)
         keep=np.ones(len(nodes.positions),dtype=bool)
         basis=nodes.modules if node["selection_basis"]=="module" else nodes.values
         if node["selection_mode"]=="threshold": keep &= basis>node["threshold"]
@@ -582,6 +603,21 @@ class SceneRenderer:
         elif scope=="right": keep &= nodes.positions[:,0]>0
         radii=node_radii(nodes,node)
         keep &= radii > 0
+        return keep
+
+    def text_font(self, strings, *, bold=False):
+        info = font_for_strings(strings, bold=bold)
+        if info:
+            self.text_fonts[info['sha256']] = {key: info[key] for key in ('file','sha256','family')}
+        return info
+
+    def draw_network(self, prepared, scope):
+        nodes=prepared.nodes
+        if nodes is None: return
+        node,edge=prepared.settings["node"],prepared.settings["edge"]
+        node_positions = self.node_positions(prepared)
+        keep = self.node_mask(prepared, scope)
+        radii = node_radii(nodes, node)
         colors=node_colors(nodes,node)
         if keep.any():
             cloud=pv.PolyData(node_positions[keep]); cloud["radius"]=radii[keep]; cloud["rgb"]=(colors[keep]*255).astype(np.uint8)
@@ -603,10 +639,12 @@ class SceneRenderer:
                 label_array=vtkStringArray(); label_array.SetName("labels")
                 for name in names: label_array.InsertNextValue(name)
                 label_cloud.GetPointData().AddArray(label_array)
+                font_info = self.text_font(names, bold=node['label_font_weight']=='bold')
+                extra_font = {'font_file': font_info['path']} if font_info else {}
                 actor = self.plotter.add_point_labels(label_cloud,"labels",
                     font_size=max(1,int(np.floor(pixels*72/self.plotter.render_window.GetDPI()+.5))),font_family=family,bold=node["label_font_weight"]=="bold",
                     italic=node["label_font_angle"]=="italic",text_color=node["label_color"],show_points=False,
-                    always_visible=node["label_in_front"],shape=None,reset_camera=False,justification_horizontal="center")
+                    always_visible=node["label_in_front"],shape=None,reset_camera=False,justification_horizontal="center",**extra_font)
                 self.label_records.append((renderer,label_cloud,node_positions[labels].copy(),radii[labels].copy(),node,names,actor))
         valid=keep[prepared.pairs].all(axis=1)
         pairs,values=prepared.pairs[valid],prepared.edge_values[valid]
@@ -757,6 +795,7 @@ class SceneRenderer:
             for prop in (bar.GetTitleTextProperty(), bar.GetLabelTextProperty(), bar.GetAnnotationTextProperty()):
                 prop.SetColor(*foreground); prop.SetFontSize(12); prop.SetBold(False); prop.SetItalic(False)
                 self.annotation_text_props.append((prop,12))
+            use_font(bar.GetTitleTextProperty(), self.text_font([bar.GetTitle()]))
             if name=="Surface":
                 # Keep the surface strip independent of the Node/Edge location.
                 # Place the dorsal bar below the central brain, alongside the
@@ -798,6 +837,8 @@ class SceneRenderer:
             title.SetPosition(.5, .985)
             prop = title.GetTextProperty(); prop.SetColor(*foreground); prop.SetFontSize(18)
             prop.SetJustificationToCentered(); prop.SetVerticalJustificationToTop(); prop.SetBold(True)
+            use_font(prop, self.text_font([image['title']], bold=True))
+            self.title_actor = title
             self.annotation_text_props.append((prop,18))
             self.annotations.AddViewProp(title)
             scale_y *= .93
@@ -830,6 +871,9 @@ class SceneRenderer:
     def update_annotation_fonts(self, dpi):
         # Global annotations adapt to the available pixels, not to the metadata DPI.
         for prop,pixels in self.annotation_text_props: prop.SetFontSize(max(1,int(np.floor(pixels*72/dpi+.5))))
+        if self.title_actor is not None:
+            fit_title(self.title_actor, *self.plotter.window_size, dpi,
+                      measure_dpi=self.plotter.render_window.GetDPI())
 
     def reset(self):
         width,height=self.plotter.window_size
@@ -845,6 +889,8 @@ class SceneRenderer:
     def dispose(self):
         for camera,tag in self.label_observers: camera.RemoveObserver(tag)
         self.label_observers, self.label_records = [], []
+        self.title_actor = None
+        self.text_fonts = {}
 
     def inspect_vertex(self, x, y):
         if self.prepared is None or self.prepared.surface is None: return None
@@ -918,6 +964,7 @@ class SceneRenderer:
             _prepare_raster_capture(self.plotter)
             image=self.plotter.screenshot(return_img=True,window_size=(width,height),transparent_background=transparent)
             return save_figure(self.plotter,image,target,width,height,dpi,transparent,overwrite=overwrite,before_publish=check_inputs,
+                               font_text_as_path=bool(self.text_fonts),
                                provenance=lambda export:build_provenance(self,paths,export,provenance_context))
         finally:
             self.plotter.window_size=old_size

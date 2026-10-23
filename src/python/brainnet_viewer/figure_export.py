@@ -11,7 +11,39 @@ import numpy as np
 from PIL import Image
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (NameObject, NumberObject, DictionaryObject,
-                           DecodedStreamObject)
+                           DecodedStreamObject, ContentStream, FloatObject)
+
+
+def _outline_graphics_states(page, writer):
+    """Normalize GL2PS glyph-path alpha into valid PDF graphics states.
+
+    GL2PS emits standalone `ca` commands and undeclared /GS<n> names for
+    outlined text. Repair only this generated path, not arbitrary input PDFs.
+    """
+    resources = page['/Resources']
+    states = resources.get('/ExtGState', DictionaryObject())
+    states = states.get_object()
+    resources[NameObject('/ExtGState')] = states
+    stream = ContentStream(page.get_contents(), writer)
+    operations = []
+    for operands, operator in stream.operations:
+        if operator == b'gs' and operands[0] not in states:
+            import re
+            if not re.fullmatch(r'/GS\d+', str(operands[0])):
+                raise ValueError('Undefined graphics state in generated PDF.')
+            continue
+        if operator == b'ca':
+            alpha = float(operands[0])
+            if len(operands) != 1 or not np.isfinite(alpha) or not 0 <= alpha <= 1:
+                raise ValueError('Invalid glyph opacity in generated PDF.')
+            name = NameObject(f'/BNVTextAlpha{len(states)}')
+            state = DictionaryObject({NameObject('/Type'):NameObject('/ExtGState'),
+                                      NameObject('/ca'):FloatObject(alpha)})
+            states[name] = writer._add_object(state)
+            operands, operator = [name], b'gs'
+        operations.append((operands, operator))
+    stream.operations = operations
+    page.replace_contents(stream)
 
 
 def alpha_pdf(image, width_pt, height_pt, destination):
@@ -36,7 +68,7 @@ def alpha_pdf(image, width_pt, height_pt, destination):
     with destination.open("wb") as target: writer.write(target)
 
 
-def graphic(plotter, image, width, height, dpi, transparent, destination):
+def graphic(plotter, image, width, height, dpi, transparent, destination, *, font_text_as_path=False):
     suffix=destination.suffix.lower(); width_pt=width*72/dpi; height_pt=height*72/dpi
     if transparent:
         if image.shape[2]!=4: raise ValueError("Transparent capture did not produce an alpha channel.")
@@ -52,7 +84,7 @@ def graphic(plotter, image, width, height, dpi, transparent, destination):
         raw=destination.parent/"mixed"
         exporter=vtkGL2PSExporter(); exporter.SetRenderWindow(plotter.render_window)
         exporter.SetFilePrefix(str(raw)); exporter.CompressOff(); exporter.Write3DPropsAsRasterImageOn()
-        if suffix==".pdf": exporter.SetFileFormatToPDF(); exporter.SetTextAsPath(False)
+        if suffix==".pdf": exporter.SetFileFormatToPDF(); exporter.SetTextAsPath(font_text_as_path)
         else: exporter.SetFileFormatToSVG(); exporter.SetTextAsPath(True)
         exporter.Write(); raw=raw.with_suffix(suffix)
         if not raw.is_file() or raw.stat().st_size==0: raise RuntimeError("VTK did not produce the requested graphic.")
@@ -61,6 +93,8 @@ def graphic(plotter, image, width, height, dpi, transparent, destination):
             reader=PdfReader(raw); writer=PdfWriter()
             if len(reader.pages)!=1: raise ValueError("Scene export must have one PDF page.")
             page=writer.add_page(reader.pages[0]); page.scale_to(width_pt,height_pt)
+            if font_text_as_path:
+                _outline_graphics_states(page, writer)
             content=DecodedStreamObject()
             backdrop=f"q {background[0]:.12g} {background[1]:.12g} {background[2]:.12g} rg 0 0 {width_pt:.12g} {height_pt:.12g} re f Q\n".encode("ascii")
             content.set_data(backdrop+page.get_contents().get_data())
@@ -87,7 +121,7 @@ def graphic(plotter, image, width, height, dpi, transparent, destination):
         if root.tag.rsplit("}",1)[-1]!="svg": raise ValueError("Invalid SVG output.")
 
 
-def save_figure(plotter, image, filename, width, height, dpi, transparent, *, overwrite=False, before_publish=None, provenance=None):
+def save_figure(plotter, image, filename, width, height, dpi, transparent, *, overwrite=False, before_publish=None, provenance=None, font_text_as_path=False):
     """Stage locally; exclusive create by default, explicit replacement only."""
     target=Path(filename).absolute()
     from .provenance import sidecar_path
@@ -101,10 +135,12 @@ def save_figure(plotter, image, filename, width, height, dpi, transparent, *, ov
             "width_pt":width*72/dpi,"height_pt":height*72/dpi,"transparent":transparent,
             "content":"transparent raster" if transparent and target.suffix.lower() in (".pdf",".svg") else
                       "mixed raster/vector" if target.suffix.lower() in (".pdf",".svg") else "raster"}
+    if font_text_as_path and not transparent and target.suffix.lower() in ('.pdf', '.svg'):
+        result['annotation_text'] = 'glyph outlines'
     with tempfile.TemporaryDirectory(prefix=".brainnet-export-",dir=target.parent) as folder:
         stage=Path(folder)/("figure"+target.suffix.lower())
         if target.suffix.lower() in (".pdf",".svg"):
-            graphic(plotter,image,width,height,dpi,transparent,stage)
+            graphic(plotter,image,width,height,dpi,transparent,stage,font_text_as_path=font_text_as_path)
         else: Image.fromarray(image).save(stage,dpi=(dpi,dpi))
         if not stage.is_file() or not stage.stat().st_size: raise RuntimeError("Figure export produced an empty file.")
         publications=[(stage,target)]

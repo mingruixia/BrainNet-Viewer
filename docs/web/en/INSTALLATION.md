@@ -197,6 +197,12 @@ Still frames use 2x sampling; moving frames use lower sampling/quality. CPU-only
 surface detail reduction is temporary; still frames, Inspect and export restore
 the original geometry. Export image dimensions are set by Export Figure.
 
+Current source builds carry annotation fonts for Chinese and supported Unicode
+characters; the host needs no additional font installation. Missing glyphs produce
+an error rather than disappearing. Mixed Unicode node labels use the bundled font,
+titles fit the available canvas, and PDF fallback text uses glyph outlines. The
+downloadable beta image is unchanged; these updates require the current source.
+
 Scene JSON metadata is limited to 32 MiB; scientific-file uploads to 32 MiB each,
 Scene ZIPs to 64 MiB compressed and session files to 128 MiB. Portable Scene saves
 stage and verify assets before committing a new filename, and require a filesystem
