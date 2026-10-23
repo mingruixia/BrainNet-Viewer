@@ -7,7 +7,7 @@ import math
 import re
 import sys
 from PySide6 import QtCore, QtGui, QtWidgets as W
-from pyvistaqt import QtInteractor
+from .qt_rendering import QtInteractor
 from . import __version__
 from .settings import DEFAULTS, normalize
 from .scene import read_scene, portable_scene

@@ -10,6 +10,11 @@
 - Fit complete titles to the available canvas width. Keep annotation fonts and
   cameras unchanged after export, and preserve Unicode glyph outlines in PDF.
 
+### Windows desktop
+
+- Fix an OpenGL initialization crash when opening the drawing window on Windows.
+  Load the Windows graphics entry points before initializing the Qt/VTK canvas.
+
 ### MATLAB rendering
 
 - Display the configured figure title above the brain views in embedded and
