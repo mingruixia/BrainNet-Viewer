@@ -4,6 +4,7 @@ BrainNet Viewer 2.0.0-beta.1 对应 Python 包版本 **2.0.0b1**。
 从配套 GitHub 或 NITRC 发行页面获取 brainnet_viewer-2.0.0b1-py3-none-any.whl，
 根据该版 SHA256SUMS 校验。不需要 MATLAB 或 SPM。
 除非另备离线依赖集合，安装依赖需要联网。
+当前源码在所有平台上均要求Python 3.11或更新版本。
 
 Apple Silicon macOS 要求 Python 3.11 或更新版本，已验证配置为 Python 3.11。
 新安装应选择仍受维护的版本：
@@ -80,8 +81,9 @@ CLI 导出使用本版本 Scene，参见统一命令行教程。
 ## 安装当前源码
 
 默认源码分支包含后续维护更新（包版本2.0.0b1.post2），不在已下载的2.0.0b1
-wheel中。请在完整仓库根目录打开终端并创建新环境。Windows推荐Python 3.12，
-Apple Silicon仍要求Python 3.11或更新版本；不要复用或改动已有公测环境。
+wheel中。请在完整仓库根目录打开终端，用Python 3.11或更新版本创建新环境；
+Windows推荐Python 3.12。当前源码已停止支持Python 3.10，因为修复安全漏洞的
+Pillow版本要求Python 3.11。请新建环境，不要直接升级已有公测环境。
 
 Windows PowerShell：
 

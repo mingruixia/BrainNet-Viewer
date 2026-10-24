@@ -21,6 +21,9 @@
 
 ### Input handling and security
 
+- Update Pillow to 13.0.0 to fix image-processing security vulnerabilities.
+  Current source builds now require Python 3.11 or newer on all platforms.
+
 - Keep small nonzero surface-map values in the selected colormap. Only exact zero
   and nonfinite values use the base surface color; the scalar legend stays continuous.
 - Label statistical P values as voxelwise and uncorrected in the controls and

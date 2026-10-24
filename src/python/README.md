@@ -16,6 +16,7 @@ through a browser on port 1031. MATLAB is not required.
 Run python -m brainnet_viewer in the installed desktop environment.
 For development, install this directory with the desktop or web extra.
 The Dockerfile builds the Web edition from this source and bundled resources.
+Current source installations require Python 3.11 or newer on all platforms.
 Direct dependencies are pinned in pyproject.toml.
 
 Select input files, adjust the display settings and click **Apply** to render. You can then explore a view, export a figure or save a Scene. The installation includes surface templates, atlas examples, tutorial data and the AAL/Brodmann Inspect tables.

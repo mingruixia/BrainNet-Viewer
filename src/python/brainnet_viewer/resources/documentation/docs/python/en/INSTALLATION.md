@@ -5,6 +5,7 @@ Obtain brainnet_viewer-2.0.0b1-py3-none-any.whl from the accompanying GitHub or
 NITRC release and verify its SHA-256 against that release's SHA256SUMS.
 MATLAB and SPM are not required. Dependencies need Internet access unless
 supplied in a separate offline collection.
+Current source builds require Python 3.11 or newer on all platforms.
 
 Apple Silicon macOS requires Python 3.11 or newer; Python 3.11 is the verified
 configuration. For new installations, use a supported Python version:
@@ -87,8 +88,10 @@ Contact Mingrui Xia: mxia@bnu.edu.cn; mingruixia@gmail.com.
 The default source branch includes maintenance updates (package version
 2.0.0b1.post2) that are not in the downloadable 2.0.0b1 wheel. For source
 installation, open a terminal at the complete repository root and use a new
-environment. Python 3.12 is recommended on Windows; Apple Silicon still requires
-Python 3.11 or newer. Do not reuse or change an existing beta environment.
+environment with Python 3.11 or newer; Python 3.12 is recommended on Windows.
+Python 3.10 is no longer supported by the current source because the patched
+Pillow dependency requires Python 3.11. Create a new environment rather than
+upgrading an existing beta environment.
 
 Windows PowerShell:
 

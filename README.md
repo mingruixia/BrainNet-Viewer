@@ -10,6 +10,8 @@ The default branch contains maintenance updates made after the public beta.
 The downloadable packages and Docker Hub `2.0.0-beta.1` image still contain the
 released code. To use the maintenance updates, follow the source-installation
 instructions. [Changes](CHANGELOG.md) lists the updates.
+Current Python source builds require Python 3.11 or newer; the Docker source
+image includes Python 3.12.
 
 ## Install and launch
 

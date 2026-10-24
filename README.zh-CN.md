@@ -8,6 +8,7 @@ BrainNet Viewer 用于显示脑曲面、网络、曲面映射和图谱 ROI。
 默认分支包含公测发布后的维护更新，下载包和 Docker Hub 的 `2.0.0-beta.1`
 镜像仍保留发布时的代码。如需使用维护更新，请按安装指南从源码安装。
 具体变更见[更新说明](CHANGELOG.zh-CN.md)。
+当前Python源码要求Python 3.11或更新版本；源码Docker镜像内置Python 3.12。
 
 ## 安装与启动
 

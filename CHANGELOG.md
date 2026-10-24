@@ -44,6 +44,9 @@
 
 ### Input handling and security
 
+- Update Pillow to 13.0.0 to fix image-processing security vulnerabilities.
+  Current source builds now require Python 3.11 or newer on all platforms.
+
 - Record the surface scalar display rule in export metadata. Exact zero and nonfinite
   values use the base surface color; small nonzero values retain the selected colormap.
   Python and Web also record a separate hash of the display rules. These fields

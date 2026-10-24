@@ -17,6 +17,9 @@
 
 ### Input handling and security
 
+- Update Pillow to 13.0.0 to fix image-processing security vulnerabilities.
+  Current source builds now require Python 3.11 or newer on all platforms.
+
 - Reclaim inactive server sessions even when a browser remains connected, with
   advance warnings and an option to keep the session. Count failed sign-ins
   separately, add audit records and cache static browser assets privately.
@@ -26,7 +29,7 @@
   application process for each browser session. Bound concurrent sessions and
   sign-in attempts; remove inactive workers after the configured idle period.
   Keep the local single-user recipe unchanged.
-- Update pypdf to 6.19.0 and use defusedxml for XML entity protection.
+- Update pypdf to 6.21.2 to address PDF parsing vulnerabilities, including excessive processing of malformed references. Use defusedxml for XML entity protection.
 - Preserve `#` within node labels in MATLAB and Python.
 - Validate Python Scene paths, bound JSON reads and reject duplicate keys or nonfinite values.
   Check portable assets before saving a new Scene without replacing existing files.
