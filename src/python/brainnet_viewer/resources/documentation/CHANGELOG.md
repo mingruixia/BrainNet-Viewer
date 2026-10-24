@@ -50,6 +50,9 @@
 
 ### Documentation and development
 
+- Check final, beta and maintenance version numbers against Python package metadata
+  and the MATLAB display version when validating a wheel.
+
 - Revise the English and Chinese guides, tutorials and illustrated manual for clearer instructions.
 - Explain the trusted-local-user security model and configurable Compose resource limits.
 - Add HTTP/WebSocket authentication, GIfTI preflight and affine-reader regression tests,
