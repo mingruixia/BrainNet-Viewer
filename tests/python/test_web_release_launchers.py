@@ -68,9 +68,15 @@ function global:docker {
  return 'fixture'
 }
 function global:Invoke-WebRequest { return [pscustomobject]@{StatusCode=200} }
-if ($env:BNV_MOCK_CLI_CPUS) {
- & $Launcher -Action Start -Backend $Backend -CPUs $env:BNV_MOCK_CLI_CPUS
-} else { & $Launcher -Action Start -Backend $Backend }
+try {
+ if ($env:BNV_MOCK_CLI_CPUS) {
+  & $Launcher -Action Start -Backend $Backend -CPUs $env:BNV_MOCK_CLI_CPUS
+ } else { & $Launcher -Action Start -Backend $Backend }
+} catch {
+ # Capture the exception content, not PowerShell's width-dependent ANSI view.
+ [Console]::Error.WriteLine($_.Exception.Message)
+ exit 1
+}
 """
 
 class ReleaseLauncherTests(unittest.TestCase):
