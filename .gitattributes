@@ -1,0 +1,2 @@
+# Keep POSIX launchers executable by /bin/sh after Windows checkouts.
+*.sh text eol=lf

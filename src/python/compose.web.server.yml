@@ -39,7 +39,7 @@ services:
     tmpfs:
       - /tmp:size=${BNV_TMP_SIZE:-2g},mode=1777
     mem_limit: ${BNV_MEM:-16g}
-    cpus: ${BNV_CPUS:-8}
+    cpus: ${BNV_CPUS:-1}
     pids_limit: 512
     init: true
     cap_drop: [ALL]

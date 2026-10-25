@@ -1,17 +1,17 @@
-name: brainnet-viewer-beta
+name: brainnet-viewer
 services:
   brainnet-web:
-    image: mingruixia/brainnet-viewer:2.0.0-beta.1
+    image: ${BNV_IMAGE:-mingruixia/brainnet-viewer:2.0.0}
     ports:
       - "127.0.0.1:${BNV_PORT:-1031}:1031"
     restart: unless-stopped
     read_only: true
     environment:
-      LIBGL_ALWAYS_SOFTWARE: "1"
+      BNV_RENDER_BACKEND: ${BNV_RENDER_BACKEND:-auto}
     tmpfs:
       - /tmp:size=512m,mode=1777
     mem_limit: ${BNV_MEM:-8g}
-    cpus: ${BNV_CPUS:-2}
+    cpus: ${BNV_CPUS:-1}
     pids_limit: 256
     cap_drop: [ALL]
     security_opt:

@@ -1,10 +1,11 @@
 param(
     [Parameter(Mandatory=$true)]
     [ValidateSet('Start','Stop','Restart','Status','Logs')][string]$Action,
-    [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9._:/@-]*$')][string]$Image='brainnet-viewer:web-local',
+    [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9._:/@-]*$')][string]$Image='mingruixia/brainnet-viewer:2.0.0',
     [ValidatePattern('^[A-Za-z0-9][A-Za-z0-9_.-]*$')][string]$ContainerName='brainnet-web',
     [ValidateRange(1024,65535)][int]$Port=1031,
-    [ValidateSet('Auto','GPU','CPU')][string]$Backend='Auto'
+    [ValidateSet('Auto','GPU','CPU')][string]$Backend='Auto',
+    [string]$CPUs=$env:BNV_CPUS
 )
 $ErrorActionPreference='Stop'
 
@@ -15,6 +16,30 @@ function Invoke-BnvDocker {
     return ($bnvOutput -join [Environment]::NewLine).Trim()
 }
 
+function Get-BnvCpuLimit {
+    $bnvAvailableText=Invoke-BnvDocker -Arguments @('info','--format','{{.NCPU}}')
+    $bnvAvailable=0
+    if (-not [int]::TryParse($bnvAvailableText,[ref]$bnvAvailable) -or $bnvAvailable -lt 1) {
+        throw 'Cannot determine available Docker engine CPUs. No container created.'
+    }
+    if ([string]::IsNullOrEmpty($CPUs)) { $bnvValue=[decimal][Math]::Min(8,$bnvAvailable) }
+    else {
+        $bnvValue=[decimal]0
+        if ($CPUs -notmatch '^[0-9]+(\.[0-9]+)?$' -or
+            -not [decimal]::TryParse($CPUs,[Globalization.NumberStyles]::AllowDecimalPoint,
+                [Globalization.CultureInfo]::InvariantCulture,[ref]$bnvValue)) {
+            throw 'Invalid CPU limit. Use a decimal number such as 1 or 0.5.'
+        }
+    }
+    if ($bnvValue -lt [decimal]0.01 -or $bnvValue -gt $bnvAvailable) {
+        throw "CPU limit must be 0.01 through $bnvAvailable (Docker engine CPUs). No container created."
+    }
+    return [pscustomobject]@{
+        Limit=$bnvValue.ToString('0.#########',[Globalization.CultureInfo]::InvariantCulture)
+        Available=$bnvAvailable
+    }
+}
+
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { throw 'Docker CLI is unavailable. Install/configure Docker first.' }
 $bnvNames=Invoke-BnvDocker -Arguments @('container','ls','-a','--filter',('name=^'+[regex]::Escape($ContainerName)+'$'),'--format','{{.Names}}')
 $bnvExists=$bnvNames -eq $ContainerName
@@ -22,6 +47,9 @@ if ($bnvExists) {
     $bnvExpected=Invoke-BnvDocker -Arguments @('image','inspect',$Image,'--format','{{.Id}}')
     $bnvRecord=Invoke-BnvDocker -Arguments @('inspect',$ContainerName)
     $bnvContainer=($bnvRecord | ConvertFrom-Json)[0]
+    if ($bnvContainer.Config.Labels.'org.brainnetviewer.application' -ne 'web') {
+        throw 'Existing container is not managed by this launcher. No changes made; choose another name.'
+    }
     if ($bnvContainer.Image -ne $bnvExpected) {
         throw 'Existing container uses another image. No changes made. Choose its exact image or a different container name.'
     }
@@ -36,6 +64,9 @@ switch ($Action) {
         if ($bnvExists) {
             if (-not $bnvContainer.State.Running) { Invoke-BnvDocker -Arguments @('start',$ContainerName) | Out-Null }
         } else {
+            Invoke-BnvDocker -Arguments @('image','inspect',$Image,'--format','{{.Id}}') | Out-Null
+            $bnvQuota=Get-BnvCpuLimit
+            Write-Output "CPU limit: $($bnvQuota.Limit); Docker engine CPUs: $($bnvQuota.Available)"
             # Docker cannot conditionally allocate a GPU inside Compose. Probe the
             # actual native render in a disposable container before choosing flags.
             $bnvGpuArguments=@('--gpus','all','--env','NVIDIA_DRIVER_CAPABILITIES=graphics,utility,compute')
@@ -46,8 +77,8 @@ switch ($Action) {
             $bnvSelected='cpu'
             if ($Backend -ne 'CPU') {
                 try {
-                    $bnvProbe=Invoke-BnvDocker -Arguments (@('run','--rm','--read-only',
-                        '--tmpfs','/tmp:size=512m,mode=1777','--cpus','8','--memory','8g',
+                    $bnvProbe=Invoke-BnvDocker -Arguments (@('run','--rm','--pull=never','--read-only',
+                        '--tmpfs','/tmp:size=512m,mode=1777','--cpus',$bnvQuota.Limit,'--memory','8g',
                         '--pids-limit','256','--cap-drop','ALL','--security-opt','no-new-privileges:true',
                         '--entrypoint','python')+$bnvGpuArguments+@($Image,'-m','brainnet_viewer.web_backend','--probe-gpu'))
                     Write-Output $bnvProbe
@@ -59,13 +90,14 @@ switch ($Action) {
             }
             $bnvRuntimeBackend=$bnvSelected
             if ($Backend -eq 'Auto' -and $bnvSelected -eq 'gpu') { $bnvRuntimeBackend='auto' }
-            $bnvRunArguments=@('run','-d','--name',$ContainerName,
+            $bnvRunArguments=@('run','-d','--pull=never','--name',$ContainerName,
                 '--label','org.brainnetviewer.application=web','--read-only',
-                '--tmpfs','/tmp:size=512m,mode=1777','--cpus','8','--memory','8g',
+                '--tmpfs','/tmp:size=512m,mode=1777','--cpus',$bnvQuota.Limit,'--memory','8g',
                 '--pids-limit','256','--cap-drop','ALL','--security-opt','no-new-privileges:true',
                 '--env',"BNV_RENDER_BACKEND=$bnvRuntimeBackend",'-p',"127.0.0.1:${Port}:1031")
             if ($bnvSelected -eq 'gpu') { $bnvRunArguments+=$bnvGpuArguments }
-            Invoke-BnvDocker -Arguments ($bnvRunArguments+@($Image)) | Out-Null
+            try { Invoke-BnvDocker -Arguments ($bnvRunArguments+@($Image)) | Out-Null }
+            catch { throw "Application startup failed. If the port is occupied, save the old Scene and stop only its identified container, or use a new name AND a free port. $($_.Exception.Message)" }
             Write-Output "Requested backend: $Backend; selected: $bnvSelected"
         }
     }
