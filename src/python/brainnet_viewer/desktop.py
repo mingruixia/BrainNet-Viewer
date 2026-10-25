@@ -1046,7 +1046,7 @@ class BrainNetWindow(W.QMainWindow):
         dialog=HelpDialog(RESOURCE_ROOT, self)
         dialog.move(self.geometry().center()-dialog.rect().center()); dialog.exec()
         self.raise_(); self.activateWindow()
-    def about(self): W.QMessageBox.information(self,"About",f"BrainNet Viewer {__version__}\nMingrui Xia\nmxia@bnu.edu.cn · mingruixia@gmail.com\nGPL-3.0\nXia M, Wang J, He Y (2013). PLoS ONE 8: e68910.")
+    def about(self): W.QMessageBox.information(self,"About",f"BrainNet Viewer {__version__}\nMingrui Xia\nmxia@bnu.edu.cn · mingruixia@gmail.com\nGPL-3.0-or-later\nXia M, Wang J, He Y (2013). PLoS ONE 8: e68910.")
     def closeEvent(self,event):
         if self.popout_dialog: self.popout_dialog.close()
         self.stop_demo()

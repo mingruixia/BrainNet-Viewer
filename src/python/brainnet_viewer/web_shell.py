@@ -156,7 +156,7 @@ def build_shell(server, workspace, initial, actions):
                                                    still_ratio=2,still_quality=100,style='height:100%;width:100%')
                         with html.Div(classes='bnv-welcome',v_if='!rendered'):
                             html.Img(src=('brand_image',),alt='BrainNet Viewer startup brain')
-                            html.Div(f'Version {__version__} · Public Beta 1 · Developer: Mingrui Xia',classes='bnv-welcome-info')
+                            html.Div(f'Version {__version__} · Developer: Mingrui Xia',classes='bnv-welcome-info')
                             html.Div('Project: https://github.com/mingruixia/BrainNet-Viewer',classes='bnv-welcome-info')
                             html.Div('Xia M, Wang J, He Y (2013). BrainNet Viewer: A Network Visualization Tool for Human Brain Connectomics. PLoS ONE 8: e68910.',classes='bnv-citation')
                     html.Div('{{ inspect_text }}',v_if='inspect_on',classes='bnv-inspect')
@@ -399,7 +399,7 @@ def build_shell(server, workspace, initial, actions):
                     v3.VBtn('Cancel',click='legacy_open = false',variant='outlined')
                     v3.VBtn('Use in Settings',click=actions['legacy_use'],disabled=('!legacy_ready || !legacy_trusted',),color='#0754e9',classes='ml-2')
             for key,title,text in (('help_open','Help','Select files, configure, Apply to render, then interact or export. Figure and provenance download separately; save locations follow browser settings. Pop Out expands the existing canvas in this tab; Return restores the panels. Resource information describes the rendering host.'),
-                                   ('about_open','About',f'BrainNet Viewer {__version__} — Web development. Developer: Mingrui Xia. mxia@bnu.edu.cn · mingruixia@gmail.com')):
+                                   ('about_open','About',f'BrainNet Viewer {__version__} · Developer: Mingrui Xia. mxia@bnu.edu.cn · mingruixia@gmail.com · GPL-3.0-or-later')):
                 with v3.VDialog(v_model=(key,False),max_width=620):
                     with html.Div(classes='bnv-dialog'):
                         html.H3(title); html.P(text)
