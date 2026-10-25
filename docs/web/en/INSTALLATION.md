@@ -11,6 +11,11 @@ This download image is unchanged. Maintenance updates on the default source
 branch require a local source build; pulling the beta tag does not install them.
 The source-build instructions at the end cover GPU selection and CPU fallback.
 
+For 2.0.0 recipes, offline candidates and GPU-preferred startup, see
+[versioned installation](RELEASE_INSTALLATION.md). The source release Compose
+now targets 2.0.0; use the downloaded beta ZIP's own recipe for beta.1.
+Do not pull an unpublished formal tag.
+
 ## 1. Install and start Docker
 
 - **Windows:** install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/),
@@ -57,14 +62,9 @@ to initialize. Docker Desktop must remain running; closing the terminal is fine.
 If the page is not ready, use the log command below instead of starting a second
 container.
 
-If you downloaded the complete source repository, the equivalent commands are:
-
-```sh
-docker compose -f src/python/compose.web.release.yml pull
-docker compose -f src/python/compose.web.release.yml up -d
-```
-
-Use one of these folder layouts consistently for subsequent commands.
+For a complete source checkout, use the optional source-build instructions below.
+The current release recipe targets 2.0.0 and has a separate installation guide;
+it is not a replacement for the unchanged beta ZIP's Compose file.
 
 ## 3. Stop, reopen and update
 
@@ -145,7 +145,7 @@ service or the downloaded image on port 1031, not both at once.
 
 The source image uses Python 3.12 and fixed application dependencies. Compose
 does not allocate a GPU: Auto performs a real graphics probe and normally chooses
-CPU without GPU access. Source Compose allows up to 8 CPU cores, 8 GiB memory and
+CPU without GPU access. Source Compose defaults to a 1-CPU quota, 8 GiB memory and
 512 MiB temporary storage. ARM64 source rendering has not been verified; a graphics probe under emulation failed. Check rendering on the target machine before using a source-built ARM64 image.
 The existing released ARM64 image has not been replaced.
 
@@ -160,7 +160,9 @@ docker build -f src/python/Dockerfile.web -t brainnet-viewer:web-local src/pytho
 powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Start -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031 -Backend Auto
 ```
 
-Auto first allocates the GPU to a disposable container and verifies actual
+The launcher defaults to min(8, Docker engine CPUs); BNV_CPUS or -CPUs can
+select a valid lower or higher quota within that engine limit. Auto first
+allocates the GPU to a disposable container and verifies actual
 rendering. It starts a CPU container if GPU startup is unavailable. Use `-Backend
 CPU` to request software rendering, or `-Backend GPU` to require hardware rendering
 and fail rather than silently fall back. Merely listing a GPU is not proof of
@@ -188,7 +190,7 @@ embed it in another site's iframe without a separately designed deployment.
 Only one trusted local user is supported. Local processes can forge Origin and
 obtain a key; this is not OS-user authentication. Do not use shared-user hosts,
 JupyterHub or untrusted shared network namespaces. See [security guidance](../../../SECURITY.md).
-Compose accepts `BNV_PORT` (default 1031), `BNV_CPUS` (2) and `BNV_MEM` (8g).
+Compose accepts `BNV_PORT` (default 1031), `BNV_CPUS` (1) and `BNV_MEM` (8g).
 On WSL, `MESA_D3D12_DEFAULT_ADAPTER_NAME` optionally chooses an adapter when supplied
 to the container environment; no vendor is forced by default. Do not set internal
 `BNV_WEB_BOOTSTRAPPED` loader state manually. Startup allows 90 seconds for the graphics probe and service initialization. Check the reported backend to distinguish hardware rendering from software rendering.

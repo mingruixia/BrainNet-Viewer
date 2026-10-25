@@ -101,7 +101,7 @@ For immediate cleanup, open `https://SERVER_IP:1031/_bnv/session` and select
 | `BNV_LOGIN_ATTEMPTS` | `10` | Failed sign-ins per source group per window, 1–100 |
 | `BNV_LOGIN_WINDOW` | `60` | Sign-in failure window, 10–3600 seconds |
 | `BNV_MEM` | `16g` | Memory limit for the whole container |
-| `BNV_CPUS` | `8` | CPU quota for the whole container |
+| `BNV_CPUS` | `1` | CPU quota for the whole container |
 | `BNV_TMP_SIZE` | `2g` | Shared temporary-storage limit |
 | `BNV_RENDER_BACKEND` | `auto` | `auto`, `cpu` or `gpu` |
 | `BNV_SERVER_BIND` | `0.0.0.0` | Host interface receiving connections |
@@ -135,6 +135,11 @@ messages, up to 72 MiB per message, with existing per-file and workspace limits
 still enforced by the application. The gateway relays messages rather than
 decoding scientific arrays; allow for simultaneous incoming/outgoing buffers
 when planning memory. This is not a constant-memory file-streaming interface.
+
+
+The Compose CPU default is conservative for small engines. Increase BNV_CPUS
+for the server's workload, never above the Docker engine's available CPU count;
+this quota is shared across sessions and is not a per-user reservation.
 
 ## CPU and GPU rendering
 
@@ -170,3 +175,9 @@ commands, or store non-secret settings in a private environment file. Access
 passwords and TLS private keys belong in the mounted secret files, not command
 arguments. After updating source, save active Scenes and run `up -d --build`.
 Service restarts end all unsaved sessions.
+
+## Versioned image
+
+For an image without a source build, use [versioned installation](RELEASE_INSTALLATION.md).
+HTTPS, password, independent sessions and resource rules remain the same.
+The unchanged beta.1 image does not contain server mode.

@@ -84,7 +84,7 @@ docker compose -f src/python/compose.web.server.yml logs --tail 80
 | `BNV_LOGIN_ATTEMPTS` | `10` | 每来源组在一个窗口内最多失败登录次数，可设 1–100 |
 | `BNV_LOGIN_WINDOW` | `60` | 登录失败计数窗口秒数，可设 10–3600 |
 | `BNV_MEM` | `16g` | 整个容器的内存上限 |
-| `BNV_CPUS` | `8` | 整个容器的 CPU 配额 |
+| `BNV_CPUS` | `1` | 整个容器的 CPU 配额 |
 | `BNV_TMP_SIZE` | `2g` | 全部会话共享的临时存储上限 |
 | `BNV_RENDER_BACKEND` | `auto` | 可选 `auto`、`cpu`、`gpu` |
 | `BNV_SERVER_BIND` | `0.0.0.0` | 主机接收连接的接口 |
@@ -108,6 +108,10 @@ ERROR。静态 JavaScript、CSS 和字体使用浏览器私有缓存，会话及
 普通 HTTP 表单上限为 4 KiB；科学数据上传使用 WebSocket，每条消息最多 72 MiB，
 应用原有的单文件与工作区限额仍有效。网关转发消息，不解码科学数组；规划内存时
 需计入同时收发的消息缓冲。这不是恒定内存占用的文件流式上传接口。
+
+
+Compose的CPU默认值为小型引擎保守配置。可按服务器负载增加BNV_CPUS，
+但不得超过Docker引擎可用CPU数；配额为各会话共享，不是每用户资源预留。
 
 ## CPU 与 GPU
 
@@ -134,3 +138,8 @@ docker compose -f src/python/compose.web.server.yml start
 执行这些命令时，保持 `BNV_SERVER_ORIGIN` 等环境变量有效，也可将非秘密设置
 保存在私有环境文件中。访问密码和 TLS 私钥应保存在挂载文件，不要放入命令参数。
 更新源码后，先保存全部活动 Scene，再运行 `up -d --build`；重启会丢弃未保存会话。
+
+## 指定版本镜像
+
+不从源码构建时，使用[指定版本配方](RELEASE_INSTALLATION.md)。
+HTTPS、密码、会话独立进程及资源约束保持不变；旧beta.1镜像不包含服务器模式。

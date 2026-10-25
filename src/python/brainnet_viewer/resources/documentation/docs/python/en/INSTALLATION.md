@@ -54,6 +54,12 @@ operating systems.
 
 ## First use
 
+Current source builds include fonts for Chinese and supported Unicode annotations.
+Unsupported glyphs are reported rather than silently omitted. Mixed Unicode node
+labels use the bundled fallback; ASCII labels retain their selected font family.
+Long titles fit within the heading strip. If a title cannot fit legibly, widen the
+canvas or shorten it. PDF fallback text is stored as glyph outlines.
+
 Select your input files, adjust **Visualization Settings** and click **Apply** to render. **Rotate**, **Pan** and **Zoom** affect the selected view. Use **Export Figure** to save an image with its provenance record, or **Save Scene** to reopen the inputs and settings later. A preset stores display settings only.
 Use the [shared tutorials](../../tutorials/unified/en/index.md) and
 [manual](../../manual/en/index.md).

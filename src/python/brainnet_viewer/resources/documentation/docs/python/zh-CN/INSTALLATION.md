@@ -51,6 +51,8 @@ SciPy 1.17.1，该依赖要求 Python 3.11 或更新版本。Linux 和 Intel mac
 
 ## 首次使用
 
+当前源码包含用于中文和支持的Unicode图件文字的随附字体，不支持的字形会明确报错，不再静默丢失。混合Unicode节点标签使用随附回退字体，纯ASCII标签保留所选字体。长标题在标题区内适配；无法清晰容纳时，请加宽画布或缩短标题。PDF中的回退字体文字保存为字形轮廓。
+
 选择输入文件，在 **Visualization Settings** 中调整设置，点击 **Apply** 绘图。**Rotate**、**Pan** 和 **Zoom** 操作所选视图。**Export Figure** 保存图片和溯源记录；**Save Scene** 保存输入与设置，便于再次打开。Preset 只保存显示设置。使用[统一教程（英文）](../../tutorials/unified/en/index.md)
 和[手册](../../manual/en/index.md)。
 

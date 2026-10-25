@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Installation and distribution
+
+- Adapt launcher CPU quotas to the Docker engine, reject invalid limits before
+  GPU probing, and use a conservative 1-CPU Compose default. Document beta upgrade
+  steps that preserve old containers and saved Scenes.
+
+- Synchronize the documentation bundled with Python and Web, including font
+  notices and current installation requirements.
+- Add versioned local and Linux-server Docker recipes and a Linux/macOS launcher
+  that probes GPU rendering before selecting GPU or CPU. Explicit GPU requests
+  fail rather than silently switching backends.
+- Add release planning and archive checks for version, file membership, licences
+  and source identity. Planning does not build or publish packages.
+
 ### Annotation text
 
 - Use bundled fonts for Chinese and supported Unicode titles, node labels and

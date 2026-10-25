@@ -9,4 +9,10 @@ The historical code identifies Mingrui Xia and Beijing Normal University; the so
 The `viridis`, `plasma`, `inferno`, `magma`, and `cividis` RGB lookup tables in `brainnet.core.scientificColormap` reproduce the 256-entry tables from Matplotlib 3.10.0 (`lib/matplotlib/_cm_listed.py`). Copyright (c) 2012- Matplotlib Development Team; All Rights Reserved. Their source licence is retained in [`LICENSE_MATPLOTLIB_COLORMAPS.txt`](LICENSE_MATPLOTLIB_COLORMAPS.txt); the BrainNet Viewer GPL-3.0-or-later licence does not remove that notice.
 
 
+Python/Web annotation fonts are distributed under SIL Open Font License 1.1,
+not the code's GPL licence. The modified BrainNet Sans family combines Noto
+Sans SC and complementary Noto Sans glyphs; attribution, source identities and
+both OFL notices are retained in
+[font notices](../fonts/NOTICE.txt).
+
 No trademark licence, warranty, scientific-validity guarantee, or blanket permission for external datasets is granted by this notice. The GPL text's own disclaimer and conditions govern the code.

@@ -2,7 +2,44 @@
 
 ## Unreleased
 
+### Installation and distribution
+
+- Adapt launcher CPU quotas to the Docker engine, reject invalid limits before
+  GPU probing, and use a conservative 1-CPU Compose default. Document beta upgrade
+  steps that preserve old containers and saved Scenes.
+
+- Synchronize the documentation bundled with Python and Web, including font
+  notices and current installation requirements.
+- Add versioned local and Linux-server Docker recipes and a Linux/macOS launcher
+  that probes GPU rendering before selecting GPU or CPU. Explicit GPU requests
+  fail rather than silently switching backends.
+- Add release planning and archive checks for version, file membership, licences
+  and source identity. Planning does not build or publish packages.
+
+### Annotation text
+
+- Use bundled fonts for Chinese and supported Unicode titles, node labels and
+  scalar-bar titles. Report missing glyphs before rendering rather than silently
+  dropping characters. ASCII node labels retain their selected font family.
+- Fit complete titles to the available canvas width. Keep annotation fonts and
+  cameras unchanged after export, and preserve Unicode glyph outlines in PDF.
+
+### Windows desktop
+
+- Fix an OpenGL initialization crash when opening the drawing window on Windows.
+  Load the Windows graphics entry points before initializing the Qt/VTK canvas.
+
+### MATLAB rendering
+
+- Display the configured figure title above the brain views in embedded and
+  separate windows, and include it in image exports. Empty titles retain the
+  existing layout.
+- Allow the application to close cleanly after its drawing target has been cleared.
+
 ### Web display and startup
+
+- Clear a failed drawing-window transfer and restore a usable canvas for retrying
+  Apply, with input selections retained.
 
 - Reuse the native drawing window across Apply, layout changes and Clear Figure,
   releasing the previous scene's geometry without repeatedly creating GPU contexts.
@@ -24,6 +61,10 @@
 - Update Pillow to 13.0.0 to fix image-processing security vulnerabilities.
   Current source builds now require Python 3.11 or newer on all platforms.
 
+- Record the surface scalar display rule in export metadata. Exact zero and nonfinite
+  values use the base surface color; small nonzero values retain the selected colormap.
+  Python and Web also record a separate hash of the display rules. These fields
+  distinguish the corrected rendering behavior from earlier beta exports.
 - Keep small nonzero surface-map values in the selected colormap. Only exact zero
   and nonfinite values use the base surface color; the scalar legend stays continuous.
 - Label statistical P values as voxelwise and uncorrected in the controls and

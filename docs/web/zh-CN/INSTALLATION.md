@@ -14,6 +14,9 @@ BrainNet Viewer Web 在 Docker 后台运行，通过浏览器
 其中包含认证及浏览器会话隔离，需要当前源码构建。不要仅修改本机配置的回环绑定
 来开放局域网访问。
 
+2.0.0配方、离线候选及GPU优先启动见[指定版本安装](RELEASE_INSTALLATION.md)。
+源码发布Compose现面向2.0.0；beta.1请使用已下载公测ZIP自带的配方，不要拉取尚未公开的正式标签。
+
 ## 1. 安装并启动 Docker
 
 - **Windows：**安装 [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)，
@@ -56,14 +59,8 @@ docker compose -f compose.web.release.yml ps
 Docker Desktop 需要保持运行，终端可以关闭。如果暂时打不开页面，请先按下文查看日志，
 不要重复启动另一个容器。
 
-若下载的是完整源码仓库，在仓库根目录使用：
-
-```sh
-docker compose -f src/python/compose.web.release.yml pull
-docker compose -f src/python/compose.web.release.yml up -d
-```
-
-后续操作请始终使用与所选目录布局对应的命令。
+完整源码仓库请按下方可选源码构建步骤操作。当前发布配方面向2.0.0，安装方式见独立指南；
+它不能代替已下载公测ZIP中保持不变的Compose文件。
 
 ## 3. 停止、重新打开与更新
 
@@ -126,7 +123,7 @@ docker compose -f src/python/compose.web.yml up -d --build
 构建依赖需要联网下载。在 1031 端口上选择源码构建服务或下载镜像中的一种，避免同时启动。
 
 源码镜像使用Python 3.12及固定应用依赖。Compose不分配GPU：Auto进行真实试绘，
-没有GPU访问权限时通常选择CPU。源码Compose上限为8核CPU、8 GiB内存及512 MiB临时存储。
+没有GPU访问权限时通常选择CPU。源码Compose默认配额为1CPU、8 GiB内存及512 MiB临时存储。
 ARM64源码绘图尚未验证，模拟环境中的图形探测失败。使用源码构建的ARM64镜像前，请在目标机器上检查绘图；
 已发布的ARM64镜像未替换。
 
@@ -141,6 +138,7 @@ docker build -f src/python/Dockerfile.web -t brainnet-viewer:web-local src/pytho
 powershell -NoProfile -File tools/manage_brainnet_web.ps1 -Action Start -Image brainnet-viewer:web-local -ContainerName brainnet-web-source -Port 1031 -Backend Auto
 ```
 
+启动器默认配额为Docker引擎可用CPU与8的较小值，可用BNV_CPUS或-CPUs设置有效配额。
 Auto先在临时容器中分配GPU并核验实际绘图，GPU启动不可用则启动CPU容器。
 `-Backend CPU`明确选择软件绘图；`-Backend GPU`要求硬件绘图，不满足则报错，
 不会静默回退。能列出GPU不代表硬件绘图可用。已有容器保留原后端，Stop/Restart
@@ -163,7 +161,7 @@ Origin，通过同源请求获取每次启动的新key。它不提供用户登�
 
 仅支持一名受信任用户的私有本机。本机进程可伪造Origin取得key，这不是操作系统
 用户认证；不要用于多用户共享主机、JupyterHub或不可信共享网络命名空间。参见
-[安全说明](../../../SECURITY.md)。Compose支持`BNV_PORT`（默认1031）、`BNV_CPUS`（2）
+[安全说明](../../../SECURITY.md)。Compose支持`BNV_PORT`（默认1031）、`BNV_CPUS`（1）
 及`BNV_MEM`（8g）。WSL容器环境可用`MESA_D3D12_DEFAULT_ADAPTER_NAME`选择显卡，
 默认不强制厂商。不要设置内部`BNV_WEB_BOOTSTRAPPED`；启动允许90秒完成图形探测和服务初始化，请根据报告的后端区分硬件与软件绘图。
 
