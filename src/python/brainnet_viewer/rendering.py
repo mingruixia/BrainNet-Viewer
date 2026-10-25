@@ -17,7 +17,7 @@ from .binding import geometry_signature, custom_edge_colors
 from .display import double_brain, label_positions, label_font
 from .session import content_hashes, signature, validate_session
 from .render_detail import resolve_detail
-from .text_rendering import font_for_strings, use_font, fit_title
+from .text_rendering import font_for_strings, use_font, fit_title, validate_title, TitleFitError
 
 
 def _is_mac_qt_plotter(plotter):
@@ -240,6 +240,7 @@ class SceneRenderer:
         self.label_observers = []
         self.title_actor = None
         self.text_fonts = {}
+        self.annotation_warning = ''
         # A full-window background fills the intentional gaps between viewports.
         from vtkmodules.vtkRenderingCore import vtkRenderer
         self.background = vtkRenderer()
@@ -266,6 +267,9 @@ class SceneRenderer:
                 visible &= basis > node['label_threshold']
             font_for_strings([prepared.nodes.labels[i] for i in np.flatnonzero(visible)],
                              bold=node['label_font_weight'] == 'bold')
+        width,height=self.plotter.window_size
+        if width<=0 or height<=0: raise ValueError("The canvas is not yet sized; retry rendering after the window appears.")
+        validate_title(prepared.settings['image']['title'],width,height,self.plotter.render_window.GetDPI())
         appearance=material(prepared.settings["global"])
         for camera, tag in self.label_observers: camera.RemoveObserver(tag)
         self.label_observers, self.label_records = [], []
@@ -529,10 +533,11 @@ class SceneRenderer:
         self.update_label_records(); self.plotter.render()
         return "restored"
 
-    def resize_fit(self, width, height):
+    def resize_fit(self, width, height, *, annotation_dpi=None, strict_title=False):
         """Adapt aspect ratio without resetting each subplot's pan, rotation or zoom."""
-        if self.title_actor is not None and width > 0 and height > 0:
-            fit_title(self.title_actor, width, height, self.plotter.render_window.GetDPI())
+        if width > 0 and height > 0:
+            self.update_annotation_fonts(annotation_dpi or self.plotter.render_window.GetDPI(),
+                                         size=(width,height), strict_title=strict_title)
         if not self.initial_cameras or width<=0 or height<=0 or self.fit_size==(width,height): return
         old_width,old_height=self.fit_size
         old_pixel=self.pixel_scale(old_width,old_height); new_pixel=self.pixel_scale(width,height)
@@ -868,12 +873,22 @@ class SceneRenderer:
             for actor in (symbol,text): self.annotations.AddViewProp(actor); actors.append(actor)
         self.legends.append({"labels":names,"colors":colors,"actors":actors,"rectangle":rectangle})
 
-    def update_annotation_fonts(self, dpi):
+    def update_annotation_fonts(self, dpi, *, size=None, strict_title=True):
         # Global annotations adapt to the available pixels, not to the metadata DPI.
-        for prop,pixels in self.annotation_text_props: prop.SetFontSize(max(1,int(np.floor(pixels*72/dpi+.5))))
+        warning = ''
         if self.title_actor is not None:
-            fit_title(self.title_actor, *self.plotter.window_size, dpi,
-                      measure_dpi=self.plotter.render_window.GetDPI())
+            try:
+                fit_title(self.title_actor, *(size or self.plotter.window_size), dpi,
+                          measure_dpi=self.plotter.render_window.GetDPI())
+            except TitleFitError:
+                if strict_title: raise
+                warning = ('Title temporarily hidden because this canvas is too small. '
+                           'Enlarge the canvas to restore it. Exports require the complete title to fit.')
+            self.title_actor.SetVisibility(not warning)
+        self.annotation_warning = warning
+        for prop,pixels in self.annotation_text_props:
+            if self.title_actor is None or prop is not self.title_actor.GetTextProperty():
+                prop.SetFontSize(max(1,int(np.floor(pixels*72/dpi+.5))))
 
     def reset(self):
         width,height=self.plotter.window_size
@@ -945,6 +960,8 @@ class SceneRenderer:
             if any(p in [source.resolve() for source in protected] for p in (target,sidecar_path(target).resolve())):
                 raise ValueError("Do not overwrite an input or its external data.")
         check_inputs()
+        # Validate against the requested output, never the current screen size.
+        validate_title(self.prepared.settings['image']['title'],width,height,dpi)
         old_size=self.plotter.window_size
         old_fit=self.fit_size
         states=[(r.camera.position,r.camera.focal_point,r.camera.up,r.camera.parallel_scale,r.camera.view_angle) for r in self.plotter.renderers]
@@ -953,13 +970,14 @@ class SceneRenderer:
         # Preserve the actual screen typography. Recomputing from pixel targets
         # at a high screen DPI can halve the original sizes on any platform.
         old_annotation_fonts=[(prop,prop.GetFontSize()) for prop,_ in self.annotation_text_props]
+        old_title_visible=self.title_actor.GetVisibility() if self.title_actor is not None else None
+        old_warning=self.annotation_warning
         self.exporting=True
         try:
             self.plotter.render_window.SetDPI(int(dpi))
-            self.update_annotation_fonts(dpi)
             self.background.SetBackgroundAlpha(0 if transparent else 1)
             self.plotter.window_size=(width,height)
-            self.resize_fit(width,height)
+            self.resize_fit(width,height,strict_title=True)
             self.update_label_records()
             _prepare_raster_capture(self.plotter)
             image=self.plotter.screenshot(return_img=True,window_size=(width,height),transparent_background=transparent)
@@ -971,7 +989,10 @@ class SceneRenderer:
             for renderer,state in zip(self.plotter.renderers,states):
                 camera=renderer.camera; camera.position,camera.focal_point,camera.up,camera.parallel_scale,camera.view_angle=state
                 renderer.ResetCameraClippingRange()
-            self.fit_size=old_fit; self.background.SetBackgroundAlpha(background_alpha); self.exporting=False
+            self.fit_size=old_fit; self.background.SetBackgroundAlpha(background_alpha)
             self.plotter.render_window.SetDPI(old_dpi); self.update_label_records()
             for prop,size in old_annotation_fonts: prop.SetFontSize(size)
+            if self.title_actor is not None: self.title_actor.SetVisibility(old_title_visible)
+            self.annotation_warning=old_warning
+            self.exporting=False
             self.plotter.render()

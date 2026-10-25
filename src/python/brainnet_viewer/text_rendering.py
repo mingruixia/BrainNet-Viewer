@@ -58,10 +58,27 @@ def use_font(prop, info):
         prop.SetFontFile(info['path'])
 
 
+class TitleFitError(ValueError):
+    """The complete title cannot fit without exceeding the minimum text size."""
+
+
+def validate_title(text, width, height, dpi):
+    """Measure a prospective title without touching the visible canvas."""
+    if not text:
+        return
+    from vtkmodules.vtkRenderingCore import vtkTextActor
+    actor = vtkTextActor(); actor.SetInput(text)
+    prop = actor.GetTextProperty(); prop.SetBold(True)
+    use_font(prop, font_for_strings([text], bold=True))
+    fit_title(actor, width, height, dpi)
+
+
 def fit_title(actor, width, height, dpi, *, target_pixels=18, measure_dpi=None):
     """Fit the complete title into its reserved strip; do not crop or elide it."""
     from vtkmodules.vtkRenderingFreeType import vtkFreeTypeTools
-    prop = actor.GetTextProperty()
+    from vtkmodules.vtkRenderingCore import vtkTextProperty
+    original = actor.GetTextProperty()
+    prop = vtkTextProperty(); prop.ShallowCopy(original)
     requested = max(1, int(target_pixels * 72 / dpi + .5))
     minimum = min(requested, max(1, int(8 * 72 / dpi + .999)))
     maximum_width, maximum_height = .94 * width, .065 * height
@@ -73,5 +90,6 @@ def fit_title(actor, width, height, dpi, *, target_pixels=18, measure_dpi=None):
         if not tools.GetBoundingBox(prop, actor.GetInput(), int(measure_dpi), box):
             raise ValueError('The title could not be drawn with the selected annotation font.')
         if box[1] - box[0] + 1 <= maximum_width and box[3] - box[2] + 1 <= maximum_height:
+            original.SetFontSize(size)
             return size
-    raise ValueError('The complete title does not fit this canvas. Widen the canvas or shorten the title.')
+    raise TitleFitError('The complete title does not fit this canvas. Widen the canvas or shorten the title.')

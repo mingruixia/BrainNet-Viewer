@@ -21,12 +21,17 @@ def create_app(server=None, workspace=None):
     workspace.interaction_detail=detail
     state,ctrl=server.state,server.controller
     server.options['ws_max_msg_size']=72*1024*1024
-    state.update({'status':'Select inputs, configure, then Apply.','error':'','preset':1,'view_direction':1,
+    state.update({'status':'Select inputs, configure, then Apply.','error':'','canvas_warning':'','preset':1,'view_direction':1,
                   'opacity':.3,'node_scale':1.,'edge_scale':.7,'width':2000,'height':1500,'dpi':300,
                   'transparent':False,'export_format':'png','export_units':'Pixels','export_ready':False,
                   'interaction':'Rotate','rendered':False,'volume_mode':'surface-map',
                   'inspect_on':False,'inspect_text':'','boundary_ready':False,'boundary_busy':False,'cpu_detail_uses':0,'view_generation':0})
     for role in workspace.catalog: state[role]=''
+    def canvas_warning(message):
+        if state.canvas_warning != message:
+            state.canvas_warning=message
+            state.flush()
+    workspace.on_canvas_warning=canvas_warning
     seed(state,workspace.settings)
     state.update({'upload_open':False,'scene_open':False,'upload_role':'auto','upload_files':[],
                   'scene_files':[],'scene_filename':'Open JSON / ZIP','splittable':True,'bind_open':False,'bind_kind':'boundary','bind_files':[],
@@ -616,7 +621,7 @@ def create_app(server=None, workspace=None):
             validate()
             settings=read(state,pending_base or workspace.settings,workspace.paths,bindings,edge_bindings)
             previous=workspace.settings; workspace.settings=settings
-            try: workspace.render()
+            try: workspace.render(canvas_size=canvas_size)
             except Exception: workspace.settings=previous; raise
             workspace.plotter.render_window.SetSize(*canvas_size)
             detail.prepare(workspace.renderer)

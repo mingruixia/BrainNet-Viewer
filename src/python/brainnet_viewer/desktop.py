@@ -750,6 +750,12 @@ class BrainNetWindow(W.QMainWindow):
         def render():
             settings=self.settings_value(); prepared=prepare(self.paths,settings)
             _,views=layout(settings["layout"],prepared.split)
+            if self.plotter is not None:
+                # A layout change must not destroy the old Qt canvas before
+                # discovering that the prospective title cannot be displayed.
+                from .text_rendering import validate_title
+                validate_title(settings['image']['title'],*self.plotter.window_size,
+                               self.plotter.render_window.GetDPI())
             if self.plotter is None or len(self.plotter.renderers)!=len(views):
                 if self.plotter:
                     self.renderer.dispose()
@@ -813,7 +819,12 @@ class BrainNetWindow(W.QMainWindow):
 
     def fit_canvas(self):
         if self.renderer and not self.renderer.exporting and not self.busy:
+            previous_warning=self.renderer.annotation_warning
             self.renderer.resize_fit(*self.plotter.window_size); self.plotter.render()
+            if self.renderer.annotation_warning:
+                self.statusBar().showMessage(self.renderer.annotation_warning)
+            elif previous_warning:
+                self.statusBar().showMessage('Canvas enlarged; the complete title is visible again.')
 
     def reset_view(self):
         self.stop_demo()

@@ -18,6 +18,11 @@
 
 ### Annotation text
 
+- Preserve the existing canvas when a new title cannot fit. When a window is too
+  small, show a warning and temporarily hide the title; enlarging the window
+  restores it. Exports fit the complete title to the output dimensions and
+  restore the screen state after success or failure.
+
 - Use bundled fonts for Chinese and supported Unicode titles, node labels and
   scalar-bar titles. Report missing glyphs before rendering rather than silently
   dropping characters. ASCII node labels retain their selected font family.

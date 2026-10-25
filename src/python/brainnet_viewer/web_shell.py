@@ -161,6 +161,7 @@ def build_shell(server, workspace, initial, actions):
                             html.Div('Xia M, Wang J, He Y (2013). BrainNet Viewer: A Network Visualization Tool for Human Brain Connectomics. PLoS ONE 8: e68910.',classes='bnv-citation')
                     html.Div('{{ inspect_text }}',v_if='inspect_on',classes='bnv-inspect')
                     html.Div('{{ status }}',classes='bnv-canvas-status')
+                    v3.VAlert('{{ canvas_warning }}',v_if='canvas_warning',type='warning',density='compact')
                     v3.VAlert('{{ error }}',v_if='error',type='error',density='compact')
                 with html.Section(classes='bnv-card bnv-right'):
                     with html.Div(classes='bnv-right-header'):

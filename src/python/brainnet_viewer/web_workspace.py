@@ -47,6 +47,11 @@ class WebWorkspace:
         self._resize_observer=None
         self.retire_view=None
         self._retained_window=None
+        self.on_canvas_warning=None
+
+    def _publish_canvas_warning(self):
+        if self.on_canvas_warning:
+            self.on_canvas_warning(self.renderer.annotation_warning if self.renderer else '')
 
     def select(self, selections):
         if not isinstance(selections,dict) or set(selections)-set(self.catalog):
@@ -102,13 +107,13 @@ class WebWorkspace:
                 raise ValueError('Animation output exceeds the 48 MiB download limit.')
             return {p.name:p.read_bytes() for p in paths}
 
-    def render(self):
+    def render(self, *, canvas_size=None):
         import pyvista as pv
         from .rendering import prepare, layout, SceneRenderer
         if not self.paths: raise ValueError('Select inputs before rendering.')
         prepared=prepare(self.paths,self.settings)
         _,views=layout(self.settings['layout'],prepared.split)
-        plot=pv.Plotter(shape=(1,len(views)),border=False,off_screen=True,window_size=(1200,900))
+        plot=pv.Plotter(shape=(1,len(views)),border=False,off_screen=True,window_size=canvas_size or (1200,900))
         renderer=SceneRenderer(plot)
         try:
             renderer.render(prepared)
@@ -134,8 +139,8 @@ class WebWorkspace:
             if renderer.exporting or fitting: return
             fitting=True
             try:
-                renderer.resize_fit(*window.GetSize())
-                renderer.update_annotation_fonts(window.GetDPI()/getattr(self,'screen_ratio',1))
+                renderer.resize_fit(*window.GetSize(),annotation_dpi=window.GetDPI()/getattr(self,'screen_ratio',1))
+                self._publish_canvas_warning()
             finally: fitting=False
         try:
             self.close_render(preserve_window=True)
@@ -169,6 +174,7 @@ class WebWorkspace:
                 self.render_settings=None; self.render_paths=None
             raise
         self.pending_session=None
+        self._publish_canvas_warning()
         return renderer
 
     def set_screen_ratio(self, ratio):
@@ -182,7 +188,8 @@ class WebWorkspace:
                 self._screen_dpi_base=self.plotter.render_window.GetDPI()
             self.plotter.render_window.SetDPI(max(1,int(self._screen_dpi_base*self.screen_ratio+.5)))
             self.renderer.update_label_records()
-            self.renderer.update_annotation_fonts(self.plotter.render_window.GetDPI()/self.screen_ratio)
+            self.renderer.update_annotation_fonts(self.plotter.render_window.GetDPI()/self.screen_ratio,strict_title=False)
+            self._publish_canvas_warning()
 
     def download(self, width=1600,height=1200,dpi=200,transparent=False,format='png',units='Pixels'):
         files=self.export_files(width,height,dpi,transparent,format,units)
@@ -236,6 +243,7 @@ class WebWorkspace:
             self.plotter.close()
             self.plotter.deep_clean()
         self.renderer=None; self.plotter=None
+        self._publish_canvas_warning()
         if not preserve_window and self._retained_window is not None:
             if self.retire_view is not None: self.retire_view(self._retained_window)
             self._retained_window.Finalize(); self._retained_window=None
