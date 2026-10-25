@@ -12,6 +12,8 @@ Review every blocker. Before writing archives:
 
 - Set the Python and MATLAB versions to the same formal version and update
   their release metadata and Web display text.
+- Set the MATLAB build date to the actual candidate preparation date before
+  freezing the source. Do not use a planned publication date as a build date.
 - Finish the English Word manual, then generate and verify the matching PDF.
   Replace the canonical manual and its package copy together only after review.
 - Synchronize documentation contents while preserving runtime-relative links.

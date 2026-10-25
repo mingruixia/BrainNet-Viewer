@@ -113,6 +113,9 @@ def candidate_blockers(repo, version, dirty):
         problems.append("Python source version is not the requested formal version")
     if not re.search(r"'version',\s*'" + re.escape(version) + "'", matlab):
         problems.append("MATLAB source version is not the requested formal version")
+    build_date = re.search(r"'build_date',\s*'([^']*)'", matlab)
+    if build_date is None or not build_date[1].strip():
+        problems.append("MATLAB candidate build date is not set")
     if "Development Status :: 5 - Production/Stable" not in project:
         problems.append("Package classifier remains pre-release")
     for text in ("Public beta", "Source maintenance update"):
