@@ -1,14 +1,15 @@
 # Python 桌面版安装
 
-BrainNet Viewer 2.0.0-beta.1 对应 Python 包版本 **2.0.0b1**。
-从配套 GitHub 或 NITRC 发行页面获取 brainnet_viewer-2.0.0b1-py3-none-any.whl，
-根据该版 SHA256SUMS 校验。不需要 MATLAB 或 SPM。
+BrainNet Viewer 2.0.0对应Python包版本 **2.0.0**。
+从配套 GitHub 或 NITRC 发行页面获取 brainnet_viewer-2.0.0-py3-none-any.whl，
+根据该版SHA256SUMS校验。若尚无对应wheel，请使用下方源码安装步骤，不要重命名旧wheel。
+不需要MATLAB或SPM。
 除非另备离线依赖集合，安装依赖需要联网。
 当前源码在所有平台上均要求Python 3.11或更新版本。
 
 Apple Silicon macOS 要求 Python 3.11 或更新版本，已验证配置为 Python 3.11。
 新安装应选择仍受维护的版本：
-公测版建议使用 Python 3.11，当前 Windows 源码建议使用 Python 3.12。
+Apple Silicon建议使用Python 3.11，Windows建议使用Python 3.12。
 Python 3.10 已于 2026 年 10 月 1 日停止支持，见 [Python 发行计划](https://peps.python.org/pep-0619/)。
 需要支持 OpenGL 的图形桌面和可写目录。
 部分桌面工作流程已在 Windows x64 和 Apple Silicon macOS 上测试，Linux Desktop 和 Intel Mac 尚未验证。请在独立虚拟环境中安装项目指定的依赖版本。
@@ -20,7 +21,7 @@ Python 3.10 已于 2026 年 10 月 1 日停止支持，见 [Python 发行计划]
 ```powershell
 py -3.11 -m venv .venv-bnv
 $bnvPython = (Resolve-Path .venv-bnv/Scripts/python.exe).Path
-$bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
+$bnvWheel = (Resolve-Path brainnet_viewer-2.0.0-py3-none-any.whl).Path
 $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())" $bnvWheel
 & $bnvPython -m pip install "brainnet-viewer[desktop] @ $bnvWheelUrl"
 & $bnvPython -m pip check
@@ -38,7 +39,7 @@ $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path
 ```bash
 python3.11 -m venv .venv-bnv
 source .venv-bnv/bin/activate
-BNV_WHEEL="$(pwd)/brainnet_viewer-2.0.0b1-py3-none-any.whl"
+BNV_WHEEL="$(pwd)/brainnet_viewer-2.0.0-py3-none-any.whl"
 BNV_WHEEL_URL="$(python -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())' "$BNV_WHEEL")"
 python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
 python -m pip check
@@ -80,8 +81,8 @@ CLI 导出使用本版本 Scene，参见统一命令行教程。
 
 ## 安装当前源码
 
-默认源码分支包含后续维护更新（包版本2.0.0b1.post2），不在已下载的2.0.0b1
-wheel中。请在完整仓库根目录打开终端，用Python 3.11或更新版本创建新环境；
+源码包版本为2.0.0，既有2.0.0b1 wheel保留原发行内容。
+请在完整仓库根目录打开终端，用Python 3.11或更新版本创建新环境；
 Windows推荐Python 3.12。当前源码已停止支持Python 3.10，因为修复安全漏洞的
 Pillow版本要求Python 3.11。请新建环境，不要直接升级已有公测环境。
 

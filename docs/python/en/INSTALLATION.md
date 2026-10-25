@@ -1,16 +1,17 @@
 # Python desktop installation
 
-BrainNet Viewer 2.0.0-beta.1 uses Python package version **2.0.0b1**.
-Obtain brainnet_viewer-2.0.0b1-py3-none-any.whl from the accompanying GitHub or
+BrainNet Viewer 2.0.0 uses Python package version **2.0.0**.
+Obtain brainnet_viewer-2.0.0-py3-none-any.whl from the accompanying GitHub or
 NITRC release and verify its SHA-256 against that release's SHA256SUMS.
+If the matching wheel is not yet available, use the source-installation section
+below; do not rename an older wheel.
 MATLAB and SPM are not required. Dependencies need Internet access unless
 supplied in a separate offline collection.
 Current source builds require Python 3.11 or newer on all platforms.
 
 Apple Silicon macOS requires Python 3.11 or newer; Python 3.11 is the verified
 configuration. For new installations, use a supported Python version:
-3.11 for the beta, or 3.12 for the
-current Windows source. Python 3.10 reached end of support on 1 October 2026
+3.11 on Apple Silicon, or 3.12 on Windows. Python 3.10 reached end of support on 1 October 2026
 ([Python release schedule](https://peps.python.org/pep-0619/)). A graphical
 desktop with working OpenGL and a writable folder is required.
 Selected desktop workflows have been tested on Windows x64 and Apple Silicon macOS. Linux Desktop and Intel Mac have not been verified. Install the pinned dependencies in a separate virtual environment.
@@ -22,7 +23,7 @@ Open PowerShell in the wheel directory:
 ```powershell
 py -3.11 -m venv .venv-bnv
 $bnvPython = (Resolve-Path .venv-bnv/Scripts/python.exe).Path
-$bnvWheel = (Resolve-Path brainnet_viewer-2.0.0b1-py3-none-any.whl).Path
+$bnvWheel = (Resolve-Path brainnet_viewer-2.0.0-py3-none-any.whl).Path
 $bnvWheelUrl = & $bnvPython -c "from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())" $bnvWheel
 & $bnvPython -m pip install "brainnet-viewer[desktop] @ $bnvWheelUrl"
 & $bnvPython -m pip check
@@ -40,7 +41,7 @@ On the graphical desktop, open a terminal in the wheel directory:
 ```bash
 python3.11 -m venv .venv-bnv
 source .venv-bnv/bin/activate
-BNV_WHEEL="$(pwd)/brainnet_viewer-2.0.0b1-py3-none-any.whl"
+BNV_WHEEL="$(pwd)/brainnet_viewer-2.0.0-py3-none-any.whl"
 BNV_WHEEL_URL="$(python -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())' "$BNV_WHEEL")"
 python -m pip install "brainnet-viewer[desktop] @ $BNV_WHEEL_URL"
 python -m pip check
@@ -91,10 +92,10 @@ Contact Mingrui Xia: mxia@bnu.edu.cn; mingruixia@gmail.com.
 
 ## Install the current source
 
-The default source branch includes maintenance updates (package version
-2.0.0b1.post2) that are not in the downloadable 2.0.0b1 wheel. For source
-installation, open a terminal at the complete repository root and use a new
-environment with Python 3.11 or newer; Python 3.12 is recommended on Windows.
+The source package version is 2.0.0. Earlier 2.0.0b1 wheels retain their
+original contents. For source installation, open a terminal at the complete
+repository root and use a new environment with Python 3.11 or newer;
+Python 3.12 is recommended on Windows.
 Python 3.10 is no longer supported by the current source because the patched
 Pillow dependency requires Python 3.11. Create a new environment rather than
 upgrading an existing beta environment.

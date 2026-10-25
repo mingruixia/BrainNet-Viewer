@@ -1,6 +1,6 @@
 # Changes in BrainNet Viewer
 
-## Unreleased
+## 2.0.0 — Unreleased
 
 ### Installation and distribution
 

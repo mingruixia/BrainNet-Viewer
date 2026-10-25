@@ -1,8 +1,9 @@
 # BrainNet Viewer Python and Web
 
-BrainNet Viewer 2.0.0-beta.1 uses Python package version 2.0.0b1.
-This source tree uses version 2.0.0b1.post2 and includes newer maintenance
-updates; released wheels and Docker Hub images have not been replaced.
+BrainNet Viewer uses Python package version **2.0.0**, matching the MATLAB and
+Docker/Web editions. Install the matching release assets, or use this source
+tree when those assets are not yet available. Earlier beta wheels and Docker
+images are separate releases and do not acquire source updates automatically.
 Desktop uses Qt and VTK; Web runs in a background Docker container accessed
 through a browser on port 1031. MATLAB is not required.
 
@@ -22,7 +23,7 @@ Direct dependencies are pinned in pyproject.toml.
 Select input files, adjust the display settings and click **Apply** to render. You can then explore a view, export a figure or save a Scene. The installation includes surface templates, atlas examples, tutorial data and the AAL/Brodmann Inspect tables.
 Local Web mode supports one shared session. Linux server mode uses HTTPS and a
 team access password, with an independent process for each browser session.
-Server mode requires a current source build. Source builds select a verified GPU or
+Server mode uses the matching image or a source build. The launchers select a verified GPU or
 fall back to CPU at startup; GPU allocation depends on the Docker host. Save a portable
 Scene before stopping/updating its container. Project code uses GPL-3.0-or-later;
 bundled resources retain accompanying terms.

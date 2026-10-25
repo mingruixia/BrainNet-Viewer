@@ -1,21 +1,17 @@
-# BrainNet Viewer Web 安装指南
+# BrainNet Viewer Web 安装
 
 [English](../en/INSTALLATION.md)
 
-BrainNet Viewer Web 在 Docker 后台运行，通过浏览器
-**http://127.0.0.1:1031/index.html** 使用，无需安装 MATLAB 或本机 Python。
-公测镜像为
-[mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer)。
+BrainNet Viewer Web 2.0.0在Docker中后台运行，浏览器访问
+**http://127.0.0.1:1031/index.html**，无需安装MATLAB或本机Python。
+对应镜像为[mingruixia/brainnet-viewer:2.0.0](https://hub.docker.com/r/mingruixia/brainnet-viewer)。
 
-已发布镜像保持不变。默认源码分支的维护更新需要本机源码构建，拉取原公测标签
-不会安装这些更新。GPU选择与CPU回退见末尾的源码构建部分。
+仅在对应版本可用后拉取。公开前可使用提供的、身份明确的本地测试镜像，或按下文从源码构建；
+不要用保持不变的公测镜像替代2.0.0。[指定版本安装](RELEASE_INSTALLATION.md)介绍离线加载、
+GPU优先启动器、CPU回退及公测升级步骤。
 
-团队通过 IP 访问 Linux 服务器时，请使用独立的[服务器部署说明](SERVER_DEPLOYMENT.md)，
-其中包含认证及浏览器会话隔离，需要当前源码构建。不要仅修改本机配置的回环绑定
-来开放局域网访问。
-
-2.0.0配方、离线候选及GPU优先启动见[指定版本安装](RELEASE_INSTALLATION.md)。
-源码发布Compose现面向2.0.0；beta.1请使用已下载公测ZIP自带的配方，不要拉取尚未公开的正式标签。
+通过Linux服务器IP访问时，请按[服务器部署说明](SERVER_DEPLOYMENT.md)配置HTTPS、
+认证与独立浏览器会话，不要直接将本机回环配方开放到局域网。
 
 ## 1. 安装并启动 Docker
 
@@ -40,11 +36,14 @@ Docker 会自动选择适合引擎的 amd64 或 arm64 镜像，Apple Silicon 不
 
 ## 2. 下载 Web 安装包并启动
 
-从 [GitHub 公测发行页](https://github.com/mingruixia/BrainNet-Viewer/releases/tag/v2.0.0-beta.1)
-或 [NITRC](https://www.nitrc.org/projects/bnv/) 下载
-**BrainNet-Viewer-Web-2.0.0-beta.1.zip** 并解压。
-在包含 `compose.web.release.yml` 的解压文件夹打开终端。
-以下命令适用于 Windows PowerShell 和 macOS/Linux 终端：
+从对应的[GitHub发行页](https://github.com/mingruixia/BrainNet-Viewer/releases)
+或[NITRC](https://www.nitrc.org/projects/bnv/)取得 **BrainNet-Viewer-Web-2.0.0.zip**，
+核对SHA256SUMS后解压。若尚未列出该资产，请使用提供的本地镜像或源码构建。
+
+GPU优先启动请使用[指定版本安装](RELEASE_INSTALLATION.md)中的Windows或Linux/macOS启动器。
+启动器会实际测试GPU绘图再选择后端；Docker需能向容器分配GPU设备。
+
+使用兼容CPU的Compose配置时，在解压目录打开终端：
 
 ```sh
 docker compose -f compose.web.release.yml pull
@@ -52,15 +51,13 @@ docker compose -f compose.web.release.yml up -d
 docker compose -f compose.web.release.yml ps
 ```
 
-第一条从 Docker Hub 下载软件及依赖，首次可能需要数分钟。
-第二条启动后台服务，第三条应显示正在运行的容器。
+仅在对应镜像公开后执行pull。未公开的本地镜像应将`BNV_IMAGE`设为已核验标签，并跳过pull。
+Compose默认不分配GPU，CPU配额默认为1，可按需显式设置`BNV_CPUS`。
 
-浏览器打开 **http://127.0.0.1:1031/index.html**，首次启动请等待初始化。
-Docker Desktop 需要保持运行，终端可以关闭。如果暂时打不开页面，请先按下文查看日志，
-不要重复启动另一个容器。
-
-完整源码仓库请按下方可选源码构建步骤操作。当前发布配方面向2.0.0，安装方式见独立指南；
-它不能代替已下载公测ZIP中保持不变的Compose文件。
+浏览器打开 **http://127.0.0.1:1031/index.html**。Docker Desktop需保持运行，终端可关闭。
+无法访问时先检查日志，不要重复启动另一个容器。
+下方生命周期命令适用于Compose启动；启动器管理的容器应使用[指定版本安装](RELEASE_INSTALLATION.md)
+中的操作入口。既有公测安装保留原配方，不混用新版文件。
 
 ## 3. 停止、重新打开与更新
 
@@ -168,7 +165,7 @@ Origin，通过同源请求获取每次启动的新key。它不提供用户登�
 静止画面使用2倍采样，移动画面降低采样及质量。CPU曲面细节简化仅用于交互期间，
 静止、Inspect及导出恢复原几何；输出图片尺寸仍由Export Figure设置。
 
-当前源码自带用于中文和支持的Unicode图件文字的字体，无需在宿主机另行安装字体。不支持的字形会明确报错，不再静默丢失。混合Unicode节点标签使用随附回退字体，标题按实际画布适配，PDF中的回退文字保存为字形轮廓。已下载的公测镜像不变，这些更新需使用当前源码。
+2.0.0包含用于中文和支持的Unicode图件文字的随附字体，无需在宿主机另行安装字体。不支持的字形会明确报错，不再静默丢失。混合Unicode节点标签使用随附回退字体，标题按实际画布适配，PDF中的回退文字保存为字形轮廓。既有公测镜像不变，请使用对应2.0.0镜像或当前源码。
 
 Scene JSON元数据上限32 MiB，科学文件上传每份32 MiB，Scene ZIP压缩大小64 MiB，
 会话文件总量128 MiB。便携Scene保存先暂存并核验资产，再提交新文件名，要求文件系统

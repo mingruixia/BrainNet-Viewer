@@ -2,7 +2,7 @@
 
 [中文](Getting_Started.zh-CN.md) · [Manual](../manual/en/index.md) · [Scene and preset details](Scene_Workflows.en.md)
 
-For `2.0.0-beta.1`, build date **1 Oct 2026**. This MATLAB public beta is intended for evaluation and feedback. MATLAB is required; this is not a MATLAB Runtime standalone. See the README for installation requirements and limitations.
+For BrainNet Viewer `2.0.0`. Use the matching source or distribution and verify its release notes and checksums. MATLAB is required; this is not a MATLAB Runtime standalone. See the README for installation requirements and limitations.
 
 ## 1. Install and launch
 

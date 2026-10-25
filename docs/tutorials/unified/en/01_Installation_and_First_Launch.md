@@ -8,7 +8,7 @@ Choose MATLAB Desktop, Python Desktop in a separate environment, or Docker/Web i
 
 MATLAB Desktop needs installed, licensed MATLAB. Python Desktop uses Python, Qt and VTK and does not require MATLAB or SPM. The desktop editions need a local graphical desktop. Docker/Web runs in a background container and needs neither MATLAB nor a local Python environment. A standalone executable and MATLAB Runtime-only package are not supplied.
 
-Check the supplied package's compatibility notes and SHA256SUMS. The public beta is named 2.0.0-beta.1; its Python package version is 2.0.0b1. Selected workflows have been tested on Windows x64 and Apple Silicon macOS. Consult the release notes for platform details; Intel Mac, Linux Desktop and other display arrangements have not been verified. For browser use follow the [Docker installation guide](../../../web/en/INSTALLATION.md).
+Check the supplied package's compatibility notes and SHA256SUMS. The MATLAB, Python and Docker/Web versions are 2.0.0. Python requires 3.11 or newer. If matching release assets are unavailable, follow the source-installation instructions. Selected workflows have been tested on Windows x64 and Apple Silicon macOS. Consult the release notes for platform details; Intel Mac, Linux Desktop and other display arrangements have not been verified. For browser use follow the [Docker installation guide](../../../web/en/INSTALLATION.md).
 
 ## Launch MATLAB Desktop
 

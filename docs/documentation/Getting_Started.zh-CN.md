@@ -2,7 +2,7 @@
 
 [English](Getting_Started.en.md) · [手册](../manual/zh-CN/index.md) · [Scene与预设细节](Scene_Workflows.zh-CN.md)
 
-适用于`2.0.0-beta.1`，构建日期 **1 Oct 2026**。本MATLAB公开测试版用于评估及反馈；需安装MATLAB，不是MATLAB Runtime独立程序。验证范围及限制请以README为准。
+适用于BrainNet Viewer `2.0.0`。请使用对应版本的源码或安装包，核对发行说明和校验值；需安装MATLAB，不是MATLAB Runtime独立程序。验证范围及限制请以README为准。
 
 ## 1. 安装与启动
 

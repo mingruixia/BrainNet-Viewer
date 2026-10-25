@@ -2,19 +2,20 @@
 
 [中文](../zh-CN/INSTALLATION.md)
 
-BrainNet Viewer Web runs in the background in Docker. Use it in your browser at
+BrainNet Viewer Web 2.0.0 runs in the background in Docker. Use it at
 **http://127.0.0.1:1031/index.html**. MATLAB and a local Python installation are
-not required. The public-beta image is
-[mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer).
+not required. The matching image is
+[mingruixia/brainnet-viewer:2.0.0](https://hub.docker.com/r/mingruixia/brainnet-viewer).
 
-This download image is unchanged. Maintenance updates on the default source
-branch require a local source build; pulling the beta tag does not install them.
-The source-build instructions at the end cover GPU selection and CPU fallback.
+Use the image only when that version is available. Before publication, use an
+identified local image supplied for testing or the source-build instructions.
+Do not substitute the unchanged beta image for 2.0.0.
+[Versioned installation](RELEASE_INSTALLATION.md) covers offline loading,
+GPU-preferred launchers, CPU fallback and beta upgrades.
 
-For 2.0.0 recipes, offline candidates and GPU-preferred startup, see
-[versioned installation](RELEASE_INSTALLATION.md). The source release Compose
-now targets 2.0.0; use the downloaded beta ZIP's own recipe for beta.1.
-Do not pull an unpublished formal tag.
+For access through a Linux server's IP, follow
+[server deployment](SERVER_DEPLOYMENT.md), including HTTPS, authentication and
+independent browser sessions. Do not expose the local loopback recipe on a LAN.
 
 ## 1. Install and start Docker
 
@@ -41,11 +42,16 @@ not force amd64 on Apple Silicon.
 
 ## 2. Download the Web package and start
 
-Download **BrainNet-Viewer-Web-2.0.0-beta.1.zip** from the
-[GitHub release](https://github.com/mingruixia/BrainNet-Viewer/releases/tag/v2.0.0-beta.1)
-or [NITRC](https://www.nitrc.org/projects/bnv/), then extract it.
-Open a terminal in the extracted folder containing `compose.web.release.yml`.
-These commands work in Windows PowerShell and macOS/Linux Terminal:
+Download **BrainNet-Viewer-Web-2.0.0.zip** from the matching
+[GitHub release](https://github.com/mingruixia/BrainNet-Viewer/releases)
+or [NITRC](https://www.nitrc.org/projects/bnv/), verify SHA256SUMS and extract it.
+If the assets are not yet listed, use a supplied local image or build from source.
+
+For GPU-preferred startup, follow the supplied Windows or Linux/macOS launcher
+steps in [versioned installation](RELEASE_INSTALLATION.md). They test GPU drawing
+before selecting a backend. Docker must be able to allocate the GPU.
+
+For a CPU-compatible Compose launch, open a terminal in the extracted folder:
 
 ```sh
 docker compose -f compose.web.release.yml pull
@@ -53,18 +59,15 @@ docker compose -f compose.web.release.yml up -d
 docker compose -f compose.web.release.yml ps
 ```
 
-The first command downloads the application and dependencies from Docker Hub.
-It may take several minutes on the first installation. The second starts the
-background service. A container should appear as running in the third command.
+Pull only after the matching image is published. For an unpublished local image,
+set `BNV_IMAGE` to its verified tag and omit `pull`. Compose does not allocate GPU
+devices by default. The default CPU quota is 1; set `BNV_CPUS` explicitly when needed.
 
-Open **http://127.0.0.1:1031/index.html**. Allow the first startup a short time
-to initialize. Docker Desktop must remain running; closing the terminal is fine.
-If the page is not ready, use the log command below instead of starting a second
-container.
-
-For a complete source checkout, use the optional source-build instructions below.
-The current release recipe targets 2.0.0 and has a separate installation guide;
-it is not a replacement for the unchanged beta ZIP's Compose file.
+Open **http://127.0.0.1:1031/index.html**. Docker Desktop must remain running;
+the terminal can close. Check logs before starting another container.
+The following lifecycle commands apply to Compose launches; for launcher-managed
+containers use the actions described in [versioned installation](RELEASE_INSTALLATION.md).
+Keep a beta installation's original recipe with its beta files.
 
 ## 3. Stop, reopen and update
 
@@ -203,7 +206,7 @@ Current source builds carry annotation fonts for Chinese and supported Unicode
 characters; the host needs no additional font installation. Missing glyphs produce
 an error rather than disappearing. Mixed Unicode node labels use the bundled font,
 titles fit the available canvas, and PDF fallback text uses glyph outlines. The
-downloadable beta image is unchanged; these updates require the current source.
+earlier beta image is unchanged; use the matching 2.0.0 image or current source.
 
 Scene JSON metadata is limited to 32 MiB; scientific-file uploads to 32 MiB each,
 Scene ZIPs to 64 MiB compressed and session files to 128 MiB. Portable Scene saves

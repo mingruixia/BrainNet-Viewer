@@ -1,13 +1,14 @@
-# BrainNet Viewer 2.0
+# BrainNet Viewer 2.0.0
 
 [English](README.md) · [统一手册](docs/manual/en/index.md) · [统一教程（英文）](docs/tutorials/unified/en/index.md)
 
-BrainNet Viewer 用于显示脑曲面、网络、曲面映射和图谱 ROI。
-2.0.0-beta.1 提供 MATLAB 桌面版、独立的 Python 桌面版和由 Docker 运行的 Web 版。
+BrainNet Viewer用于显示脑曲面、网络、曲面映射和图谱ROI，提供MATLAB桌面版、
+独立Python桌面版和Docker/Web版。三版源码的版本号均为 **2.0.0**。
 
-默认分支包含公测发布后的维护更新，下载包和 Docker Hub 的 `2.0.0-beta.1`
-镜像仍保留发布时的代码。如需使用维护更新，请按安装指南从源码安装。
-具体变更见[更新说明](CHANGELOG.zh-CN.md)。
+请使用GitHub或NITRC对应发行版的安装包和镜像标签，并核对SHA256SUMS。
+若尚未列出2.0.0资产，请按指南从源码安装。既有2.0.0-beta.1下载仍为独立的公测发行，
+其Python wheel版本为2.0.0b1。具体变更见[更新说明](CHANGELOG.zh-CN.md)。
+Python要求3.11或更新版本；Docker镜像内置Python 3.12。
 
 ## 安装与启动
 
@@ -18,8 +19,8 @@ BrainNet Viewer 用于显示脑曲面、网络、曲面映射和图谱 ROI。
   desktop附加依赖，运行 `python -m brainnet_viewer`，不需要MATLAB。
 - Web版：按[Docker说明](docs/web/zh-CN/INSTALLATION.md)后台启动容器，
   浏览器打开 http://127.0.0.1:1031/index.html。
-  下载Web安装包，按指南拉取并启动镜像即可，无需源码构建。
-  镜像：[mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer)。
+  对应镜像发布后，下载Web安装包并按指南拉取启动，无需源码构建。
+  镜像：[mingruixia/brainnet-viewer:2.0.0](https://hub.docker.com/r/mingruixia/brainnet-viewer)。
 
 ## 操作流程
 
@@ -33,12 +34,16 @@ BrainNet Viewer 用于显示脑曲面、网络、曲面映射和图谱 ROI。
 AAL90体积和顶点标签位于源码/MATLAB包根目录的`resources/atlases/AAL90/`；
 Python/Docker资源库中对应`atlases/AAL90/`。Inspect基于MNI类空间查询
 AAL/Brodmann；使用个人数据前确认配准与坐标对应。界面为英文，
-软件不限于人脑数据。Web 版使用一个共享会话，适合受信任用户在个人电脑上运行。
-源码启动时会测试 GPU 绘图，不可用时使用 CPU；已发布镜像使用 CPU。
+软件不限于人脑数据。Web 本机模式使用一个共享会话，适合受信任用户在个人电脑上运行。
+随附启动器会实际测试GPU绘图，可用时选择GPU，否则使用CPU；容器需获分配GPU设备。未分配GPU的Compose配置使用CPU。
 停止或更新容器前，请保存便携 Scene。
 
+团队部署可使用 [Linux 局域网服务器模式](docs/web/zh-CN/SERVER_DEPLOYMENT.md)，
+采用 HTTPS 和访问密码，为每个浏览器会话分配独立应用进程，面向可信团队使用。
+使用对应2.0.0镜像或源码构建；既有公测镜像不包含服务器模式。
+
 本地服务会检查浏览器请求，但不提供操作系统用户认证。本机进程可以伪造请求头，
-因此不适合多用户共享主机或公网部署。参见[安全说明](SECURITY.md)。
+因此不能直接作为多用户共享主机或公网部署配置。参见[安全说明](SECURITY.md)。
 
 ## 源码构建
 

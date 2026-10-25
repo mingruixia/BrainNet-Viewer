@@ -8,9 +8,9 @@ files, settings and cameras. Two browsers using the same client IP remain separa
 Tabs in the same browser profile share its session cookie and therefore its process;
 use a different profile or a private browsing session for a separate workspace.
 
-Server mode is available from the current source branch. The existing
-`2.0.0-beta.1` Docker Hub image does not include it. Build the source image using
-the recipe below. The ordinary local Compose recipe still uses port 1031 on loopback
+Server mode is included in 2.0.0. Use the matching image and
+[versioned server recipe](RELEASE_INSTALLATION.md), or build from source as below.
+The earlier `2.0.0-beta.1` image does not include server mode. The ordinary local Compose recipe still uses port 1031 on loopback
 and one shared application session.
 
 ## Prepare the server

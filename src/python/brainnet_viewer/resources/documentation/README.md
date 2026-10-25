@@ -1,17 +1,16 @@
-# BrainNet Viewer 2.0
+# BrainNet Viewer 2.0.0
 
 [中文](README.zh-CN.md) · [Unified manual](docs/manual/en/index.md) · [Shared tutorials](docs/tutorials/unified/en/index.md)
 
-BrainNet Viewer displays brain surfaces, networks, surface maps and atlas ROIs.
-Version 2.0.0-beta.1 is available as a MATLAB desktop application, an independent
-Python desktop application and a Web application hosted in Docker.
+BrainNet Viewer displays brain surfaces, networks, surface maps and atlas ROIs
+through MATLAB Desktop, Python Desktop and Docker/Web. This source tree uses
+version **2.0.0** for all three editions.
 
-The default branch contains maintenance updates made after the public beta.
-The downloadable packages and Docker Hub `2.0.0-beta.1` image still contain the
-released code. To use the maintenance updates, follow the source-installation
-instructions. [Changes](CHANGELOG.md) lists the updates.
-Current Python source builds require Python 3.11 or newer; the Docker source
-image includes Python 3.12.
+Use packages and image tags from the matching GitHub or NITRC release and check
+their SHA256SUMS. If the 2.0.0 assets are not yet listed, use the source-installation
+instructions. The earlier 2.0.0-beta.1 downloads remain a separate release; their
+Python wheel is 2.0.0b1. [Changes](CHANGELOG.md) describes the updates.
+Python requires 3.11 or newer; the Docker image includes Python 3.12.
 
 ## Install and launch
 
@@ -24,7 +23,7 @@ image includes Python 3.12.
 - Web: follow [Docker installation](docs/web/en/INSTALLATION.md). The service
   runs in the background and opens at http://127.0.0.1:1031/index.html.
   Download the Web package and run its Compose pull/start commands; no source
-  build is required. Image: [mingruixia/brainnet-viewer:2.0.0-beta.1](https://hub.docker.com/r/mingruixia/brainnet-viewer).
+  build is required once the matching image is available. Image: [mingruixia/brainnet-viewer:2.0.0](https://hub.docker.com/r/mingruixia/brainnet-viewer).
 
 ## Workflow
 
@@ -48,14 +47,15 @@ registration and coordinate correspondence for your own data. The application
 interface is English and is not restricted to human-brain data.
 
 The local Web mode has one shared session and is intended for a trusted user on a
-private local computer. Source builds test GPU rendering at startup and use the
-CPU if a GPU is unavailable; the released image uses the CPU. Save a portable
+private local computer. The supplied launchers test GPU rendering and select
+the GPU when available, otherwise the CPU. GPU devices must be allocated to the
+container. Compose without GPU allocation runs on the CPU. Save a portable
 Scene before stopping or updating the container.
 
-For a trusted team on a Linux LAN server, the current source also provides
+For a trusted team on a Linux LAN server, use
 [server mode](docs/web/en/SERVER_DEPLOYMENT.md), with HTTPS, an access password
-and one application process per browser session. This requires a source build;
-the published beta image has not changed.
+and one application process per browser session. Use a matching 2.0.0 image or
+a source build; the earlier beta image does not include server mode.
 
 The local server checks browser requests but does not authenticate operating-system
 users. Another local process can forge request headers, so this configuration is

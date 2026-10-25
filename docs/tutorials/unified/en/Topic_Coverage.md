@@ -24,7 +24,7 @@ Both editions retain the core workflow: open the main window, select inputs, con
 
 Start with the [tutorial index](index.md) for the shared workflow. The [manual](../../../manual/en/index.md) provides the illustrated English Word/PDF edition and links to edition-specific reference chapters.
 
-Create your own Scenes as you work through the lessons; prebuilt Scenes are not included. Lesson 01 and the installation guide cover Docker/Web deployment. This public beta does not provide time-varying connectivity, AI tools or fiber tracking.
+Create your own Scenes as you work through the lessons; prebuilt Scenes are not included. Lesson 01 and the installation guide cover Docker/Web deployment. This version does not provide time-varying connectivity, AI tools or fiber tracking.
 
 ## Docker/Web edition
 
