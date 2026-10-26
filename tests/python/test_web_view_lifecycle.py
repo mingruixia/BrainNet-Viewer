@@ -102,6 +102,86 @@ class ViewLifecycleTests(unittest.TestCase):
             finally:
                 plot.close(); plot.deep_clean()
 
+    def test_sampling_changes_fit_once_with_matching_dpi(self):
+        from pathlib import Path
+        w=self.workspace
+        w.paths={'surface': Path(__file__).parents[1] / 'fixtures/cross-platform-v0.1/tetrahedron.nv'}
+        w.configure({'image': {'title': 'Linux GPU 验证 — Schaefer100 / Yeo7'}})
+        w.render(canvas_size=(631,387))
+        window=w.plotter.render_window
+        key=str(self.objects.GetGlobalId(window))
+        self.delivery.add_render_observer(key)
+        self.delivery.set_view_size(key,631,387)
+        self.delivery.set_view_quality(key,100,2)
+        messages=[]
+        w.on_canvas_warning=messages.append
+        self.actions['stream_start']()
+        self.assertEqual((window.GetDPI(),w.screen_ratio),(144,2))
+        self.delivery.set_view_quality(key,70,.65)
+        self.assertEqual(window.GetSize(),(410,252))
+        self.assertEqual(window.GetDPI(),47)
+        self.assertEqual(w.screen_ratio,.65)
+        self.actions['stream_end']()
+        self.assertEqual((window.GetDPI(),w.screen_ratio),(47,.65))
+        self.delivery.set_view_quality(key,100,2)
+        self.assertEqual(window.GetSize(),(1262,774))
+        self.assertEqual(window.GetDPI(),144)
+        self.assertEqual(w.screen_ratio,2)
+        self.assertFalse(any(messages),messages)
+        self.assertTrue(w.renderer.title_actor.GetVisibility())
+
+    def test_resize_during_dolly_preserves_event_coordinate_basis(self):
+        from pathlib import Path
+        from vtkmodules.vtkWebCore import vtkWebApplication, vtkWebInteractionEvent
+        w=self.workspace
+        w.paths={'surface': Path(__file__).parents[1] / 'fixtures/cross-platform-v0.1/tetrahedron.nv'}
+        w.render(canvas_size=(410,252))
+        w.plotter.enable_custom_trackball_style(left='dolly')
+        window=w.plotter.render_window
+        w.plotter.screenshot(return_img=True)
+        app=vtkWebApplication()
+        event=vtkWebInteractionEvent()
+        event.SetX(.21077654516640254); event.SetY(.21059431524547803)
+        event.SetButtons(vtkWebInteractionEvent.LEFT_BUTTON)
+        app.HandleInteractionEvent(window,event)
+        self.assertEqual(window.GetInteractor().GetInteractorStyle().GetState(),4)
+        self.assertEqual(window.GetInteractor().GetEventPosition(),(86,53))
+        before=w.renderer.capture_camera()['views'][0]['zoom_factor']
+        window.SetSize(410,121)
+        self.assertEqual(window.GetInteractor().GetEventPosition(),(86,25))
+        event.SetY(.2054263565891473)
+        app.HandleInteractionEvent(window,event)
+        self.assertEqual(w.renderer.capture_camera()['views'][0]['zoom_factor'],before)
+        event.SetButtons(0); app.HandleInteractionEvent(window,event)
+
+    def test_initial_stream_placeholder_cannot_replace_committed_frame(self):
+        from unittest.mock import patch
+        window=vtkRenderWindow()
+        key=str(self.objects.GetGlobalId(window))
+        try:
+            with patch.object(self.delivery,'still_render',return_value={'stale':False,'image':None}) as render:
+                self.delivery.add_render_observer(key)
+                self.delivery.set_view_size(key,631,387)
+                self.delivery.set_view_quality(key,5,.1)
+                self.delivery.push_render(key)
+                render.assert_not_called()
+                self.delivery.set_view_quality(key,100,2)
+                self.delivery.push_render(key)
+                self.assertEqual(render.call_args.args[0]['size'],[1262,774])
+                self.assertEqual(render.call_args.args[0]['quality'],100)
+                self.delivery.set_view_quality(key,5,.1)
+                self.assertEqual(window.GetSize(),(1262,774))
+                self.assertEqual(self.delivery.get_view_quality(key),{'quality':100,'ratio':2})
+                self.delivery.set_view_quality(key,70,.65)
+                self.assertEqual(window.GetSize(),(410,252))
+                self.delivery.remove_render_observer(key)
+                self.assertNotIn(key,self.delivery._brainnet_quality_ready)
+                self.assertNotIn(key,self.delivery._brainnet_size_ready)
+        finally:
+            w=self.workspace
+            w.retire_view(window)
+            window.Finalize()
+
     def test_apply_layout_clear_and_failure_keep_one_native_context(self):
         from pathlib import Path
         from unittest.mock import patch

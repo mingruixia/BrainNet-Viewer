@@ -809,7 +809,7 @@ def create_app(server=None, workspace=None):
              'demo_start':navigation.start,'demo_stop':navigation.stop,'toolbar_view':navigation.direction,
              'resources_refresh':navigation.refresh,'legacy_review':legacy_review,'legacy_use':legacy_use}
     def start_detail():
-        workspace.set_screen_ratio(.65)
+        # Sampling RPCs own DPI and size together, regardless of callback order.
         if not state.inspect_on:
             detail.start()
             if detail.active: state.cpu_detail_uses+=1
@@ -817,12 +817,11 @@ def create_app(server=None, workspace=None):
     def finish_detail():
         changed=detail.active or getattr(workspace,'screen_ratio',1)!=2
         detail.finish()
-        workspace.set_screen_ratio(2)
         if changed: view.update()  # Always push original geometry after the last proxy frame.
     actions['stream_end']=finish_detail
     view=build_shell(server,workspace,initial,actions)
     from .web_view_lifecycle import RemoteViewLifecycle
-    view_lifecycle=RemoteViewLifecycle(server)
+    view_lifecycle=RemoteViewLifecycle(server,workspace)
     workspace.retire_view=view_lifecycle.retire
     navigation.refresh()
     def close(*_,**__):

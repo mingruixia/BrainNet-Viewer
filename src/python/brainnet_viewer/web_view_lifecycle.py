@@ -6,6 +6,7 @@ keeps native windows in its object map; closing a PyVista plotter is not enough.
 Protocol customization runs before any WebSocket RPC methods are registered.
 """
 from functools import wraps, lru_cache
+from contextlib import nullcontext
 
 
 class _UnavailableView(Exception):
@@ -116,15 +117,62 @@ def _guarded_protocol(base):
         method = getattr(base, name)
         if callable(method) and hasattr(method, '_wslinkuris'):
             methods[name] = _guard_rpc(method)
+    from trame_vtk.modules.vtk.protocols.publish_image_delivery import vtkWebPublishImageDelivery
+    if issubclass(base,vtkWebPublishImageDelivery):
+        @wraps(base.set_view_quality)
+        def quality(self,view_id,quality,ratio=1):
+            window=self.get_view(view_id)
+            key=str(self.get_global_id(window))
+            if key not in self.tracking_views:
+                return base.set_view_quality(self,view_id,quality,ratio)
+            # The pinned client sends this placeholder while mounting. It must
+            # not replace a committed frame or resize an already shared window.
+            if quality==5 and ratio==.1: return {'result':'success'}
+            workspace=self._brainnet_workspace
+            transaction=(workspace.screen_sampling(ratio) if workspace and workspace.plotter
+                         and workspace.plotter.render_window is window else nullcontext())
+            self._brainnet_sampling.add(key)
+            try:
+                with transaction:
+                    result=base.set_view_quality(self,view_id,quality,ratio)
+                if result.get('result')=='success': self._brainnet_quality_ready.add(key)
+                return result
+            finally: self._brainnet_sampling.discard(key)
+
+        @wraps(base.set_view_size)
+        def size(self,view_id,width,height):
+            result=base.set_view_size(self,view_id,width,height)
+            if result.get('result')=='success' and width>10 and height>10:
+                self._brainnet_size_ready.add(str(self.get_global_id(self.get_view(view_id))))
+            return result
+
+        @wraps(base.remove_render_observer)
+        def remove(self,view_id):
+            key=str(self.get_global_id(self.get_view(view_id)))
+            result=base.remove_render_observer(self,view_id)
+            if key not in self.tracking_views:
+                self._brainnet_quality_ready.discard(key)
+                self._brainnet_size_ready.discard(key)
+            return result
+
+        @wraps(base.push_render)
+        def push(self,v_id,*args,**kwargs):
+            if (v_id not in self._brainnet_quality_ready or v_id not in self._brainnet_size_ready
+                    or v_id in self._brainnet_sampling): return
+            return base.push_render(self,v_id,*args,**kwargs)
+
+        methods.update(set_view_quality=_guard_rpc(quality),set_view_size=_guard_rpc(size),
+                       remove_render_observer=_guard_rpc(remove),push_render=push)
     return type('BrainNet' + base.__name__, (base,), methods)
 
 
 class RemoteViewLifecycle:
-    def __init__(self, server):
+    def __init__(self, server, workspace=None):
         from trame_vtk.modules.vtk import get_helper
         self.helper = get_helper(server)
         self.helper._vtk_core = _ImageApplication(self.helper._vtk_core)
         self.protocols = []
+        self.workspace = workspace
         server.add_protocol_to_configure(self.configure)
 
     def configure(self, root):
@@ -135,6 +183,11 @@ class RemoteViewLifecycle:
             # private subclass for these server-owned instances; SDK classes
             # and other servers remain untouched. Preserve initialized state.
             protocol.__class__ = _guarded_protocol(type(protocol))
+            if hasattr(protocol,'tracking_views'):
+                protocol._brainnet_workspace=self.workspace
+                protocol._brainnet_quality_ready=set()
+                protocol._brainnet_size_ready=set()
+                protocol._brainnet_sampling=set()
 
     def retire(self, window):
         if window is None:
@@ -145,6 +198,8 @@ class RemoteViewLifecycle:
         for protocol in self.protocols:
             tracking = getattr(protocol, 'tracking_views', {})
             info = tracking.pop(view_id, None)
+            for name in ('_brainnet_quality_ready','_brainnet_size_ready','_brainnet_sampling'):
+                getattr(protocol,name,set()).discard(view_id)
             if info:
                 for tag in info['tags']:
                     core.RemoveObserver(tag)

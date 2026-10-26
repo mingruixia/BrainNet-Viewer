@@ -4,6 +4,7 @@ Inputs are bundled catalog entries or bounded files uploaded into an owned
 temporary directory. Host filesystem paths are never accepted from the browser.
 """
 from copy import deepcopy
+from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -136,11 +137,10 @@ class WebWorkspace:
         fitting=False
         def fit_canvas(window, _event):
             nonlocal fitting
-            if renderer.exporting or fitting: return
+            if renderer.exporting or fitting or getattr(self,'_sampling_update',False): return
             fitting=True
             try:
-                renderer.resize_fit(*window.GetSize(),annotation_dpi=window.GetDPI()/getattr(self,'screen_ratio',1))
-                self._publish_canvas_warning()
+                self._fit_screen()
             finally: fitting=False
         try:
             self.close_render(preserve_window=True)
@@ -177,6 +177,35 @@ class WebWorkspace:
         self._publish_canvas_warning()
         return renderer
 
+    def _fit_screen(self):
+        renderer=self.renderer; window=self.plotter.render_window
+        size=window.GetSize(); previous=renderer.fit_size
+        interactor=window.GetInteractor()
+        style=interactor.GetInteractorStyle() if interactor else None
+        if previous and size!=previous and all(previous) and style and style.GetState():
+            # A held drag must not mix event coordinates from two raster sizes.
+            position=interactor.GetEventPosition(); last=interactor.GetLastEventPosition()
+            scale=lambda point: tuple(int(value*new/old+.5) for value,new,old in zip(point,size,previous))
+            interactor.SetEventPosition(*scale(position))
+            interactor.SetLastEventPosition(*scale(last))
+        renderer.resize_fit(*size,annotation_dpi=window.GetDPI()/getattr(self,'screen_ratio',1))
+        self._publish_canvas_warning()
+
+    @contextmanager
+    def screen_sampling(self, ratio):
+        # The protocol changes native size synchronously. Fit only after its DPI
+        # and size agree, so a provisional title warning cannot resize the UI.
+        previous=getattr(self,'_sampling_update',False)
+        self._sampling_update=True
+        try:
+            self.set_screen_ratio(ratio)
+            yield
+        finally:
+            self._sampling_update=previous
+            if not previous and self.renderer:
+                self._fit_screen()
+                self.renderer.update_label_records()
+
     def set_screen_ratio(self, ratio):
         # Scalar bars/title/legends use fixed pixels; preserve their CSS extent
         # when the remote image is sampled above/below the CSS canvas size.
@@ -186,7 +215,13 @@ class WebWorkspace:
             # the base screen DPI; figure export retains its own DPI transaction.
             if not hasattr(self,'_screen_dpi_base'):
                 self._screen_dpi_base=self.plotter.render_window.GetDPI()
-            self.plotter.render_window.SetDPI(max(1,int(self._screen_dpi_base*self.screen_ratio+.5)))
+            window=self.plotter.render_window
+            old_dpi=window.GetDPI()
+            window.SetDPI(max(1,int(self._screen_dpi_base*self.screen_ratio+.5)))
+            if window.GetDPI()!=old_dpi:
+                # VTK's scalar-bar layout cache does not track window DPI.
+                for bar in self.renderer.colorbars: bar.Modified()
+            if getattr(self,'_sampling_update',False): return
             self.renderer.update_label_records()
             self.renderer.update_annotation_fonts(self.plotter.render_window.GetDPI()/self.screen_ratio,strict_title=False)
             self._publish_canvas_warning()
