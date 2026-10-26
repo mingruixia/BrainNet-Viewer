@@ -170,6 +170,9 @@ def create_server(config, password, *, launcher=None):
             headers['Cache-Control'] = 'private, max-age=3600'
             headers['Vary'] = 'Cookie'
         if request.path in ('/_bnv/login', '/_bnv/session'):
+            # no-referrer makes browser form POSTs send Origin:null, which our
+            # strict origin guard must reject. Keep origins for same-origin forms.
+            headers['Referrer-Policy'] = 'same-origin'
             headers['Content-Security-Policy'] = "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
         if config.origin.startswith('https://'):
             headers['Strict-Transport-Security'] = 'max-age=31536000'

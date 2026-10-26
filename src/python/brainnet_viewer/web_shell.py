@@ -86,6 +86,9 @@ def build_shell(server, workspace, initial, actions):
     state.trame__title='BrainNet Viewer — Web'
     # Vue templates omit style elements; load CSS through Trame's module assets.
     server.enable_module({'styles':['data:text/css;base64,'+base64.b64encode((CSS+COMPACT_CSS).encode()).decode()]})
+    from pathlib import Path
+    connection_client = Path(__file__).with_name('web_connection_client.js').read_bytes()
+    server.enable_module({'scripts':['data:text/javascript;base64,'+base64.b64encode(connection_client).decode()]})
     with VAppLayout(server,theme=("theme === 'Dark' ? 'dark' : 'light'",)):
         with html.Div(classes=("'bnv '+(theme === 'Dark' ? 'dark' : '')",)):
             with html.Header(classes='bnv-banner'):

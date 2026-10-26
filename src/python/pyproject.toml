@@ -48,6 +48,7 @@ include = ["brainnet_viewer*"]
 brainnet_viewer = [
     "resources/fonts/*.ttf", "resources/fonts/*.json", "resources/fonts/*.txt",
     "web_session_client.js",
+    "web_connection_client.js",
     "data/*.npz", "data/*.json",
     "resources/Help.en.md", "resources/*.mat",
     "resources/Tutorials.en.md",

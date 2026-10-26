@@ -184,6 +184,27 @@ class GatewayProcessTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(response.status, 401)
         self.assertEqual(len(self.pool.sessions), 2)
 
+    async def test_form_referrer_policy_preserves_strict_origin_checks(self):
+        for path in ('/_bnv/login', '/_bnv/session'):
+            async with self.a.get(self.origin + path) as response:
+                self.assertEqual(response.headers['Referrer-Policy'], 'same-origin')
+                self.assertIn("form-action 'self'", response.headers['Content-Security-Policy'])
+        async with self.a.post(self.origin + '/_bnv/login', data={'password': PASSWORD},
+                               headers={'Origin': 'null'}, allow_redirects=False) as response:
+            self.assertEqual(response.status, 403)
+        self.assertEqual(len(self.pool.sessions), 0)
+        key = await self.login(self.a)
+        async with self.a.post(self.origin + '/_bnv/session', headers={'Origin': 'null'},
+                               allow_redirects=False) as response:
+            self.assertEqual(response.status, 403)
+        self.assertIsNotNone(self.pool.find(key))
+        async with self.a.get(self.origin + '/_bnv/status') as response:
+            self.assertEqual(response.headers['Referrer-Policy'], 'no-referrer')
+        async with self.a.post(self.origin + '/_bnv/session', headers={'Origin': self.origin},
+                               allow_redirects=False) as response:
+            self.assertEqual(response.status, 303)
+        self.assertIsNone(self.pool.find(key))
+
     async def test_idle_crash_and_cleanup(self):
         key = await self.login(self.a)
         a = await self.index(self.a)
