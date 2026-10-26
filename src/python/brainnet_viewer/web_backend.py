@@ -20,7 +20,8 @@ try:
  print(json.dumps({'device':device,'drawn':image.shape[:2]==(64,64)}))
 finally:p.close()
 '''
-DRIVER_KEYS = ('GALLIUM_DRIVER','MESA_LOADER_DRIVER_OVERRIDE','MESA_D3D12_DEFAULT_ADAPTER_NAME')
+DRIVER_KEYS = ('GALLIUM_DRIVER','MESA_LOADER_DRIVER_OVERRIDE','MESA_D3D12_DEFAULT_ADAPTER_NAME',
+               '__EGL_VENDOR_LIBRARY_FILENAMES')
 
 def hardware(device):
     value=device.lower()
@@ -33,6 +34,12 @@ def driver_environment(base, *, cpu=False):
     if cpu:
         env['LIBGL_ALWAYS_SOFTWARE']='1'
         env['GALLIUM_DRIVER']='llvmpipe'
+        if sys.platform=='linux':
+            # Mesa's software hints do not constrain NVIDIA GLX/EGL. Select
+            # Mesa EGL explicitly when its system vendor manifest is present.
+            env['VTK_DEFAULT_OPENGL_WINDOW']='vtkEGLRenderWindow'
+            mesa=Path('/usr/share/glvnd/egl_vendor.d/50_mesa.json')
+            if mesa.is_file(): env['__EGL_VENDOR_LIBRARY_FILENAMES']=str(mesa)
     else:
         env.pop('LIBGL_ALWAYS_SOFTWARE',None)
         adapter=base.get('MESA_D3D12_DEFAULT_ADAPTER_NAME')
@@ -76,7 +83,10 @@ def configure_backend(mode=None, *, run=subprocess.run):
     else:
         env=driver_environment(base,cpu=True);chosen=probe(env,run=run);selected='cpu'
     if not chosen['ok']: raise RuntimeError('CPU/GPU render startup failed: '+chosen['reason'])
-    for key in (*DRIVER_KEYS,'LIBGL_ALWAYS_SOFTWARE','LD_LIBRARY_PATH','EGL_PLATFORM'):
+    if selected=='cpu' and hardware(chosen['device']):
+        raise RuntimeError('CPU render probe selected hardware: '+chosen['device'])
+    for key in (*DRIVER_KEYS,'LIBGL_ALWAYS_SOFTWARE','LD_LIBRARY_PATH','EGL_PLATFORM',
+                'VTK_DEFAULT_OPENGL_WINDOW'):
         if key in env: os.environ[key]=env[key]
         else: os.environ.pop(key,None)
     record={'requested':mode,'selected':selected,'device':chosen['device'],'fallback':fallback}
