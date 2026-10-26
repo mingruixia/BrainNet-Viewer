@@ -7,6 +7,17 @@ import json
 from pathlib import Path
 
 
+# Screen typography stays in pixels; exports use print point sizes.
+EXPORT_TITLE_POINTS = 12
+EXPORT_ANNOTATION_POINTS = 8
+
+
+def annotation_font_points(pixels, dpi, *, for_export=False):
+    if for_export:
+        return max(6, int(pixels * EXPORT_ANNOTATION_POINTS / 12 + .5))
+    return max(1, int(pixels * 72 / dpi + .5))
+
+
 @lru_cache(maxsize=2)
 def _font(style):
     folder = Path(__file__).parent / 'resources/fonts'
@@ -62,7 +73,7 @@ class TitleFitError(ValueError):
     """The complete title cannot fit without exceeding the minimum text size."""
 
 
-def validate_title(text, width, height, dpi):
+def validate_title(text, width, height, dpi, *, target_points=None):
     """Measure a prospective title without touching the visible canvas."""
     if not text:
         return
@@ -70,17 +81,21 @@ def validate_title(text, width, height, dpi):
     actor = vtkTextActor(); actor.SetInput(text)
     prop = actor.GetTextProperty(); prop.SetBold(True)
     use_font(prop, font_for_strings([text], bold=True))
-    fit_title(actor, width, height, dpi)
+    fit_title(actor, width, height, dpi, target_points=target_points)
 
 
-def fit_title(actor, width, height, dpi, *, target_pixels=18, measure_dpi=None):
+def fit_title(actor, width, height, dpi, *, target_pixels=18, measure_dpi=None, target_points=None):
     """Fit the complete title into its reserved strip; do not crop or elide it."""
     from vtkmodules.vtkRenderingFreeType import vtkFreeTypeTools
     from vtkmodules.vtkRenderingCore import vtkTextProperty
     original = actor.GetTextProperty()
     prop = vtkTextProperty(); prop.ShallowCopy(original)
-    requested = max(1, int(target_pixels * 72 / dpi + .5))
-    minimum = min(requested, max(1, int(8 * 72 / dpi + .999)))
+    if target_points is None:
+        requested = max(1, int(target_pixels * 72 / dpi + .5))
+        minimum = min(requested, max(1, int(8 * 72 / dpi + .999)))
+    else:
+        requested = max(1, int(target_points + .5))
+        minimum = min(requested, 6)
     maximum_width, maximum_height = .94 * width, .065 * height
     measure_dpi = dpi if measure_dpi is None else measure_dpi
     tools = vtkFreeTypeTools.GetInstance()

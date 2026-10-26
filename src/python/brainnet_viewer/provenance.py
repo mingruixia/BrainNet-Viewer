@@ -8,6 +8,7 @@ import platform
 from pathlib import Path
 from pathlib import PureWindowsPath
 from . import __version__
+from .text_rendering import EXPORT_TITLE_POINTS
 from .io import sha256, gifti_dependencies
 from .session import signature, digest
 
@@ -58,7 +59,13 @@ def build_provenance(renderer, paths, export, context=None):
                       'nodes':len(renderer.prepared.nodes.positions) if renderer.prepared.nodes else 0,
                       'selected_edges':len(renderer.prepared.pairs),
                       'roi_labels':[int(roi[0]) for roi in renderer.prepared.rois]},
-            'text_rendering': {'rules_version':'1.0', 'title_layout':'bounded-single-line-fit',
+            'text_rendering': {'rules_version':'1.1', 'title_layout':'bounded-single-line-fit',
+                               'global_annotation_sizing':'physical-points' if renderer.exporting else 'screen-pixels',
+                               'title_target_points':EXPORT_TITLE_POINTS if renderer.exporting else None,
+                               'global_annotation_font_points':sorted({prop.GetFontSize()
+                                   for prop,_ in renderer.annotation_text_props
+                                   if getattr(renderer, 'title_actor', None) is None
+                                   or prop is not renderer.title_actor.GetTextProperty()}),
                                'font_assets':list(getattr(renderer, 'text_fonts', {}).values()),
                                'title_font_points':renderer.title_actor.GetTextProperty().GetFontSize()
                                    if getattr(renderer, 'title_actor', None) is not None else None},

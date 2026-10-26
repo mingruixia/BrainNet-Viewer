@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Figure export
+
+- Use physical point sizes for titles, scalar bars and global legends in
+  Python Desktop and Web exports, so higher-DPI figures retain readable text.
+  Preserve selected node-label units, record effective annotation sizes in
+  provenance, and restore screen typography after success or failure.
+
 ### Web display and startup
 
 - Align the Scene File / Open and Save Scene / Import Settings controls with the desktop editions.

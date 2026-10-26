@@ -18,6 +18,11 @@
 
 ### Annotation text
 
+- Use physical point sizes for titles, scalar bars and global legends in
+  Python Desktop and Web exports, so higher-DPI figures retain readable text.
+  Preserve selected node-label units, record effective annotation sizes in
+  provenance, and restore screen typography after success or failure.
+
 - Preserve the existing canvas when a new title cannot fit. When a window is too
   small, show a warning and temporarily hide the title; enlarging the window
   restores it. Exports fit the complete title to the output dimensions and

@@ -17,7 +17,8 @@ from .binding import geometry_signature, custom_edge_colors
 from .display import double_brain, label_positions, label_font
 from .session import content_hashes, signature, validate_session
 from .render_detail import resolve_detail
-from .text_rendering import font_for_strings, use_font, fit_title, validate_title, TitleFitError
+from .text_rendering import (font_for_strings, use_font, fit_title, validate_title, TitleFitError,
+                             EXPORT_TITLE_POINTS, annotation_font_points)
 
 
 def _is_mac_qt_plotter(plotter):
@@ -874,12 +875,13 @@ class SceneRenderer:
         self.legends.append({"labels":names,"colors":colors,"actors":actors,"rectangle":rectangle})
 
     def update_annotation_fonts(self, dpi, *, size=None, strict_title=True):
-        # Global annotations adapt to the available pixels, not to the metadata DPI.
+        # Preserve screen pixels, but keep export typography in physical points.
         warning = ''
         if self.title_actor is not None:
             try:
                 fit_title(self.title_actor, *(size or self.plotter.window_size), dpi,
-                          measure_dpi=self.plotter.render_window.GetDPI())
+                          measure_dpi=self.plotter.render_window.GetDPI(),
+                          target_points=EXPORT_TITLE_POINTS if self.exporting else None)
             except TitleFitError:
                 if strict_title: raise
                 warning = ('Title temporarily hidden because this canvas is too small. '
@@ -888,7 +890,7 @@ class SceneRenderer:
         self.annotation_warning = warning
         for prop,pixels in self.annotation_text_props:
             if self.title_actor is None or prop is not self.title_actor.GetTextProperty():
-                prop.SetFontSize(max(1,int(np.floor(pixels*72/dpi+.5))))
+                prop.SetFontSize(annotation_font_points(pixels,dpi,for_export=self.exporting))
 
     def reset(self):
         width,height=self.plotter.window_size
@@ -961,7 +963,8 @@ class SceneRenderer:
                 raise ValueError("Do not overwrite an input or its external data.")
         check_inputs()
         # Validate against the requested output, never the current screen size.
-        validate_title(self.prepared.settings['image']['title'],width,height,dpi)
+        validate_title(self.prepared.settings['image']['title'],width,height,dpi,
+                       target_points=EXPORT_TITLE_POINTS)
         old_size=self.plotter.window_size
         old_fit=self.fit_size
         states=[(r.camera.position,r.camera.focal_point,r.camera.up,r.camera.parallel_scale,r.camera.view_angle) for r in self.plotter.renderers]
