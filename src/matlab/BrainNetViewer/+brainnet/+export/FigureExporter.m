@@ -116,8 +116,10 @@ classdef FigureExporter
                     'Height', actualHeight, 'Units', char(actualUnits), ...
                     'PreserveAspectRatio', 'on'}]; % Pad, never distort scientific geometry.
             end
+            [annotationCleanup, prepareAnnotations, annotationRecord] = ...
+                annotationExport(figureHandle, options, format, contentType); %#ok<ASGLU>
             if format == "bmp"
-                exportWithExactRasterSize(figureHandle, temporaryRaster, nameValues, options, true);
+                exportWithExactRasterSize(figureHandle, temporaryRaster, nameValues, options, true, prepareAnnotations);
                 [pixels, ~, alpha] = imread(temporaryRaster);
                 if ~isempty(alpha)
                     matte = repmat(reshape(255 * background,1,1,3),size(pixels,1),size(pixels,2));
@@ -128,7 +130,7 @@ classdef FigureExporter
                 imwrite(pixels, temporaryOutput, 'bmp');
             else
                 exportWithExactRasterSize(figureHandle, temporaryOutput, nameValues, ...
-                    options, any(format == rasterFormats));
+                    options, any(format == rasterFormats), prepareAnnotations);
             end
             if ~isfile(temporaryOutput) || dir(temporaryOutput).bytes == 0
                 error('BNV:Export:EmptyOutput', 'The graphics export did not create a nonempty file.');
@@ -141,7 +143,7 @@ classdef FigureExporter
                     % Some MATLAB raster backends silently flatten "none".
                     % Recover composited alpha from matched near-black/white mattes,
                     % never from a color key (which erases dark/white anatomy).
-                    exportRasterAlpha(figureHandle,temporaryOutput,nameValues,options);
+                    exportRasterAlpha(figureHandle,temporaryOutput,nameValues,options,prepareAnnotations);
                     transparencyMethod = 'matched-near-black-white-mattes';
                 end
             end
@@ -153,6 +155,7 @@ classdef FigureExporter
             % Record both the requested policy and the exact resolved canvas RGB.
             record.export.background_color_resolved = background;
             record.export.transparency_method = transparencyMethod;
+            record.text_rendering = annotationRecord();
             writeJson(temporarySidecar, record);
             movefile(temporaryOutput, destination, 'f');
             movefile(temporarySidecar, sidecar, 'f');
@@ -304,7 +307,97 @@ switch requested
 end
 end
 
-function exportRasterAlpha(target,path,nameValues,options)
+function [cleanup,prepare,record] = annotationExport(target,options,format,contentType)
+cleanup = []; prepare = []; record = @() struct('sizing','unchanged');
+if ~any(format == ["png","pdf"]), return; end
+titles = findall(target,'Tag','brainnet-image-title');
+bars = findall(target,'Type','ColorBar');
+if isempty(titles) && isempty(bars), return; end
+oldTitles = cell(numel(titles),2); oldBars = cell(numel(bars),1);
+for k=1:numel(titles)
+    oldTitles(k,:) = {titles(k).FontUnits,titles(k).FontSize};
+end
+for k=1:numel(bars), oldBars{k} = bars(k).FontSize; end
+cleanup = onCleanup(@() restoreAnnotationFonts(titles,bars,oldTitles,oldBars));
+ppi = get(groot,'ScreenPixelsPerInch');
+position = getpixelposition(target); canvasInches = position(3:4)/ppi;
+isImage = format == "png" || contentType == "image";
+if isImage, step = 72/options.Resolution; else, step = 72/ppi; end
+% Native backends quantize font ems to device pixels. Round to the nearest
+% available em and report it, rather than claiming every backend emits 8pt.
+resolved = repmat(round(12/step)*step,numel(titles),1);
+scalarPoints = round(8/step)*step;
+lastScale = 1;
+prepare = @apply; record = @metadata;
+    function apply(values)
+        widthIndex = find(strcmp(values(1:2:end),'Width'),1)*2;
+        if ~isempty(widthIndex)
+            heightIndex = find(strcmp(values(1:2:end),'Height'),1)*2;
+            unitIndex = find(strcmp(values(1:2:end),'Units'),1)*2;
+            switch string(values{unitIndex})
+                case "pixels", inchesPerUnit = 1/options.Resolution;
+                case "inches", inchesPerUnit = 1;
+                case "centimeters", inchesPerUnit = 1/2.54;
+                case "millimeters", inchesPerUnit = 1/25.4;
+                case "points", inchesPerUnit = 1/72;
+            end
+            physicalSize = [values{widthIndex} values{heightIndex}]*inchesPerUnit;
+            lastScale = min(physicalSize./canvasInches);
+        else
+            % Older MATLAB sizes image exports through Resolution, then pads.
+            resolutionIndex = find(strcmp(values(1:2:end),'Resolution'),1)*2;
+            lastScale = values{resolutionIndex}/options.Resolution;
+        end
+        for j=1:numel(bars)
+            bars(j).FontSize = scalarPoints/lastScale*(1+1e-10);
+        end
+        for j=1:numel(titles)
+            t = titles(j); t.FontUnits = 'points';
+            for attempt=1:4
+                t.FontSize = resolved(j)/lastScale*(1+1e-10);
+                drawnow nocallbacks;
+                % Renderer-owned titles have normalized positions and a
+                % single-line literal string. Fit width, never truncate it.
+                extent = t.Extent;
+                if extent(3) <= .96, break; end
+                next = floor(resolved(j)*.96/extent(3)/step)*step;
+                if next < ceil(6/step)*step
+                    error('BNV:Export:TitleTooLong', ...
+                        'The complete title cannot fit at the minimum 6pt size.');
+                end
+                resolved(j) = min(resolved(j)-step,next);
+            end
+            if t.Extent(3) > .98
+                error('BNV:Export:TitleTooLong','The complete title does not fit the export canvas.');
+            end
+        end
+    end
+    function value = metadata
+        value = struct('sizing','physical-points','title_target_points',12, ...
+            'title_minimum_points',6,'title_font_points',reshape(resolved,1,[]), ...
+            'scalar_target_points',8,'scalar_font_points',scalarPoints, ...
+            'native_em_step_points',step,'render_scale',lastScale, ...
+            'node_label_units','preserved');
+    end
+end
+
+function restoreAnnotationFonts(titles,bars,oldTitles,oldBars)
+for j=1:numel(titles)
+    if isgraphics(titles(j))
+        set(titles(j),'FontUnits',oldTitles{j,1},'FontSize',oldTitles{j,2});
+    end
+end
+for j=1:numel(bars)
+    if isgraphics(bars(j)), bars(j).FontSize = oldBars{j}; end
+end
+end
+
+function renderPrepared(target,path,values,prepareAnnotations)
+if ~isempty(prepareAnnotations), prepareAnnotations(values); end
+exportgraphics(target,path,values{:});
+end
+
+function exportRasterAlpha(target,path,nameValues,options,prepareAnnotations)
 blackPath = string(tempname(fileparts(path))) + ".png";
 whitePath = string(tempname(fileparts(path))) + ".png";
 cleanup = onCleanup(@() cleanupFiles([blackPath whitePath])); %#ok<NASGU>
@@ -314,9 +407,39 @@ backgroundIndex = find(strcmp(nameValues(1:2:end),'BackgroundColor'),1)*2;
 % their output sizes match. Keep both endpoints one code value inside RGB8.
 low = 1/255; high = 254/255;
 nameValues{backgroundIndex} = repmat(low,1,3);
-exportWithExactRasterSize(target,blackPath,nameValues,options,true);
+blackPlan = exportWithExactRasterSize(target,blackPath,nameValues,options,true,prepareAnnotations);
 nameValues{backgroundIndex} = repmat(high,1,3);
-exportWithExactRasterSize(target,whitePath,nameValues,options,true);
+whitePlan = exportWithExactRasterSize(target,whitePath,nameValues,options,true,prepareAnnotations);
+% Matte colors can change the native bounds by a pixel. Independent exact-
+% size retries must not give the two renders different scales or origins.
+if ~isempty(blackPlan) && ~isempty(whitePlan) && ~isequaln(blackPlan.geometry,whitePlan.geometry)
+    plan = blackPlan;
+    if whitePlan.scale < blackPlan.scale, plan = whitePlan; end
+    values = plan.values;
+    if ~verLessThan('matlab','25.1')
+        wi = find(strcmp(values(1:2:end),'Width'),1)*2;
+        hi = find(strcmp(values(1:2:end),'Height'),1)*2;
+        ui = find(strcmp(values(1:2:end),'Units'),1)*2;
+        switch string(values{ui})
+            case "pixels", pixelsPerUnit = 1;
+            case "inches", pixelsPerUnit = options.Resolution;
+            case "centimeters", pixelsPerUnit = options.Resolution/2.54;
+            case "millimeters", pixelsPerUnit = options.Resolution/25.4;
+            case "points", pixelsPerUnit = options.Resolution/72;
+        end
+        % Avoid an integer-pixel boundary where native floating-point bounds
+        % can round in opposite directions for the two matte colors.
+        ratio = values{hi}/values{wi};
+        values{wi} = max(.5,floor(values{wi}*pixelsPerUnit)-.5)/pixelsPerUnit;
+        values{hi} = values{wi}*ratio;
+        plan = [];
+    end
+    values{backgroundIndex} = repmat(low,1,3);
+    plan = exportWithExactRasterSize(target,blackPath,values,options,true,prepareAnnotations,plan);
+    values = plan.values;
+    values{backgroundIndex} = repmat(high,1,3);
+    exportWithExactRasterSize(target,whitePath,values,options,true,prepareAnnotations,plan);
+end
 black = imread(blackPath); white = imread(whitePath);
 if ~isequal(size(black),size(white)) || size(black,3)~=3
     error('BNV:Export:TransparencyUnavailable','Matched RGB matte renders are required for transparent output.');
@@ -351,7 +474,9 @@ else
 end
 end
 
-function exportWithExactRasterSize(target, path, nameValues, options, isRaster)
+function plan = exportWithExactRasterSize(target, path, nameValues, options, isRaster, prepareAnnotations, sharedPlan)
+if nargin < 7, sharedPlan = []; end
+plan = [];
 % R2025a can quantize aspect-preserving padding to two-pixel steps.
 % On mismatch, render slightly smaller and center-pad; never crop/resample.
 legacyOptions = verLessThan('matlab', '25.1');
@@ -365,7 +490,7 @@ if legacyOptions
     end
     nameValues = nameValues(1:6);
 end
-exportgraphics(target, path, nameValues{:});
+renderPrepared(target,path,nameValues,prepareAnnotations);
 if ~isRaster || isempty(options.Width), return; end
 switch options.Units
     case "pixels", pixelsPerUnit = 1;
@@ -376,43 +501,61 @@ switch options.Units
 end
 expected = max(1,round([options.Width options.Height] * pixelsPerUnit));
 info = imfinfo(path);
-if isequal([info.Width info.Height],expected), return; end
-if legacyOptions
-    rasterPath = path;
-    for attempt = 1:4
-        if all([info.Width info.Height] <= expected), break; end
-        oldResolution = nameValues{4};
-        nameValues{4} = max(1, min(oldResolution-1, ...
-            floor(oldResolution * min(max(1,expected-2)./[info.Width info.Height]))));
-        exportgraphics(target, rasterPath, nameValues{:});
-        info = imfinfo(rasterPath);
+if isempty(sharedPlan)
+    if isequal([info.Width info.Height],expected)
+        plan = rasterPlan(nameValues,[info.Width info.Height],[0 0],legacyOptions);
+        return;
     end
+    if all([info.Width info.Height] <= expected)
+        rasterPath = path;
+    elseif legacyOptions
+        rasterPath = path;
+        for attempt = 1:4
+            if all([info.Width info.Height] <= expected), break; end
+            oldResolution = nameValues{4};
+            nameValues{4} = max(1, min(oldResolution-1, ...
+                floor(oldResolution * min(max(1,expected-2)./[info.Width info.Height]))));
+            renderPrepared(target,rasterPath,nameValues,prepareAnnotations);
+            info = imfinfo(rasterPath);
+        end
+    else
+        widthIndex = find(strcmp(nameValues(1:2:end),'Width'),1)*2;
+        heightIndex = find(strcmp(nameValues(1:2:end),'Height'),1)*2;
+        original = [nameValues{widthIndex} nameValues{heightIndex}];
+        rasterPath = string(tempname(fileparts(path))) + ".png";
+        cleanup = onCleanup(@() cleanupFiles(rasterPath));
+        factor = min(max(1,expected-2)./[info.Width info.Height]);
+        for attempt = 1:3
+            nameValues{widthIndex} = original(1)*factor;
+            nameValues{heightIndex} = original(2)*factor;
+            renderPrepared(target,rasterPath,nameValues,prepareAnnotations);
+            info = imfinfo(rasterPath);
+            if all([info.Width info.Height] <= expected), break; end
+            factor = factor * min(max(1,expected-2)./[info.Width info.Height]);
+        end
+    end
+    if any([info.Width info.Height] > expected)
+        error('BNV:Export:RasterSizeMismatch', ...
+            'Could not produce the requested raster dimensions without distortion.');
+    end
+    offset = floor((expected-[info.Width info.Height])/2);
+    plan = rasterPlan(nameValues,[info.Width info.Height],offset,legacyOptions);
 else
-    widthIndex = find(strcmp(nameValues(1:2:end),'Width'),1)*2;
-    heightIndex = find(strcmp(nameValues(1:2:end),'Height'),1)*2;
-    original = [nameValues{widthIndex} nameValues{heightIndex}];
-    rasterPath = string(tempname(fileparts(path))) + ".png";
-    cleanup = onCleanup(@() cleanupFiles(rasterPath));
-    factor = min(max(1,expected-2)./[info.Width info.Height]);
-    for attempt = 1:3
-        nameValues{widthIndex} = original(1)*factor;
-        nameValues{heightIndex} = original(2)*factor;
-        exportgraphics(target,rasterPath,nameValues{:});
-        info = imfinfo(rasterPath);
-        if all([info.Width info.Height] <= expected), break; end
-        factor = factor * min(max(1,expected-2)./[info.Width info.Height]);
+    rasterPath = path;
+    offset = sharedPlan.offset;
+    % Only the native one-pixel bounds rounding may differ. Never stretch or
+    % crop either matte, and retain the inconsistent-matte rejection below.
+    if any(abs([info.Width info.Height]-sharedPlan.size)>1) || ...
+            any(offset+[info.Width info.Height]>expected)
+        error('BNV:Export:RasterSizeMismatch','Matched matte bounds changed unexpectedly.');
     end
-end
-if any([info.Width info.Height] > expected)
-    error('BNV:Export:RasterSizeMismatch', ...
-        'Could not produce the requested raster dimensions without distortion.');
+    plan = sharedPlan;
 end
 [pixels,map,alpha] = imread(rasterPath);
 if ~isempty(map), pixels = uint8(255*ind2rgb(pixels,map)); end
 if size(pixels,3)==1, pixels = repmat(pixels,1,1,3); end
 background = pixels(1,1,:);
 canvas = repmat(background,expected(2),expected(1),1);
-offset = floor((expected-[info.Width info.Height])/2);
 rows = offset(2)+(1:info.Height); columns = offset(1)+(1:info.Width);
 canvas(rows,columns,:) = pixels;
 if ~isempty(alpha)
@@ -447,6 +590,20 @@ switch lower(extension)
     otherwise
         imwrite(canvas,path);
 end
+end
+
+
+function plan = rasterPlan(values,size,offset,legacy)
+geometry = values;
+backgroundIndex = find(strcmp(values(1:2:end),'BackgroundColor'),1)*2;
+geometry{backgroundIndex} = [];
+if legacy
+    index = find(strcmp(values(1:2:end),'Resolution'),1)*2;
+else
+    index = find(strcmp(values(1:2:end),'Width'),1)*2;
+end
+plan = struct('values',{values},'geometry',{{geometry,size,offset}}, ...
+    'scale',values{index},'size',size,'offset',offset);
 end
 
 
