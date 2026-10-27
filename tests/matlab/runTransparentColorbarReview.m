@@ -1,8 +1,9 @@
-function report = runTransparentColorbarReview(sourceRoot, output)
+function report = runTransparentColorbarReview(sourceRoot, output, options)
 % Targeted native MATLAB matte/colorbar regression; no manual acceptance.
 arguments
     sourceRoot (1,1) string
     output (1,1) string
+    options.CaseIndices (1,:) double = 1:3
 end
 assert(~isfolder(output),'Preserve previous evidence.'); mkdir(output);
 addpath(fullfile(sourceRoot,'src/matlab/BrainNetViewer'),'-begin');
@@ -26,7 +27,7 @@ try
         'image',struct('title','Linux MATLAB 透明色条验证 — Schaefer100 / Yeo7')));
     app.loadCurrentScene();
     % Light Single/Overview reproduce the failure; dark Single covers white text.
-    for caseIndex=1:3
+    for caseIndex=options.CaseIndices
         preset=1;if caseIndex==2,preset=2;end
         background="white";rgbBackground=[1 1 1];
         if caseIndex==3,background="black";rgbBackground=[0 0 0];end
@@ -61,6 +62,14 @@ try
             mask(1:firstRow-1,:)=false;mask(lastRow+1:end,:)=false;
             weight=double(alpha)/255;
             composite=double(rgb).*weight+reshape(255*rgbBackground,1,1,3).*(1-weight);
+            comparisonOffset=[0 0];
+            if verLessThan('matlab','25.1') && any(record.export.matte_padding_alignment_pixels)
+                % Resolution-only exports can center the same native panel at
+                % adjacent integer padding origins. Compare scientific pixels
+                % after at most one pixel of blank-border registration. Keep
+                % the saved file unchanged and retain the original RGB guard.
+                [composite,comparisonOffset]=registeredBlankPadding(composite,reference,alpha,mask,rgbBackground);
+            end
             delta=max(abs(composite-double(reference)),[],3);
             assert(max(delta(mask))<=3,'BNV:Test:ColorbarMismatch', ...
                 'Transparent colorbar differs from the actual opaque reference.');
@@ -70,6 +79,8 @@ try
             assert(nnz(delta>3)<.001*numel(delta),'BNV:Test:MatteMismatch', ...
                 'Transparent recomposite has a material geometry/content difference.');
             exp=struct('path',path,'transparency_method',record.export.transparency_method, ...
+                'matte_alignment_pixels',record.export.matte_padding_alignment_pixels, ...
+                'comparison_padding_offset_pixels',comparisonOffset, ...
                 'legend_rows',[firstRow lastRow],'legend_pixels',nnz(mask),'legend_max_delta',max(delta(mask)), ...
                 'recomposite_max_delta',max(delta(:)),'pixels_delta_over_3',nnz(delta>3), ...
                 'immediate',immediate,'stable',stable,'restored',true);
@@ -153,4 +164,30 @@ function removeFixture(folder)
 if contains(path,char(folder)),rmpath(folder);end
 clear exportgraphics;
 if isfolder(folder),rmdir(folder,'s');end
+end
+
+function [comp,offset]=registeredBlankPadding(comp,reference,alpha,mask,background)
+% Independent file comparison only; never transform the exported file.
+offset=[0 0];baseline=max(abs(comp-double(reference)),[],3);
+if max(baseline(mask))<=3 && nnz(baseline>3)<.001*numel(baseline),return;end
+for axis=1:2
+    for shift=[-1 1]
+        if axis==1
+            edge=alpha(:,end);if shift<0,edge=alpha(:,1);end
+        else
+            edge=alpha(end,:);if shift<0,edge=alpha(1,:);end
+        end
+        if any(edge(:)~=0),continue;end
+        candidate=repmat(reshape(255*background,1,1,3),size(comp,1),size(comp,2),1);
+        if axis==1
+            if shift<0,candidate(:,1:end-1,:)=comp(:,2:end,:);else,candidate(:,2:end,:)=comp(:,1:end-1,:);end
+        else
+            if shift<0,candidate(1:end-1,:,:)=comp(2:end,:,:);else,candidate(2:end,:,:)=comp(1:end-1,:,:);end
+        end
+        delta=max(abs(candidate-double(reference)),[],3);
+        if max(delta(mask))<=3 && nnz(delta>3)<.001*numel(delta)
+            comp=candidate;offset(axis)=shift;return;
+        end
+    end
+end
 end

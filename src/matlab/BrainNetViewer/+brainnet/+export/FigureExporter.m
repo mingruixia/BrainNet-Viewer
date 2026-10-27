@@ -595,14 +595,24 @@ difference = white-black;
 % Raising the matte must not darken a pixel or exceed the matte span.
 % Allow RGB8 rounding; multisample blending can differ slightly by channel.
 tolerance = 3/255+eps(1);
-if any(difference < -tolerance | difference > high-low+tolerance,'all') && modernPair
+if any(difference < -tolerance | difference > high-low+tolerance,'all') && ...
+        ~isempty(blackPlan) && ~isempty(whitePlan)
     % Two legal center-padding roundings can differ by one pixel. Try only
     % those integer origins, only for a one-pixel non-scale-setting bound
     % difference, and only if the discarded edge is entirely blank padding.
-    canvas=getpixelposition(target); primary=1;
-    if nameValues{wi}/canvas(3)>=nameValues{hi}/canvas(4),primary=2;end
+    primary=0;
+    if modernPair
+        canvas=getpixelposition(target); primary=1;
+        if nameValues{wi}/canvas(3)>=nameValues{hi}/canvas(4),primary=2;end
+    else
+        % Resolution-only exports have no Width/Height options. An unchanged
+        % native dimension fixes their scale; only the other dimension may
+        % differ by one padding pixel. The same RGB guard still applies.
+        changed=find(blackPlan.size~=whitePlan.size);
+        if numel(changed)==1,primary=3-changed;end
+    end
     secondary=3-primary;
-    if blackPlan.size(primary)==whitePlan.size(primary) && ...
+    if primary>0 && blackPlan.size(primary)==whitePlan.size(primary) && ...
             abs(blackPlan.size(secondary)-whitePlan.size(secondary))==1
         for shift=[-1 1]
             candidate=shiftMattePadding(white,secondary,shift);

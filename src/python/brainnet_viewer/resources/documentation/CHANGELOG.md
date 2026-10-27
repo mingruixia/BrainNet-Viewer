@@ -5,8 +5,9 @@
 ### Rendering and server sessions
 
 - Preserve physical title and scalar-bar sizes in MATLAB PNG/PDF exports.
-  Reserve space for annotations and align transparent matte renders, restoring
-  the original canvas after successful or failed exports.
+  Reserve space for annotations and align transparent matte renders, including
+  one-pixel padding differences in older MATLAB releases. Restore the original
+  canvas after successful or failed exports.
 - Keep Web text and cameras stable when switching between interaction and still
   image sampling. Ignore provisional frames while a remote view is mounting.
 - Restore normal server login and logout forms while retaining origin checks.
