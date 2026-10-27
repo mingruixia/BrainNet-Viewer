@@ -135,7 +135,7 @@ classdef FigureExporter
             if ~isfile(temporaryOutput) || dir(temporaryOutput).bytes == 0
                 error('BNV:Export:EmptyOutput', 'The graphics export did not create a nonempty file.');
             end
-            transparencyMethod = 'not-requested';
+            transparencyMethod = 'not-requested'; matteAlignment=[0 0];
             if options.BackgroundColor == "none" && any(format == rasterFormats)
                 transparencyMethod = 'native-alpha';
                 [pixels, ~, alpha] = imread(temporaryOutput);
@@ -143,7 +143,7 @@ classdef FigureExporter
                     % Some MATLAB raster backends silently flatten "none".
                     % Recover composited alpha from matched near-black/white mattes,
                     % never from a color key (which erases dark/white anatomy).
-                    exportRasterAlpha(figureHandle,temporaryOutput,nameValues,options,prepareAnnotations);
+                    matteAlignment=exportRasterAlpha(figureHandle,temporaryOutput,nameValues,options,prepareAnnotations);
                     transparencyMethod = 'matched-near-black-white-mattes';
                 end
             end
@@ -155,6 +155,7 @@ classdef FigureExporter
             % Record both the requested policy and the exact resolved canvas RGB.
             record.export.background_color_resolved = background;
             record.export.transparency_method = transparencyMethod;
+            record.export.matte_padding_alignment_pixels=matteAlignment;
             record.text_rendering = annotationRecord();
             writeJson(temporarySidecar, record);
             movefile(temporaryOutput, destination, 'f');
@@ -318,7 +319,8 @@ for k=1:numel(titles)
     oldTitles(k,:) = {titles(k).FontUnits,titles(k).FontSize};
 end
 for k=1:numel(bars), oldBars{k} = bars(k).FontSize; end
-cleanup = onCleanup(@() restoreAnnotationFonts(titles,bars,oldTitles,oldBars));
+layout = captureAnnotationLayout(target,titles,bars);
+cleanup = onCleanup(@() restoreAnnotations(titles,bars,oldTitles,oldBars,layout));
 ppi = get(groot,'ScreenPixelsPerInch');
 position = getpixelposition(target); canvasInches = position(3:4)/ppi;
 isImage = format == "png" || contentType == "image";
@@ -327,9 +329,15 @@ if isImage, step = 72/options.Resolution; else, step = 72/ppi; end
 % available em and report it, rather than claiming every backend emits 8pt.
 resolved = repmat(round(12/step)*step,numel(titles),1);
 scalarPoints = round(8/step)*step;
-lastScale = 1;
+lastScale = 1; layoutAdjusted = false; lastGeometry = [];
 prepare = @apply; record = @metadata;
     function apply(values)
+        geometry=values;
+        backgroundIndex=find(strcmp(values(1:2:end),'BackgroundColor'),1)*2;
+        geometry{backgroundIndex}=[];
+        % Black/white replay must share one settled layout. Reassigning
+        % UIAxes positions/modes between identical renders can reflow it.
+        if isequaln(geometry,lastGeometry), return; end
         widthIndex = find(strcmp(values(1:2:end),'Width'),1)*2;
         if ~isempty(widthIndex)
             heightIndex = find(strcmp(values(1:2:end),'Height'),1)*2;
@@ -371,17 +379,21 @@ prepare = @apply; record = @metadata;
                 error('BNV:Export:TitleTooLong','The complete title does not fit the export canvas.');
             end
         end
+        adjusted = reserveAnnotationSpace(layout,titles,bars,ppi,lastScale,position(4));
+        if layoutAdjusted && ~adjusted, restoreAnnotationLayout(layout); end
+        layoutAdjusted=adjusted; lastGeometry=geometry;
     end
     function value = metadata
         value = struct('sizing','physical-points','title_target_points',12, ...
             'title_minimum_points',6,'title_font_points',reshape(resolved,1,[]), ...
             'scalar_target_points',8,'scalar_font_points',scalarPoints, ...
             'native_em_step_points',step,'render_scale',lastScale, ...
-            'node_label_units','preserved');
+            'node_label_units','preserved','vertical_gutters_applied',layoutAdjusted);
     end
 end
 
-function restoreAnnotationFonts(titles,bars,oldTitles,oldBars)
+function restoreAnnotations(titles,bars,oldTitles,oldBars,layout)
+restoreAnnotationLayout(layout);
 for j=1:numel(titles)
     if isgraphics(titles(j))
         set(titles(j),'FontUnits',oldTitles{j,1},'FontSize',oldTitles{j,2});
@@ -392,12 +404,101 @@ for j=1:numel(bars)
 end
 end
 
+function layout = captureAnnotationLayout(target,titles,bars)
+layout = struct('axes',[],'titleAxes',[],'bars',[]);
+parents = gobjects(0);
+for t=reshape(titles,1,[]), parents(end+1)=t.Parent; end
+allAxes = findall(target,'Type','axes');
+for a=reshape(allAxes,1,[])
+    if ~isequal(a.Parent,target), continue; end
+    state = struct('handle',a,'units',a.Units,'position',a.Position, ...
+        'normalized',hgconvertunits(ancestor(a,'figure'),a.Position,a.Units,'normalized',a.Parent), ...
+        'cameraModes',{{a.CameraPositionMode,a.CameraTargetMode,a.CameraUpVectorMode,a.CameraViewAngleMode}});
+    if any(a==parents), layout.titleAxes=[layout.titleAxes state];
+    else, layout.axes=[layout.axes state]; end
+end
+for b=reshape(bars,1,[])
+    layout.bars=[layout.bars struct('handle',b,'units',b.Units,'position',b.Position, ...
+        'normalized',hgconvertunits(ancestor(b,'figure'),b.Position,b.Units,'normalized',b.Parent))];
+end
+end
+
+function restoreAnnotationLayout(layout)
+for s=[layout.axes layout.titleAxes]
+    a=s.handle; if ~isgraphics(a), continue; end
+    if ~strcmp(a.Units,s.units), a.Units=s.units; end
+    if ~isequal(a.Position,s.position), a.Position=s.position; end
+    set(a,'CameraPositionMode',s.cameraModes{1},'CameraTargetMode',s.cameraModes{2}, ...
+        'CameraUpVectorMode',s.cameraModes{3},'CameraViewAngleMode',s.cameraModes{4});
+end
+for s=layout.bars
+    b=s.handle; if ~isgraphics(b), continue; end
+    if ~strcmp(b.Units,s.units), b.Units=s.units; end
+    if ~isequal(b.Position,s.position), b.Position=s.position; end
+end
+end
+
+function adjusted = reserveAnnotationSpace(layout,titles,bars,ppi,scale,height)
+% Font compensation can exceed fixed normalized gutters on a wide canvas.
+% Reserve space in the source panel before rasterization, not in final padding.
+padding = (2/scale)*ppi/72/height; % 2 physical points at the output size.
+need = false; top = 1; bottom = 0;
+for t=reshape(titles,1,[])
+    index=find(arrayfun(@(s)isequal(s.handle,t.Parent),layout.titleAxes),1);
+    if isempty(index), continue; end
+    pos=layout.titleAxes(index).normalized; em=t.FontSize*ppi/72/height;
+    anchor=pos(2)+t.Position(2)*pos(4);
+    need=need || anchor+.6*em>1-padding/2;
+end
+for k=1:numel(bars)
+    pos=layout.bars(k).normalized; em=bars(k).FontSize*ppi/72/height;
+    need=need || pos(2)<1.25*em;
+end
+adjusted=need;
+if ~need, return; end
+for s=layout.titleAxes
+    ts=titles(arrayfun(@(t)isequal(t.Parent,s.handle),titles)); pos=s.normalized;
+    % Use the physical font em, not UIAxes normalized Extent: very short
+    % UIAxes have a minimum inner plot box that differs from their Position.
+    em=max([ts.FontSize])*ppi/72/height;
+    anchor=pos(2)+ts(1).Position(2)*pos(4);
+    pos(2)=pos(2)+min(0,1-padding-.75*em-anchor);
+    if ~strcmp(s.handle.Units,'normalized')||~isequal(s.handle.Position,pos),set(s.handle,'Units','normalized','Position',pos);end
+    top=min(top,pos(2)+ts(1).Position(2)*pos(4)-.75*em-padding);
+end
+for k=1:numel(bars)
+    pos=layout.bars(k).normalized; em=bars(k).FontSize*ppi/72/height;
+    pos(2)=max(pos(2),1.5*em+padding);
+    if ~strcmp(bars(k).Units,'normalized')||~isequal(bars(k).Position,pos),set(bars(k),'Units','normalized','Position',pos);end
+    bottom=max(bottom,pos(2)+pos(4)+padding);
+end
+if top-bottom<=0
+    error('BNV:Export:AnnotationSpaceUnavailable','The canvas cannot hold physical annotation gutters (top=%g bottom=%g padding=%g height=%g scale=%g).',top,bottom,padding,height,scale);
+end
+if isempty(layout.axes), return; end
+positions=vertcat(layout.axes.normalized); low=min(positions(:,2)); high=max(positions(:,2)+positions(:,4));
+bottom=max(bottom,low); top=min(top,high);
+if top<=bottom, error('BNV:Export:AnnotationSpaceUnavailable','No scientific viewport remains between annotation gutters.'); end
+for s=layout.axes
+    a=s.handle; pos=s.normalized;
+    % Freeze the existing camera while changing viewport size; equal data
+    % aspect ratios still preserve anatomy. Restore modes after old positions.
+    set(a,'CameraPositionMode','manual','CameraTargetMode','manual','CameraUpVectorMode','manual','CameraViewAngleMode','manual');
+    pos(2)=bottom+(pos(2)-low)*(top-bottom)/(high-low);
+    pos(4)=pos(4)*(top-bottom)/(high-low);
+    if ~strcmp(a.Units,'normalized')||~isequal(a.Position,pos),set(a,'Units','normalized','Position',pos);end
+end
+drawnow nocallbacks;
+end
+
 function renderPrepared(target,path,values,prepareAnnotations)
 if ~isempty(prepareAnnotations), prepareAnnotations(values); end
 exportgraphics(target,path,values{:});
+
 end
 
-function exportRasterAlpha(target,path,nameValues,options,prepareAnnotations)
+function alignment=exportRasterAlpha(target,path,nameValues,options,prepareAnnotations)
+alignment=[0 0];
 blackPath = string(tempname(fileparts(path))) + ".png";
 whitePath = string(tempname(fileparts(path))) + ".png";
 cleanup = onCleanup(@() cleanupFiles([blackPath whitePath])); %#ok<NASGU>
@@ -406,39 +507,84 @@ backgroundIndex = find(strcmp(nameValues(1:2:end),'BackgroundColor'),1)*2;
 % content bounds, so the two exports acquire different padding even though
 % their output sizes match. Keep both endpoints one code value inside RGB8.
 low = 1/255; high = 254/255;
+modernPair=~verLessThan('matlab','25.1') && ~isempty(options.Width);
+if modernPair
+    wi=find(strcmp(nameValues(1:2:end),'Width'),1)*2;
+    hi=find(strcmp(nameValues(1:2:end),'Height'),1)*2;
+    ui=find(strcmp(nameValues(1:2:end),'Units'),1)*2;
+    ri=find(strcmp(nameValues(1:2:end),'Resolution'),1)*2;
+    switch string(nameValues{ui})
+        case "pixels", factor=1;
+        case "inches", factor=options.Resolution;
+        case "centimeters", factor=options.Resolution/2.54;
+        case "millimeters", factor=options.Resolution/25.4;
+        case "points", factor=options.Resolution/72;
+    end
+    nameValues{wi}=max(1,round(nameValues{wi}*factor));
+    nameValues{hi}=max(1,round(nameValues{hi}*factor));
+    nameValues{ui}='pixels';
+    % Binary internal DPI makes integer pixel bounds exactly representable
+    % in inches. Output pixels are native, never resampled; imwrite below
+    % records the requested DPI. Annotation preparation uses options DPI.
+    nameValues{ri}=2^ceil(log2(options.Resolution));
+end
 nameValues{backgroundIndex} = repmat(low,1,3);
 blackPlan = exportWithExactRasterSize(target,blackPath,nameValues,options,true,prepareAnnotations);
 nameValues{backgroundIndex} = repmat(high,1,3);
 whitePlan = exportWithExactRasterSize(target,whitePath,nameValues,options,true,prepareAnnotations);
 % Matte colors can change the native bounds by a pixel. Independent exact-
 % size retries must not give the two renders different scales or origins.
-if ~isempty(blackPlan) && ~isempty(whitePlan) && ~isequaln(blackPlan.geometry,whitePlan.geometry)
+if ~isempty(blackPlan) && ~isempty(whitePlan) && (modernPair || ~isequaln(blackPlan.geometry,whitePlan.geometry))
     plan = blackPlan;
     if whitePlan.scale < blackPlan.scale, plan = whitePlan; end
-    values = plan.values;
-    if ~verLessThan('matlab','25.1')
-        wi = find(strcmp(values(1:2:end),'Width'),1)*2;
-        hi = find(strcmp(values(1:2:end),'Height'),1)*2;
-        ui = find(strcmp(values(1:2:end),'Units'),1)*2;
-        switch string(values{ui})
-            case "pixels", pixelsPerUnit = 1;
-            case "inches", pixelsPerUnit = options.Resolution;
-            case "centimeters", pixelsPerUnit = options.Resolution/2.54;
-            case "millimeters", pixelsPerUnit = options.Resolution/25.4;
-            case "points", pixelsPerUnit = options.Resolution/72;
+    baseValues = plan.values;
+    for attempt=1:3
+        inset=[.25 .5 .75]; inset=inset(attempt);
+        values = baseValues;
+        if ~verLessThan('matlab','25.1')
+            wi = find(strcmp(values(1:2:end),'Width'),1)*2;
+            hi = find(strcmp(values(1:2:end),'Height'),1)*2;
+            ui = find(strcmp(values(1:2:end),'Units'),1)*2;
+            switch string(values{ui})
+                case "pixels", pixelsPerUnit = 1;
+                case "inches", pixelsPerUnit = options.Resolution;
+                case "centimeters", pixelsPerUnit = options.Resolution/2.54;
+                case "millimeters", pixelsPerUnit = options.Resolution/25.4;
+                case "points", pixelsPerUnit = options.Resolution/72;
+            end
+            % Avoid an integer-pixel boundary where native floating-point bounds
+            % can round in opposite directions for the two matte colors.
+            canvas=getpixelposition(target);
+            if nameValues{wi}/canvas(3) < nameValues{hi}/canvas(4)
+                % On a wide panel width sets the scientific scale. Keep its
+                % original value; remove only empty vertical page padding.
+                values{wi}=nameValues{wi};
+                values{hi}=max(.5,nameValues{hi}*pixelsPerUnit-2*attempt)/pixelsPerUnit;
+            elseif modernPair
+                values{wi}=max(.5,nameValues{wi}-2*attempt);
+                values{hi}=max(.5,nameValues{hi}-2*attempt);
+            else
+                ratio = values{hi}/values{wi};
+                values{wi} = max(.5,floor(values{wi}*pixelsPerUnit)-inset)/pixelsPerUnit;
+                values{hi} = values{wi}*ratio;
+            end
+            plan = [];
         end
-        % Avoid an integer-pixel boundary where native floating-point bounds
-        % can round in opposite directions for the two matte colors.
-        ratio = values{hi}/values{wi};
-        values{wi} = max(.5,floor(values{wi}*pixelsPerUnit)-.5)/pixelsPerUnit;
-        values{hi} = values{wi}*ratio;
-        plan = [];
+        values{backgroundIndex} = repmat(low,1,3);
+        plan = exportWithExactRasterSize(target,blackPath,values,options,true,prepareAnnotations,plan);
+        values = plan.values;
+        values{backgroundIndex} = repmat(high,1,3);
+        try
+            whitePlan=exportWithExactRasterSize(target,whitePath,values,options,true,prepareAnnotations,plan);
+            blackPlan=plan;
+            break;
+        catch exception
+            if ~strcmp(exception.identifier,'BNV:Export:MatteBoundsMismatch') || attempt==3
+                rethrow(exception);
+            end
+            plan=[];
+        end
     end
-    values{backgroundIndex} = repmat(low,1,3);
-    plan = exportWithExactRasterSize(target,blackPath,values,options,true,prepareAnnotations,plan);
-    values = plan.values;
-    values{backgroundIndex} = repmat(high,1,3);
-    exportWithExactRasterSize(target,whitePath,values,options,true,prepareAnnotations,plan);
 end
 black = imread(blackPath); white = imread(whitePath);
 if ~isequal(size(black),size(white)) || size(black,3)~=3
@@ -449,6 +595,25 @@ difference = white-black;
 % Raising the matte must not darken a pixel or exceed the matte span.
 % Allow RGB8 rounding; multisample blending can differ slightly by channel.
 tolerance = 3/255+eps(1);
+if any(difference < -tolerance | difference > high-low+tolerance,'all') && modernPair
+    % Two legal center-padding roundings can differ by one pixel. Try only
+    % those integer origins, only for a one-pixel non-scale-setting bound
+    % difference, and only if the discarded edge is entirely blank padding.
+    canvas=getpixelposition(target); primary=1;
+    if nameValues{wi}/canvas(3)>=nameValues{hi}/canvas(4),primary=2;end
+    secondary=3-primary;
+    if blackPlan.size(primary)==whitePlan.size(primary) && ...
+            abs(blackPlan.size(secondary)-whitePlan.size(secondary))==1
+        for shift=[-1 1]
+            candidate=shiftMattePadding(white,secondary,shift);
+            if isempty(candidate),continue;end
+            delta=candidate-black;
+            if ~any(delta < -tolerance | delta > high-low+tolerance,'all')
+                white=candidate;difference=delta;alignment(secondary)=shift;break;
+            end
+        end
+    end
+end
 if any(difference < -tolerance | difference > high-low+tolerance,'all')
     error('BNV:Export:TransparencyUnavailable', ...
         'Matte renders are inconsistent; transparent output was not written.');
@@ -543,13 +708,34 @@ if isempty(sharedPlan)
 else
     rasterPath = path;
     offset = sharedPlan.offset;
-    % Only the native one-pixel bounds rounding may differ. Never stretch or
-    % crop either matte, and retain the inconsistent-matte rejection below.
-    if any(abs([info.Width info.Height]-sharedPlan.size)>1) || ...
-            any(offset+[info.Width info.Height]>expected)
-        error('BNV:Export:RasterSizeMismatch','Matched matte bounds changed unexpectedly.');
+    % Native viewport rounding can move the 3D frame even by one pixel.
+    % Require equal bounds in the scale-setting dimension. One padding pixel
+    % in the other dimension retains a shared origin and the RGB guard below.
+    actual=[info.Width info.Height];
+    wi=find(strcmp(nameValues(1:2:end),'Width'),1)*2;
+    if isempty(wi)
+        % Pre-R2025a has Resolution-only exports; retain its original bounds
+        % policy and the unchanged RGB matte guard.
+        if any(abs(actual-sharedPlan.size)>1)||any(offset+actual>expected)
+            error('BNV:Export:MatteBoundsMismatch','Matched matte bounds changed unexpectedly.');
+        end
+    else
+        hi=find(strcmp(nameValues(1:2:end),'Height'),1)*2;
+        canvas=getpixelposition(target); primary=1;
+        if nameValues{wi}/canvas(3)>=nameValues{hi}/canvas(4),primary=2;end
+        secondary=3-primary;
+        content=ceil(sharedPlan.size(primary)*canvas(secondary)/canvas(primary));
+        % Center the same native panel, rather than independently rounding two
+        % nested padding offsets. A one-pixel page-bound difference can otherwise
+        % move an identical 3D viewport by a pixel. This is integer padding only.
+        offset(secondary)=offset(secondary)+floor((sharedPlan.size(secondary)-content)/2)-floor((actual(secondary)-content)/2);
+        if any(offset<0) || any(abs(actual-sharedPlan.size)>1) || actual(primary)~=sharedPlan.size(primary) || ...
+                any(offset+actual>expected)
+            error('BNV:Export:MatteBoundsMismatch', ...
+                'Matched matte viewport changed (%dx%d versus %dx%d).',actual(1),actual(2),sharedPlan.size(1),sharedPlan.size(2));
+        end
     end
-    plan = sharedPlan;
+    plan = sharedPlan; plan.size=actual; plan.offset=offset;
 end
 [pixels,map,alpha] = imread(rasterPath);
 if ~isempty(map), pixels = uint8(255*ind2rgb(pixels,map)); end
@@ -592,6 +778,23 @@ switch lower(extension)
 end
 end
 
+
+function shifted=shiftMattePadding(pixels,dimension,shift)
+% Reposition uniform padding only. No content cropping or resampling.
+background=pixels(1,1,:); shifted=[];
+if dimension==2
+    edge=pixels(end,:,:);if shift<0,edge=pixels(1,:,:);end
+else
+    edge=pixels(:,end,:);if shift<0,edge=pixels(:,1,:);end
+end
+if ~all(edge==background,'all'),return;end
+shifted=repmat(background,size(pixels,1),size(pixels,2),1);
+if dimension==2
+    if shift<0,shifted(1:end-1,:,:)=pixels(2:end,:,:);else,shifted(2:end,:,:)=pixels(1:end-1,:,:);end
+else
+    if shift<0,shifted(:,1:end-1,:)=pixels(:,2:end,:);else,shifted(:,2:end,:)=pixels(:,1:end-1,:);end
+end
+end
 
 function plan = rasterPlan(values,size,offset,legacy)
 geometry = values;
