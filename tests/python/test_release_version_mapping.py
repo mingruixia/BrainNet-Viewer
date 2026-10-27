@@ -16,7 +16,8 @@ SPEC.loader.exec_module(CHECK)
 
 class ReleaseVersionMappingTests(unittest.TestCase):
     def make_fixture(self, folder, version="2.0.0", *, display=None,
-                     metadata_version=None, tamper=False, license_expression="GPL-3.0-or-later"):
+                     metadata_version=None, tamper=False, license_expression="GPL-3.0-or-later",
+                     missing_client=False):
         project = Path(folder) / "project"
         root = project / "src/python"
         files = {
@@ -25,6 +26,7 @@ class ReleaseVersionMappingTests(unittest.TestCase):
                 'raise RuntimeError("Wheel package must never be executed by the checker")\n'
             ).encode(),
             "brainnet_viewer/web_security.py": b"# source identity fixture\n",
+            "brainnet_viewer/web_connection_client.js": b"// cleanup client fixture\n",
             "brainnet_viewer/resources/Data/SurfTemplate/BrainMesh_ICBM152.nv": b"fixture only\n",
         }
         for name, data in files.items():
@@ -45,6 +47,8 @@ class ReleaseVersionMappingTests(unittest.TestCase):
         wheel = Path(folder) / "fixture.whl"
         with ZipFile(wheel, "w") as archive:
             for name, data in files.items():
+                if missing_client and name.endswith("web_connection_client.js"):
+                    continue
                 if tamper and name.endswith("web_security.py"):
                     data += b"# changed after build\n"
                 archive.writestr(name, data)
@@ -80,7 +84,13 @@ class ReleaseVersionMappingTests(unittest.TestCase):
         for version in ("2.0.0", "2.0.0b1", "2.0.0b1.post2"):
             with self.subTest(version=version), tempfile.TemporaryDirectory() as folder:
                 root, wheel = self.make_fixture(folder, version)
-                self.assertEqual(CHECK.verify_wheel_payload(wheel, root), 3)
+                self.assertEqual(CHECK.verify_wheel_payload(wheel, root), 4)
+
+    def test_required_connection_client_cannot_be_omitted(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root, wheel = self.make_fixture(folder, missing_client=True)
+            with self.assertRaisesRegex(AssertionError, "Missing required web_connection_client.js"):
+                CHECK.verify_wheel_payload(wheel, root)
 
     def test_matlab_and_wheel_version_mismatches_fail(self):
         for kwargs, message in (
@@ -113,7 +123,7 @@ class ReleaseVersionMappingTests(unittest.TestCase):
                 capture_output=True, text=True, timeout=10,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("Wheel payloads verified: 3", result.stdout)
+            self.assertIn("Wheel payloads verified: 4", result.stdout)
 
 
 if __name__ == "__main__":

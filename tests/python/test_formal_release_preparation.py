@@ -47,13 +47,14 @@ class FormalPreparationTests(unittest.TestCase):
         repo=Path(folder)/"repo";src=repo/"src/python"
         files={"brainnet_viewer/__init__.py":b'__version__ = "2.0.0"\n',
                "brainnet_viewer/web_security.py":b"# fixture\n",
+               "brainnet_viewer/web_connection_client.js":b"// cleanup client fixture\n",
                "brainnet_viewer/resources/Data/SurfTemplate/BrainMesh_ICBM152.nv":b"mesh",
                "brainnet_viewer/resources/fonts/NOTICE.txt":b"font license fixture"}
         for name,data in files.items():
             p=src/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
         (src/"pyproject.toml").write_text(
             'dynamic = ["version"]\nattr = "brainnet_viewer.__version__"\n'
-            '[tool.setuptools.package-data]\nbrainnet_viewer = ["resources/Data/SurfTemplate/*.nv","resources/fonts/*.txt"]\n',
+            '[tool.setuptools.package-data]\nbrainnet_viewer = ["web_connection_client.js","resources/Data/SurfTemplate/*.nv","resources/fonts/*.txt"]\n',
             encoding="utf-8")
         matlab=repo/"src/matlab/BrainNetViewer/+brainnet/+app/productInfo.m"
         matlab.parent.mkdir(parents=True)
@@ -69,10 +70,11 @@ class FormalPreparationTests(unittest.TestCase):
 
     def test_expected_wheel_set_catches_missing_and_extra_data(self):
         for kwargs,valid in (({},True),({"missing":"brainnet_viewer/resources/fonts/NOTICE.txt"},False),
+                             ({"missing":"brainnet_viewer/web_connection_client.js"},False),
                              ({"extra":True},False),({"tamper":True},False)):
             with self.subTest(kwargs=kwargs),tempfile.TemporaryDirectory() as folder:
                 repo,wheel=self.fixture(folder,**kwargs)
-                if valid:self.assertEqual(TOOL.verify_complete_wheel(repo,wheel,"2.0.0"),4)
+                if valid:self.assertEqual(TOOL.verify_complete_wheel(repo,wheel,"2.0.0"),5)
                 else:
                     with self.assertRaises((ValueError,AssertionError)):
                         TOOL.verify_complete_wheel(repo,wheel,"2.0.0")
