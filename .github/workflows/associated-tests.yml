@@ -36,6 +36,7 @@ jobs:
         run: python tests/ci/check_native_rendering.py --require-software
       - run: python -m unittest discover -s tests/python -v
       - run: node tests/security/check_session_client.cjs src/python/brainnet_viewer/web_session_client.js
+      - run: node tests/security/check_connection_client.cjs src/python/brainnet_viewer/web_connection_client.js
       - run: python -m build --wheel src/python
       - run: python tools/check_wheel_payload.py src/python/dist/*.whl
   container:

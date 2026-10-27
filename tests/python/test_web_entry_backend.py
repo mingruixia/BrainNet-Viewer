@@ -58,7 +58,7 @@ class EntryBackendTests(unittest.TestCase):
         with patch.object(backend.sys,'platform','linux'),patch.object(backend.Path,'is_file',return_value=True):
             env=backend.driver_environment({},cpu=True)
         self.assertEqual(env['VTK_DEFAULT_OPENGL_WINDOW'],'vtkEGLRenderWindow')
-        self.assertEqual(env['__EGL_VENDOR_LIBRARY_FILENAMES'],'/usr/share/glvnd/egl_vendor.d/50_mesa.json')
+        self.assertEqual(env['__EGL_VENDOR_LIBRARY_FILENAMES'],str(backend.Path('/usr/share/glvnd/egl_vendor.d/50_mesa.json')))
         self.assertEqual(env['LIBGL_ALWAYS_SOFTWARE'],'1')
         self.assertEqual(env['GALLIUM_DRIVER'],'llvmpipe')
 
@@ -98,7 +98,7 @@ class EntryBackendTests(unittest.TestCase):
             backend.bootstrap('brainnet_viewer.web_app',[])
             env=execute.call_args.args[2]
             self.assertEqual(env['VTK_DEFAULT_OPENGL_WINDOW'],'vtkEGLRenderWindow')
-            self.assertEqual(env['__EGL_VENDOR_LIBRARY_FILENAMES'],'/usr/share/glvnd/egl_vendor.d/50_mesa.json')
+            self.assertEqual(env['__EGL_VENDOR_LIBRARY_FILENAMES'],str(backend.Path('/usr/share/glvnd/egl_vendor.d/50_mesa.json')))
             self.assertEqual(probe.call_args.args[0]['__EGL_VENDOR_LIBRARY_FILENAMES'],env['__EGL_VENDOR_LIBRARY_FILENAMES'])
             self.assertEqual(env['BNV_RENDER_BACKEND_SELECTED'],'cpu')
 

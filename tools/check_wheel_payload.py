@@ -33,6 +33,7 @@ def verify_wheel_payload(wheel_path, source_root=None):
                  if name.startswith("brainnet_viewer/") and not name.endswith("/")]
         assert len(paths) == len(set(paths)), "Duplicate package payloads"
         assert "brainnet_viewer/web_security.py" in paths
+        assert "brainnet_viewer/web_connection_client.js" in paths
         assert "brainnet_viewer/resources/Data/SurfTemplate/BrainMesh_ICBM152.nv" in paths
         for name in paths:
             assert "__pycache__" not in name and not name.endswith(".pyc")
