@@ -139,10 +139,10 @@ classdef FigureExporter
                 [pixels, ~, alpha] = imread(temporaryOutput);
                 if isempty(alpha) && size(pixels,3) ~= 4
                     % Some MATLAB raster backends silently flatten "none".
-                    % Recover composited alpha from matched black/white mattes,
+                    % Recover composited alpha from matched near-black/white mattes,
                     % never from a color key (which erases dark/white anatomy).
                     exportRasterAlpha(figureHandle,temporaryOutput,nameValues,options);
-                    transparencyMethod = 'matched-black-white-mattes';
+                    transparencyMethod = 'matched-near-black-white-mattes';
                 end
             end
 
@@ -309,17 +309,29 @@ blackPath = string(tempname(fileparts(path))) + ".png";
 whitePath = string(tempname(fileparts(path))) + ".png";
 cleanup = onCleanup(@() cleanupFiles([blackPath whitePath])); %#ok<NASGU>
 backgroundIndex = find(strcmp(nameValues(1:2:end),'BackgroundColor'),1)*2;
-nameValues{backgroundIndex} = [0 0 0];
+% Pure black/white can make matching annotations disappear from MATLAB's
+% content bounds, so the two exports acquire different padding even though
+% their output sizes match. Keep both endpoints one code value inside RGB8.
+low = 1/255; high = 254/255;
+nameValues{backgroundIndex} = repmat(low,1,3);
 exportWithExactRasterSize(target,blackPath,nameValues,options,true);
-nameValues{backgroundIndex} = [1 1 1];
+nameValues{backgroundIndex} = repmat(high,1,3);
 exportWithExactRasterSize(target,whitePath,nameValues,options,true);
 black = imread(blackPath); white = imread(whitePath);
 if ~isequal(size(black),size(white)) || size(black,3)~=3
     error('BNV:Export:TransparencyUnavailable','Matched RGB matte renders are required for transparent output.');
 end
 black = double(black)/255; white = double(white)/255;
-alpha = min(1,max(0,1-max(white-black,[],3)));
-rgb = uint8(255*min(1,max(0,black./max(alpha,1/255))));
+difference = white-black;
+% Raising the matte must not darken a pixel or exceed the matte span.
+% Allow RGB8 rounding; multisample blending can differ slightly by channel.
+tolerance = 3/255+eps(1);
+if any(difference < -tolerance | difference > high-low+tolerance,'all')
+    error('BNV:Export:TransparencyUnavailable', ...
+        'Matte renders are inconsistent; transparent output was not written.');
+end
+alpha = min(1,max(0,1-max(difference,[],3)/(high-low)));
+rgb = uint8(255*min(1,max(0,(black-low*(1-alpha))./max(alpha,1/255))));
 alpha = uint8(round(255*alpha));
 [~,~,extension] = fileparts(path);
 if strcmpi(extension,'.png')
