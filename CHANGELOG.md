@@ -2,6 +2,18 @@
 
 ## 2.0.0 — Unreleased
 
+### Rendering and server sessions
+
+- Preserve physical title and scalar-bar sizes in MATLAB PNG/PDF exports.
+  Reserve space for annotations and align transparent matte renders, restoring
+  the original canvas after successful or failed exports.
+- Keep Web text and cameras stable when switching between interaction and still
+  image sampling. Ignore provisional frames while a remote view is mounting.
+- Restore normal server login and logout forms while retaining origin checks.
+  Handle unsent disconnect-cleanup requests without hiding other errors.
+- Verify that CPU mode actually uses software rendering on Linux systems with
+  NVIDIA graphics; report an error if the selected device contradicts CPU mode.
+
 ### Installation and distribution
 
 - Adapt launcher CPU quotas to the Docker engine, reject invalid limits before
