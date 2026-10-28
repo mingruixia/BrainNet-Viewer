@@ -24,7 +24,7 @@ Expected: the English BrainNet Viewer main window opens.  If MATLAB resolves ano
 
 ### Step 02
 
-In **Data Sources**, click **Add Files** and select `Data/SurfTemplate/BrainMesh_ICBM152.nv` as **Surface**. It is already inside the App's data root, so **Stage and Add** should not be needed. If you chose a copy outside that root instead, the App may request approved staging. Do not use **Open Scene JSON** for an `.nv` mesh.
+In **Data Sources**, click **Add Files** and select `Data/SurfTemplate/BrainMesh_ICBM152.nv` as **Surface**. A local copy elsewhere can also be selected directly; no import confirmation or automatic copy is needed. Use **Open Scene** for Scene JSON/ZIP, not for an `.nv` mesh.
 
 ### Step 03
 

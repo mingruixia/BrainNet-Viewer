@@ -20,7 +20,7 @@ app = BrainNetViewer;
 
 在 **Data Sources** 中使用 **Add Files**，或分别选择Surface、Nodes、Edges、Volume等输入。**Open Scene JSON** 用于打开已保存的Scene，而不是NIfTI或曲面文件。选择相容的数据后点击 **Validate and Load**，在绘图前读取文件并检查输入错误。曲面可以单独显示；其他输入组合取决于所需可视化。角色及格式边界见[README](../../README.zh-CN.md#安装与启动)和[曲面格式矩阵](../compatibility/Surface_Format_Support.md)。
 
-App默认数据根目录为`src/matlab/BrainNetViewer`。选择根目录以外的文件时，App会要求选择 **Stage and Add** 或 **Cancel**，不会静默保存外部绝对路径。确认后，App将校验副本放到`user-data/imports/<hash>/`，并复制所支持的本地配套文件（如成对NIfTI头/图像文件）；原文件不修改。这样Scene可相对数据根目录引用该副本，但**不**因此获得再分发权，也**不**自动确认空间配准。依照原始数据权限保护原文件和副本。
+MATLAB直接读取所选本机文件，不再弹出导入确认，也不自动复制数据。普通 **Save Scene** JSON只保存路径引用和哈希，不包含数据；引用文件须保留在记录的位置。需要共享或迁移时，在保存对话框选择 **Portable Scene with data (*.zip)**，将输入及支持的成对或外部数据文件打包；目标电脑用 **Open Scene** 打开ZIP。旧版相对数据根目录的Scene JSON仍可读取。含本机绝对引用的普通JSON适合同一电脑使用，路径将改变时应选择ZIP。
 
 科学解释前须核对单位、坐标轴、物种及图谱/体数据对齐。NIfTI头信息并不能自动证明另一份曲面已与该体数据配准；格式可读不等于坐标吻合。
 

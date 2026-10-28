@@ -6,7 +6,7 @@ Load the ICBM152 brain surface, render it in the main canvas and save a PNG with
 
 ## Input and prerequisites
 
-Use the project's existing [`BrainMesh_ICBM152.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv) at `src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`, SHA-256 `471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`. It is a real human-brain surface template with **81,924 vertices and 163,840 triangular faces**, not a participant scan. Credit **Prof. Alan C. Evans (MNI)** in redistributed material; see the [source and coordinate note](Resource_Attribution.md).
+Use the project's existing [`BrainMesh_ICBM152.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv) at `src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`, SHA-256 `471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`. It is a real human-brain surface template with **81,924 vertices and 163,840 triangular faces**, not a participant scan. Credit **Prof. Alan C. Evans (MNI)** in redistributed material; see the [source and coordinate note](Resource_Attribution.md).
 
 This exercise uses Windows, MATLAB R2025a Update 1 and the project root directory. A MATLAB Runtime-only package is not supplied. Consult the installation guide before using another platform. Start with a clean MATLAB path and avoid loading another BrainNet Viewer installation.
 
@@ -24,7 +24,7 @@ Expected: the English BrainNet Viewer main window opens.  If MATLAB resolves ano
 
 ### Step 02
 
-In **Data Sources**, click **Add Files** and select `Data/SurfTemplate/BrainMesh_ICBM152.nv` as **Surface**. It is already inside the App's data root, so **Stage and Add** should not be needed. If you chose a copy outside that root instead, the App may request approved staging. Do not use **Open Scene JSON** for an `.nv` mesh.
+In **Data Sources**, click **Add Files** and select `Data/SurfTemplate/BrainMesh_ICBM152.nv` as **Surface**. A local copy elsewhere can also be selected directly; no import confirmation or automatic copy is needed. Use **Open Scene** for Scene JSON/ZIP, not for an `.nv` mesh.
 
 ### Step 03
 

@@ -6,7 +6,7 @@ Command-line rendering uses the **modern** Scene/renderer without opening the de
 
 ## Prepare a reproducible Scene
 
-In the desktop, select files, **Validate and Load**, adjust Visualization Settings, and **Apply** (which commits and renders). Use **Save Scene** to create Scene JSON. It records applied settings, relative input references/hashes, coordinate/redistribution metadata, and—when saved by the modern App—optional camera and export-panel state. It does **not** embed source data, accept unapplied edits, certify spatial registration or grant file-sharing rights. The data root is an explicit directory: references resolve relative to that root, not relative to the Scene JSON's folder. If external files are selected in the App, approval stages verified copies under its configured root; a manually written Scene or CLI run does not silently copy outside data.
+In the desktop, select files, **Validate and Load**, adjust settings and **Apply**. **Save Scene** JSON records applied settings, input references/hashes and optional camera/export state without copying data. Local files outside the configured root use explicit local references; older relative references still resolve against DataRoot. To move the data, choose **Portable Scene with data (*.zip)**; the CLI can render that ZIP as well as JSON. A Scene neither performs registration nor supplies redistribution rights.
 
 To render one image without opening the App:
 

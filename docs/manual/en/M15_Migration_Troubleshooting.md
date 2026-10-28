@@ -8,7 +8,7 @@ BrainNet Viewer provides a MATLAB desktop workflow. Standalone Runtime-only and 
 
 | Older workflow | Current route | What to check |
 |---|---|---|
-| GUIDE main window / Load File | `BrainNetViewer`; Data Sources → Validate and Load | Use the project launcher and an explicit data root. The App asks before staging an outside-root file; Scene JSON does not bundle its input files. |
+| GUIDE main window / Load File | `BrainNetViewer`; Data Sources → Validate and Load | Use the project launcher and an explicit data root. Local files are read directly. JSON saves references; choose a portable ZIP to include data. |
 | BrainNet_Option.fig and OK/Apply | Right-hand Visualization Settings → shared **Apply** | Apply commits **and renders**. **Revert** drops pending edits; canvas **Reset** changes only the camera; **Restore Defaults** replaces display settings after confirmation. |
 | Save/Load Option MAT | **Save/Load Preset** for display reuse; **Import Settings** for trusted EC MAT | Presets omit inputs/camera/export-panel preferences. An EC import is a reviewed conversion, not guaranteed lossless reproduction; retain the original MAT and inspect `fields_requiring_review`. |
 | Save or reopen an analysis | **Save Scene / Open Scene JSON** | Scene records input references/hashes and applied settings, with optional modern camera/export state. Keep the corresponding data-root structure; verify hashes and spatial alignment. |
@@ -39,7 +39,7 @@ Modern Settings schema is 1.22.0. Older Scene/preset/EC values may migrate, but 
 | Symptom | First check / safe action |
 |---|---|
 | The launcher is not found or a different BrainNet starts | Use the current project root containing `BrainNetViewer.m`, add that root to the MATLAB path if necessary, and remove conflicting path entries from the session; do not alter the original software folder. See [getting started](../../documentation/Getting_Started.en.md). |
-| External input cannot become a portable Scene | Respond to the App's **Stage and Add** prompt, or deliberately launch with an appropriate data root. Do not hand-edit absolute paths into portable Scene references. Review copied companions and permissions. |
+| Move a Scene to another computer | In Save Scene select **Portable Scene with data (*.zip)**, transfer the ZIP and use **Open Scene**. Ordinary JSON references the original files; moving it alone does not move those data. |
 | Scene/preset JSON fails to open, or files/hashes do not match | Use **Open Scene JSON** for Scene files and **Load Preset** for `*.preset.json`; these schemas are not interchangeable. Check version/required fields, data-root-relative paths, companion files and the original hashes. Do not suppress validation by changing a hash. |
 | New file selected but the old image remains / nothing exports | **Validate and Load**, then **Apply** (commits and renders) or explicit **Render Scene**. Export needs a current Modern Batch render. Loading a preset clears the old render, so Render Scene again. Check the Scene summary for retained manual volume limits when changing datasets. |
 | Wrong side, scale, or atlas region / empty split view | Check the actual coordinate frame, orientation, units, surface-volume alignment and hemisphere separability. The App does not register data. Use a supported whole-surface layout for an inseparable mesh; treat Inspect's AAL/Brodmann result as provisional. |

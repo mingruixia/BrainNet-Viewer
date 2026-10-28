@@ -14,7 +14,7 @@ The numbered interface illustrations identify the main sequence: **1 Surface Mes
 
 ## Save and reopen a Scene
 
-Load and validate the inputs, configure the scene, and select **Apply** to commit and render. Save the Scene JSON from the main window. The Scene records paths relative to its configured data root where possible and verifies referenced inputs by hash. It does not embed mesh, node, edge or volume data. Keep the inputs and their compatible directory structure with the JSON when moving a project. If files are outside the configured root, follow the explicit import/staging workflow in [M01](M01_Installation_Launch.md); selecting an external file does not silently grant redistribution rights.
+Load and validate the inputs, adjust settings and select **Apply**. Ordinary **Save Scene** JSON keeps references to the original files, verifies their hashes and preserves applied settings with optional camera/export state. It does not copy input data. For another computer, choose **Portable Scene with data (*.zip)** in the save dialog and transfer that ZIP; **Open Scene** reads JSON or ZIP. Portable ZIPs include supported companion files. Keep local data available for ordinary JSON replay. The [local-file guide](M02_Data_Formats_Coordinates.md) describes both choices.
 
 When reopening, review resolved paths, hashes, file roles, spatial alignment and the rendered result. A missing or changed input is a reason to investigate, not to bypass validation. Scene replay can restore supported camera and export preferences, but an old Scene may not express every newer option. [Scene Workflows](../../documentation/Scene_Workflows.en.md) documents the detailed schema, path and command-line behavior.
 

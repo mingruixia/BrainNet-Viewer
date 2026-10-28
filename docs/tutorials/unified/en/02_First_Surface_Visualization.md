@@ -22,9 +22,9 @@ Use `Data/SurfTemplate/BrainMesh_ICBM152.nv` from your edition's resource librar
 2. Select **Validate and Load**. Review the Surface path and counts in the Scene summary. This example should contain one surface and no other scientific inputs.
 3. If a previous exercise is loaded, clear its Nodes, Edges, Surface Map and Volume roles before proceeding; clearing only the canvas does not remove inputs.
 
-**MATLAB Desktop:** the bundled mesh is already within its data root. For a copy outside the configured root, follow the **Stage and Add** prompt if offered; cancel rather than substituting a different template.
+**MATLAB Desktop:** the bundled mesh is already within its data root. A local copy outside the configured root is read directly. Ordinary Save Scene JSON references the original file. For migration, choose **Portable Scene with data (*.zip)** in the save dialog.
 
-**Python Desktop:** select the bundled file or your own copy directly. Saving a portable Scene later creates companion assets; MATLAB staging instructions are not the Python save mechanism.
+**Python Desktop:** select the bundled file or your own copy directly. Saving a Scene later creates companion assets beside its JSON; keep those files together when moving the Scene.
 
 ## Configure and render
 

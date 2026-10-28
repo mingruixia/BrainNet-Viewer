@@ -36,9 +36,11 @@ Scene 保存文件引用、输入 SHA-256、坐标空间/资源再分发元数�
 
 ## 文件路径与数据根目录
 
-所有输入路径均相对于 **DataRoot**，不是相对于 Scene JSON 所在目录，也不是 MATLAB 当前目录。App 使用启动时指定的根目录；本项目默认是 `src/matlab/BrainNetViewer`。迁移电脑时，应保持数据相对目录结构，并明确选择新的数据根目录。只复制 Scene JSON 并不等于复制了数据包。
+旧相对引用按 **DataRoot** 解析。新选入的根目录外本机文件通过明确的本机路径引用，原文件保留原位；迁移ZIP中的输入按包内位置解析。普通JSON不包含数据，需要跨电脑移动时使用迁移ZIP。
 
-在App中选择根目录外文件时，须先确认复制校验副本至`user-data/imports/<hash>/`，原文件不改动；API调用`selectInputPath`则须显式使用`ExternalImportApproved=true`。支持的配套文件可一起暂存，但暂存不授予再分发权。保存时会验证已有哈希，并补齐缺失哈希。输入文件缺失或已变化会阻止保存，保留原 JSON。程序调用默认禁止覆盖已有 Scene、图像及溯源文件，只有明确设置 `Overwrite=true` 才覆盖；App 保存对话框负责覆盖确认。
+MATLAB直接读取所选本机文件，不再弹出导入确认，也不自动复制数据。普通 **Save Scene** JSON只保存路径引用和哈希，不包含数据；引用文件须保留在记录的位置。需要共享或迁移时，在保存对话框选择 **Portable Scene with data (*.zip)**，将输入及支持的成对或外部数据文件打包；目标电脑用 **Open Scene** 打开ZIP。旧版相对数据根目录的Scene JSON仍可读取。含本机绝对引用的普通JSON适合同一电脑使用，路径将改变时应选择ZIP。 保存会验证已有哈希并补齐缺失哈希。文件丢失或变化时先报错，保留既有输出；API覆盖保存仍须Overwrite=true。
+
+Python桌面版和Docker/Web会明确拒绝包含MATLAB本机路径引用的Scene。请在原文件可访问的MATLAB中打开该JSON，或在目标版本重新选择数据。不同版本的Portable ZIP互通尚未验证。
 
 ## 导入可信的旧版 MAT 配置
 

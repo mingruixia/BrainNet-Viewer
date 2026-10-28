@@ -6,7 +6,7 @@
 
 ## 准备可重放Scene
 
-在桌面版选文件、**Validate and Load**、调整Visualization Settings，按 **Apply**（提交并渲染），然后用 **Save Scene** 写出JSON。它记录已应用设置、相对输入引用/哈希、坐标/再分发元数据，以及现代App保存时可选的相机/导出面板状态。它**不**内嵌源数据、不记录未提交编辑、不证明空间配准、也不授予文件共享权。数据根目录须明确：引用相对该根目录解析，而不是相对Scene JSON所在目录。App选取外部文件时经用户同意可在既定根目录下暂存核实后的副本；手写Scene或命令行运行不会静默复制根目录外的数据。
+在桌面版选文件、**Validate and Load**、调整设置并按 **Apply**。普通 **Save Scene** JSON保存已应用设置、输入引用/哈希及可选相机/导出状态，不复制数据。根目录外的本机文件通过明确的本机路径引用；旧相对引用仍按DataRoot解析。需要移动数据时选择 **Portable Scene with data (*.zip)**；CLI可重放ZIP或JSON。Scene不执行配准，也不改变数据的再分发权利。
 
 无需打开App渲染一张图：
 

@@ -14,7 +14,7 @@ Choose **Save Scene** and a new writable `surface-basics.scene.json` destination
 
 | Edition | What to retain |
 | --- | --- |
-| MATLAB Desktop | Scene JSON plus referenced files under the configured data root, preserving relative structure. Inputs are not embedded in JSON. Approved external-file staging creates copies within that root. |
+| MATLAB Desktop | JSON references the original local files without copying. For migration, choose **Portable Scene with data (*.zip)** in the save dialog; the ZIP contains the required inputs and companions. |
 | Python Desktop | Scene JSON and the copied companion assets folder created beside it. Move/copy the entire bundle, not just the JSON. Keep the originals for analysis. |
 
 Do not rename or hand-edit companion paths/hashes to suppress an error. Save to a new location when an existing file must be preserved. The shared `.json` suffix does not prove Scene exchange between editions; this exercise uses same-edition replay. No prebuilt Scene files are added to the resource distribution.
@@ -22,7 +22,7 @@ Do not rename or hand-edit companion paths/hashes to suppress an error. Save to 
 ## Reopen and compare
 
 1. Record the current input identity, color, opacity and layout before reopening.
-2. Open a fresh instance of the **same edition**. In **Data Sources → Scene File → Open**, select the saved JSON.
+2. Open a fresh instance of the **same edition**. In **Data Sources → Scene File → Open**, select the saved JSON, or the MATLAB portable ZIP when migrating.
 3. Follow its load action; use **Validate and Load** if required by the current interface, then **Render Scene** for an explicit draw. Review loading or camera-compatibility warnings before exporting.
 4. Confirm the original 81,924-vertex/163,840-face mesh and Uniform gray/Opacity 1/Single View settings. Check compatible camera and export preferences if saved by the application.
 

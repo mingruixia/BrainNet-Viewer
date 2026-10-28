@@ -6,7 +6,7 @@
 
 ## 输入与前提
 
-使用项目中现有的[`BrainMesh_ICBM152.nv`](../../../../Data/SurfTemplate/BrainMesh_ICBM152.nv)，路径为`src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`，SHA-256为`471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`。这是真实人脑曲面模板，**81,924顶点、163,840三角面**，不是被试扫描。分发时保留 **Prof. Alan C. Evans（MNI）** 署名；见[来源与坐标说明](Resource_Attribution.md)。
+使用项目中现有的[`BrainMesh_ICBM152.nv`](../../../src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv)，路径为`src/matlab/BrainNetViewer/Data/SurfTemplate/BrainMesh_ICBM152.nv`，SHA-256为`471e43f955a1cb9f0350aaca2822f02fc74e393718d1e385fddaf0e578ffe572`。这是真实人脑曲面模板，**81,924顶点、163,840三角面**，不是被试扫描。分发时保留 **Prof. Alan C. Evans（MNI）** 署名；见[来源与坐标说明](Resource_Attribution.md)。
 
 本教程使用Windows、MATLAB R2025a Update 1及项目根目录。软件不提供仅依赖MATLAB Runtime的安装包；其他平台的要求见安装指南。从干净MATLAB路径开始，不要同时加载另一套BrainNet Viewer安装目录。
 
@@ -24,7 +24,7 @@ app = BrainNetViewer;
 
 ### Step 02
 
-在 **Data Sources** 点击 **Add Files**，把`Data/SurfTemplate/BrainMesh_ICBM152.nv`作为 **Surface** 选择。该文件已位于App数据根目录内，正常情况下**不需要 Stage and Add**；若选择的是数据根目录外的另一份副本，App才可能提示受控导入。`.nv`不能用 **Open Scene JSON** 读取。
+在 **Data Sources** 点击 **Add Files**，将`Data/SurfTemplate/BrainMesh_ICBM152.nv`作为 **Surface** 选入；本机其他位置的副本也可直接选择，不再额外确认导入或自动复制。**Open Scene**用于Scene JSON/ZIP，不能用它打开`.nv`曲面。
 
 ### Step 03
 

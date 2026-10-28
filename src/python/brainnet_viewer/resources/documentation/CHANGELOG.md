@@ -2,6 +2,11 @@
 
 ## 2.0.0 — Unreleased
 
+### Local files and Scenes
+
+- Python Desktop and Docker/Web clearly reject MATLAB Scenes that reference local file paths, without replacing the current Scene.
+- MATLAB reads selected local files without an import-confirmation dialog or automatic copies. Save Scene JSON keeps file references; choose a portable ZIP to include inputs and their required companions for migration. Older relative Scenes remain readable, and image/movie provenance omits local input paths.
+
 ### Rendering and server sessions
 
 - Preserve physical title and scalar-bar sizes in MATLAB PNG/PDF exports.

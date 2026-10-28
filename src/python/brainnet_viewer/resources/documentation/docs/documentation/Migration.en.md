@@ -4,7 +4,7 @@
 
 ## Practical migration route
 
-1. Preserve the old data and EC MAT configuration. Start the modern project-root `BrainNetViewer` launcher without recursively adding the old program to the MATLAB path. Use Data Sources → **Validate and Load** for input roles, or **Open Scene JSON** for a modern Scene. Outside-root files need approved staging or an appropriate data root.
+1. Preserve the old data and EC MAT configuration. Start the modern project-root `BrainNetViewer` launcher without recursively adding the old program to the MATLAB path. Use Data Sources → **Validate and Load** for input roles, or **Open Scene JSON** for a modern Scene. Local files are read directly. Save ordinary JSON references, or choose a portable ZIP when moving the inputs.
 2. Replace `BrainNet_Option.fig` with the right-hand Visualization Settings. The shared **Apply commits and renders**; Revert discards pending edits. Render Scene explicitly redraws; Clear Figure clears only views; camera Reset is not Restore Defaults.
 3. Use **Import Settings** only for a trusted EC MAT. Review its `fields_requiring_review`, data roles, `.node` columns 4/5, threshold equalities, module colors, ROI/statistical mode and spatial assumptions before saving a new Scene. A mapped field is not proof of identical scientific meaning or pixels.
 4. Use **Save Scene** to preserve one analysis's input references/hashes and applied settings (with optional modern camera/export state). Use **Save/Load Preset** to carry display settings across datasets **without** input paths, camera or export-panel preferences. Neither file grants resource redistribution rights.

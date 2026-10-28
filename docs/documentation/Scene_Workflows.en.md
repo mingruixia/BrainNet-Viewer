@@ -36,9 +36,11 @@ Axes keep their normalized layout regions during window-size changes. Resizing d
 
 ## Data-root rule
 
-Input paths are relative to **DataRoot**, not to the JSON file's folder or the current MATLAB folder. The desktop uses the root supplied at launch; the default root is `src/matlab/BrainNetViewer` in this project. Move the data with the same relative directory structure, then explicitly select the corresponding DataRoot. A Scene file alone is not a portable data package.
+Legacy relative references resolve against **DataRoot**. Newly selected local files outside that root use an explicit local path and remain in place. Portable ZIP inputs resolve inside their extracted package. Ordinary JSON does not contain the data; use a portable ZIP when moving a Scene to another computer.
 
-If you choose a file outside the App data root, the App asks before staging a verified copy in `user-data/imports/<hash>/`; the original is unchanged. Programmatic `selectInputPath` requires explicit `ExternalImportApproved=true` for that action. Staging supported companion files does not grant redistribution rights. Saving verifies existing input hashes and fills missing ones. Missing files or changed hashes stop the save; the original Scene JSON is retained. Programmatic saves and exports refuse overwrites unless `Overwrite=true`. The desktop save dialog provides the overwrite confirmation.
+MATLAB opens selected local files directly at their original locations, without an import confirmation or automatic copies. Ordinary **Save Scene** JSON stores file references and hashes; it does not include the data. Keep those files at their recorded locations. For sharing or moving a project, select **Portable Scene with data (*.zip)** in the Save Scene dialog. The ZIP contains the inputs and supported paired or external data files. Open it with **Open Scene** on the destination computer. Older root-relative Scene JSON remains readable. A local JSON containing absolute references is intended for the same computer; use a ZIP when paths will change. Saving verifies existing hashes and fills missing ones. Missing or changed files stop saving before replacing an existing output; API overwrites still require Overwrite=true.
+
+Python Desktop and Docker/Web reject MATLAB Scene inputs containing local-file references with an explicit explanation. Open that JSON in MATLAB where the files remain available, or select the data again in the destination edition. Portable ZIP compatibility between editions has not been established.
 
 ## Import trusted legacy MAT settings
 

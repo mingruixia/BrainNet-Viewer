@@ -8,7 +8,7 @@ BrainNet Viewer 2.0提供MATLAB、Python桌面和Docker/Web三版。本章介绍
 
 | 旧流程 | 当前入口 | 需核对之处 |
 |---|---|---|
-| GUIDE主窗口 / Load File | `BrainNetViewer`；Data Sources → Validate and Load | 使用当前项目启动器和明确的数据根目录。根目录外文件须经App询问后暂存；Scene JSON不打包输入。 |
+| GUIDE主窗口 / Load File | `BrainNetViewer`；Data Sources → Validate and Load | 使用当前项目启动器和明确的数据根目录。本机文件直接读取；JSON保存引用，需要携带数据时选择迁移ZIP。 |
 | BrainNet_Option.fig与OK/Apply | 右侧Visualization Settings → 共用 **Apply** | Apply**提交并渲染**；**Revert**丢弃未提交编辑；画布**Reset**只恢复相机；**Restore Defaults**经确认后重置显示设置。 |
 | Save/Load Option MAT | **Save/Load Preset**复用外观；可信EC MAT用 **Import Settings** | 预设不含输入/相机/导出面板偏好。EC导入是须审核的转换，不保证无损；保留原MAT并查看`fields_requiring_review`。 |
 | 保存/重新打开一次分析 | **Save Scene / Open Scene JSON** | Scene记录输入引用/哈希及已应用设置，可带现代相机/导出状态。保留对应数据根目录结构，复核哈希及空间对齐。 |
@@ -31,7 +31,7 @@ BrainNet Viewer 2.0提供MATLAB、Python桌面和Docker/Web三版。本章介绍
 | 现象 | 首先核查 / 安全处理 |
 |---|---|
 | 找不到启动器，或启动了另一份BrainNet | 使用含`BrainNetViewer.m`的当前项目根目录，必要时把该根目录加入MATLAB路径，并从当前会话移除冲突的*路径项*；不修改原软件文件夹。见[入门](../../documentation/Getting_Started.zh-CN.md)。 |
-| 外部输入无法写入可迁移Scene | 在App提示时选 **Stage and Add**，或有意识地用合适数据根目录启动。不要手工把绝对路径塞进可迁移Scene引用；核查复制的配套文件和权限。 |
+| 将Scene移到另一台电脑 | 在保存对话框选择 **Portable Scene with data (*.zip)**，传输ZIP后用 **Open Scene** 打开。普通JSON引用原文件，单独移动JSON并不会携带数据。 |
 | Scene/预设JSON打不开，或文件/哈希不符 | Scene用 **Open Scene JSON**，`*.preset.json`用 **Load Preset**，两种结构不能互换。检查版本/必需字段、数据根相对路径、配套文件及原始哈希；不要通过改哈希绕过校验。 |
 | 选了新文件仍见旧图，或不能导出 | 先 **Validate and Load**，再 **Apply**（提交并渲染）或显式 **Render Scene**。导出要求当前Modern Batch渲染。加载预设会清除旧渲染，需再Render Scene。换数据时检查Scene摘要中保留的手动体数值范围。 |
 | 左右、比例、图谱区不对，或分半视图为空 | 核实真实坐标系、方向、单位、曲面/体对齐及半球可分性。App不负责配准；不可分网格应选整体布局；Inspect的AAL/Brodmann结果只能暂作参考。 |

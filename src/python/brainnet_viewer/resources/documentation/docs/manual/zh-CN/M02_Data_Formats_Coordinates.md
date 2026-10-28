@@ -15,9 +15,9 @@
 
 现代独立NIfTI/GIfTI读取器**不依赖SPM**。缺少NIfTI magic的纯Analyze 7.5 `.hdr/.img`不支持。GIfTI外部二进制数组在读取器约束内可用，移动数据时须保留伴随文件。曲面`.obj`指**MNI/BIC**而非Wavefront；`.mesh`指支持的BrainVISA编码，不等于任意Medit格式。FreeSurfer `.pial`保留存储坐标，不能自动视为scanner RAS或MNI；BrainVISA不再套用旧版隐式XYZ整体取反。GIfTI变换/元数据可被记录，但不因此自动执行配准。MZ3内含标量/RGBA可被解析，并不自动进入显示配置。明确不支持的变体见[详细格式矩阵](../../compatibility/Surface_Format_Support.md)和[M13](M13_Surface_Tools.md)。
 
-## 根目录外文件与可迁移性
+## 本机文件和可迁移Scene
 
-对根目录外文件，桌面应用询问 **Stage and Add** 或 **Cancel**。批准后会在`user-data/imports/<hash>/`下生成经过验证的副本并暂存支持的伴随文件；原件不变。这**不赋予**公开分发副本的权利。程序调用`selectInputPath`须明确批准外部导入；CLI不会悄悄暂存任意绝对路径。可迁移Scene保存**相对引用及哈希**，不包含输入数据字节；移动时须在新的数据根目录下保留相对目录结构。详见[M03](M03_Scenes_Presets_Legacy.md)。
+MATLAB直接读取所选本机文件，不再弹出导入确认，也不自动复制数据。普通 **Save Scene** JSON只保存路径引用和哈希，不包含数据；引用文件须保留在记录的位置。需要共享或迁移时，在保存对话框选择 **Portable Scene with data (*.zip)**，将输入及支持的成对或外部数据文件打包；目标电脑用 **Open Scene** 打开ZIP。旧版相对数据根目录的Scene JSON仍可读取。含本机绝对引用的普通JSON适合同一电脑使用，路径将改变时应选择ZIP。
 
 ## 科学空间对应检查
 

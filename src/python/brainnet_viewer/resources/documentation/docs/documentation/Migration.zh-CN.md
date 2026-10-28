@@ -4,7 +4,7 @@
 
 ## 实际迁移路径
 
-1. 保留旧数据及EC MAT配置原件。从当前项目根目录运行现代`BrainNetViewer`启动器，不把旧程序递归加入MATLAB路径。通过Data Sources → **Validate and Load**读取各输入角色，或用 **Open Scene JSON**打开现代Scene。根目录外文件需获准暂存或选择适当数据根目录。
+1. 保留旧数据及EC MAT配置原件。从当前项目根目录运行现代`BrainNetViewer`启动器，不把旧程序递归加入MATLAB路径。通过Data Sources → **Validate and Load**读取各输入角色，或用 **Open Scene JSON**打开现代Scene。本机文件直接读取。普通JSON保存引用，需要迁移输入时选择ZIP打包。
 2. 用右侧Visualization Settings替代`BrainNet_Option.fig`。共用 **Apply提交并渲染**；Revert放弃未提交编辑。Render Scene显式重绘；Clear Figure只清视图；相机Reset不等于Restore Defaults。
 3. **Import Settings**只导入可信EC MAT。保存现代Scene之前，复核`fields_requiring_review`、输入角色、`.node`第4/5列、阈值等号归属、模块颜色、ROI/统计模式及空间假设。标为已映射的字段并不保证科学语义或像素完全相同。
 4. 用 **Save Scene**保留一次分析的输入引用/哈希与已应用设置，可带现代相机/导出状态。用 **Save/Load Preset**跨数据集复用显示配置，**不带**输入路径、相机或导出面板偏好。两者均不授予资源再分发权。

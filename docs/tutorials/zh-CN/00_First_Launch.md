@@ -24,7 +24,7 @@ app = BrainNetViewer;
 
 ### Step 02
 
-在 **Data Sources** 点击 **Add Files**，把`Data/SurfTemplate/BrainMesh_ICBM152.nv`作为 **Surface** 选择。该文件已位于App数据根目录内，正常情况下**不需要 Stage and Add**；若选择的是数据根目录外的另一份副本，App才可能提示受控导入。`.nv`不能用 **Open Scene JSON** 读取。
+在 **Data Sources** 点击 **Add Files**，将`Data/SurfTemplate/BrainMesh_ICBM152.nv`作为 **Surface** 选入；本机其他位置的副本也可直接选择，不再额外确认导入或自动复制。**Open Scene**用于Scene JSON/ZIP，不能用它打开`.nv`曲面。
 
 ### Step 03
 
