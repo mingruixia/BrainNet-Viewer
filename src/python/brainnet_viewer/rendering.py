@@ -242,6 +242,7 @@ class SceneRenderer:
         self.title_actor = None
         self.text_fonts = {}
         self.annotation_warning = ''
+        self.surface_colorbars = []
         # A full-window background fills the intentional gaps between viewports.
         from vtkmodules.vtkRenderingCore import vtkRenderer
         self.background = vtkRenderer()
@@ -279,6 +280,7 @@ class SceneRenderer:
         self.background.RemoveAllViewProps()
         self.annotations.RemoveAllViewProps()
         self.colorbars = []
+        self.surface_colorbars = []
         self.legends = []
         self.annotation_text_props = []
         self.title_actor = None
@@ -822,6 +824,7 @@ class SceneRenderer:
                 # strip in that same area so endpoint text stays between brains.
                 bar.SetOrientationToHorizontal(); bar.SetPosition(x0+.38*scale_x,y)
                 bar.SetWidth(.24*scale_x); bar.SetHeight(.10); bar.SetBarRatio(.18)
+                self.surface_colorbars.append(bar)
             elif location in ("eastoutside", "westoutside"):
                 height = .84/len(entries)
                 bar.SetOrientationToVertical(); bar.SetPosition(.865 if location == "eastoutside" else .015, .08+i*height)
@@ -891,6 +894,31 @@ class SceneRenderer:
         for prop,pixels in self.annotation_text_props:
             if self.title_actor is None or prop is not self.title_actor.GetTextProperty():
                 prop.SetFontSize(annotation_font_points(pixels,dpi,for_export=self.exporting))
+        self.update_surface_ticks(size or self.plotter.window_size)
+
+    def update_surface_ticks(self, size):
+        """Fit horizontal numeric labels without shrinking physical typography."""
+        from vtkmodules.vtkRenderingFreeType import vtkFreeTypeTools
+        tools=vtkFreeTypeTools.GetInstance()
+        dpi=self.plotter.render_window.GetDPI()
+        for bar in self.surface_colorbars:
+            prop=bar.GetLabelTextProperty()
+            available=max(0,bar.GetWidth()*size[0]-8)
+            low,high=bar.GetLookupTable().GetTableRange()
+            for count in (4,3,2):
+                widths=[]; heights=[]
+                for value in np.linspace(low,high,count):
+                    label_format=bar.GetLabelFormat()
+                    label=label_format.format(value) if '{' in label_format else label_format % value
+                    box=[0,0,0,0]
+                    if not tools.GetBoundingBox(prop,label,int(dpi),box):
+                        raise ValueError("Scalar-bar labels could not be measured with the annotation font.")
+                    widths.append(box[1]-box[0]+1); heights.append(box[3]-box[2]+1)
+                gap=max(4,.3*max(heights))
+                needed=max((a+b)/2+gap for a,b in zip(widths,widths[1:]))
+                if available/(count-1)>=needed or count==2:
+                    bar.SetNumberOfLabels(count)
+                    break
 
     def reset(self):
         width,height=self.plotter.window_size
@@ -973,6 +1001,7 @@ class SceneRenderer:
         # Preserve the actual screen typography. Recomputing from pixel targets
         # at a high screen DPI can halve the original sizes on any platform.
         old_annotation_fonts=[(prop,prop.GetFontSize()) for prop,_ in self.annotation_text_props]
+        old_scalar_ticks=[(bar,bar.GetNumberOfLabels()) for bar in self.surface_colorbars]
         old_title_visible=self.title_actor.GetVisibility() if self.title_actor is not None else None
         old_warning=self.annotation_warning
         self.exporting=True
@@ -995,6 +1024,7 @@ class SceneRenderer:
             self.fit_size=old_fit; self.background.SetBackgroundAlpha(background_alpha)
             self.plotter.render_window.SetDPI(old_dpi); self.update_label_records()
             for prop,size in old_annotation_fonts: prop.SetFontSize(size)
+            for bar,count in old_scalar_ticks: bar.SetNumberOfLabels(count)
             if self.title_actor is not None: self.title_actor.SetVisibility(old_title_visible)
             self.annotation_warning=old_warning
             self.exporting=False
