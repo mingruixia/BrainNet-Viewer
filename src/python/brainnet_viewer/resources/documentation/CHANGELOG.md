@@ -9,6 +9,12 @@
 
 ### Rendering and server sessions
 
+- Keep MATLAB transparent and opaque raster exports on the same pixel grid, preserving content when native exports add a blank boundary pixel.
+
+- Fit horizontal surface scalar-bar tick density to the available width without shrinking physical text sizes, and restore screen tick density after export.
+
+- Keep transparent raster exports aligned on macOS with MATLAB releases before R2025a by centering native matte padding at a common resolution.
+
 - Preserve physical title and scalar-bar sizes in MATLAB PNG/PDF exports.
   Reserve space for annotations and align transparent matte renders, including
   one-pixel padding differences in older MATLAB releases. Restore the original
