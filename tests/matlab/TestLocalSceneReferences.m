@@ -136,7 +136,15 @@ classdef TestLocalSceneReferences < matlab.unittest.TestCase
             t.verifyEqual(string(clone.Metadata.session_state.scene_signature),brainnet.core.SessionState.signature(clone));
             output=fullfile(t.Folder,'external.png');a.exportCurrentFigure(output);
             [~,~,alpha]=imread(output);t.verifyNotEmpty(alpha);
-            record=fileread(output+'.provenance.json');t.verifyFalse(contains(record,char(t.Folder)));
+            record=fileread(output+'.provenance.json');document=jsondecode(record);
+            % The existing output-root field is allowed; input locations are not.
+            expectedRoot=string(char(java.io.File(char(t.Folder)).getCanonicalPath()));
+            t.verifyEqual(string(document.export_root),expectedRoot);
+            privateRecord=jsonencode(rmfield(document,'export_root'));
+            for privatePath=[t.Folder,source]
+                encodedPath=jsonencode(char(privatePath));
+                t.verifyFalse(contains(privateRecord,encodedPath(2:end-1)));
+            end
             t.verifyFalse(contains(record,'local_path'));
             t.verifyEqual(a.BatchRenderer.captureCamera(),camera,'AbsTol',1e-9);
             sanitized=brainnet.io.internal.sceneForProvenance(a.Session.Scene);t.verifyFalse(isfield(sanitized.inputs.surface,'local_path'));

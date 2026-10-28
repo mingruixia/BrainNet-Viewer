@@ -129,13 +129,13 @@ classdef FigureExporter
                 end
                 imwrite(pixels, temporaryOutput, 'bmp');
             else
-                exportWithExactRasterSize(figureHandle, temporaryOutput, nameValues, ...
+                nativePlan=exportWithExactRasterSize(figureHandle, temporaryOutput, nameValues, ...
                     options, any(format == rasterFormats), prepareAnnotations);
             end
             if ~isfile(temporaryOutput) || dir(temporaryOutput).bytes == 0
                 error('BNV:Export:EmptyOutput', 'The graphics export did not create a nonempty file.');
             end
-            transparencyMethod = 'not-requested'; matteAlignment=[0 0];
+            transparencyMethod = 'not-requested'; matteAlignment=[0 0];canvasAlignment=[0 0];
             if options.BackgroundColor == "none" && any(format == rasterFormats)
                 transparencyMethod = 'native-alpha';
                 [pixels, ~, alpha] = imread(temporaryOutput);
@@ -143,7 +143,7 @@ classdef FigureExporter
                     % Some MATLAB raster backends silently flatten "none".
                     % Recover composited alpha from matched near-black/white mattes,
                     % never from a color key (which erases dark/white anatomy).
-                    matteAlignment=exportRasterAlpha(figureHandle,temporaryOutput,nameValues,options,prepareAnnotations);
+                    [matteAlignment,canvasAlignment]=exportRasterAlpha(figureHandle,temporaryOutput,nameValues,options,prepareAnnotations,nativePlan);
                     transparencyMethod = 'matched-near-black-white-mattes';
                 end
             end
@@ -156,6 +156,7 @@ classdef FigureExporter
             record.export.background_color_resolved = background;
             record.export.transparency_method = transparencyMethod;
             record.export.matte_padding_alignment_pixels=matteAlignment;
+            record.export.matte_canvas_alignment_pixels=canvasAlignment;
             record.text_rendering = annotationRecord();
             writeJson(temporarySidecar, record);
             movefile(temporaryOutput, destination, 'f');
@@ -497,8 +498,9 @@ exportgraphics(target,path,values{:});
 
 end
 
-function alignment=exportRasterAlpha(target,path,nameValues,options,prepareAnnotations)
+function [alignment,canvasAlignment]=exportRasterAlpha(target,path,nameValues,options,prepareAnnotations,nativePlan)
 alignment=[0 0];
+canvasAlignment=[0 0];reference=imread(path);
 blackPath = string(tempname(fileparts(path))) + ".png";
 whitePath = string(tempname(fileparts(path))) + ".png";
 cleanup = onCleanup(@() cleanupFiles([blackPath whitePath])); %#ok<NASGU>
@@ -523,10 +525,10 @@ if modernPair
     nameValues{wi}=max(1,round(nameValues{wi}*factor));
     nameValues{hi}=max(1,round(nameValues{hi}*factor));
     nameValues{ui}='pixels';
-    % Binary internal DPI makes integer pixel bounds exactly representable
-    % in inches. Output pixels are native, never resampled; imwrite below
-    % records the requested DPI. Annotation preparation uses options DPI.
-    nameValues{ri}=2^ceil(log2(options.Resolution));
+    % Keep the opaque reference and matte pair on the same native pixel
+    % grid. A different internal DPI changes viewport rounding in multi-view
+    % exports even when the requested output dimensions are identical.
+    nameValues{ri}=options.Resolution;
 end
 nameValues{backgroundIndex} = repmat(low,1,3);
 blackPlan = exportWithExactRasterSize(target,blackPath,nameValues,options,true,prepareAnnotations);
@@ -562,12 +564,18 @@ if ~isempty(blackPlan) && ~isempty(whitePlan) && (modernPair || ~isequaln(blackP
                 values{hi}=max(.5,nameValues{hi}*pixelsPerUnit-2*attempt)/pixelsPerUnit;
             elseif modernPair
                 values{wi}=max(.5,nameValues{wi}-2*attempt);
-                values{hi}=max(.5,nameValues{hi}-2*attempt);
+                % Height controls scientific scale; reduce empty page width.
+                values{hi}=nameValues{hi};
             else
                 ratio = values{hi}/values{wi};
                 values{wi} = max(.5,floor(values{wi}*pixelsPerUnit)-inset)/pixelsPerUnit;
                 values{hi} = values{wi}*ratio;
             end
+            plan = [];
+        elseif ismac
+            % At the selected Resolution, Mac content bounds can differ from
+            % the initial size-search pass. Establish the black replay bounds
+            % afresh; keep the native resolution and full RGB guard below.
             plan = [];
         end
         values{backgroundIndex} = repmat(low,1,3);
@@ -575,7 +583,16 @@ if ~isempty(blackPlan) && ~isempty(whitePlan) && (modernPair || ~isequaln(blackP
         values = plan.values;
         values{backgroundIndex} = repmat(high,1,3);
         try
-            whitePlan=exportWithExactRasterSize(target,whitePath,values,options,true,prepareAnnotations,plan);
+            % Mac legacy bounds may include different empty text padding.
+            % Center-pad each native image at the same DPI; never crop/resample.
+            replayPlan=plan;
+            if ismac && verLessThan('matlab','25.1'),replayPlan=[];end
+            whitePlan=exportWithExactRasterSize(target,whitePath,values,options,true,prepareAnnotations,replayPlan);
+            if ismac && verLessThan('matlab','25.1') && ...
+                    (whitePlan.scale~=plan.scale || ~any(whitePlan.size==plan.size))
+                error('BNV:Export:MatteBoundsMismatch', ...
+                    'Matched Mac matte renders must retain resolution and a common native dimension.');
+            end
             blackPlan=plan;
             break;
         catch exception
@@ -597,6 +614,24 @@ difference = white-black;
 tolerance = 3/255+eps(1);
 if any(difference < -tolerance | difference > high-low+tolerance,'all') && ...
         ~isempty(blackPlan) && ~isempty(whitePlan)
+    % An extra native blank row may be at the leading rather than trailing
+    % edge. Retain its measured bounds and accept that alternative only when
+    % the complete, unchanged RGB reconstruction guard passes.
+    if modernPair && isfield(blackPlan,'nativeSize') && isfield(whitePlan,'nativeSize')
+        extra=whitePlan.nativeSize-blackPlan.nativeSize;
+        dimensions=find(extra==1);
+        if numel(dimensions)==1 && all(extra(setdiff(1:2,dimensions))==0) && ...
+                isequal(whitePlan.nativeSize-whitePlan.size,extra) && ...
+                isequal(blackPlan.nativeSize,blackPlan.size)
+            candidate=shiftMattePadding(white,dimensions,-1);
+            if ~isempty(candidate)
+                delta=candidate-black;
+                if ~any(delta < -tolerance | delta > high-low+tolerance,'all')
+                    white=candidate;difference=delta;alignment(dimensions)=-1;
+                end
+            end
+        end
+    end
     % Two legal center-padding roundings can differ by one pixel. Try only
     % those integer origins, only for a one-pixel non-scale-setting bound
     % difference, and only if the discarded edge is entirely blank padding.
@@ -628,6 +663,30 @@ if any(difference < -tolerance | difference > high-low+tolerance,'all')
     error('BNV:Export:TransparencyUnavailable', ...
         'Matte renders are inconsistent; transparent output was not written.');
 end
+% Restore the original native page origin after a proven one-pixel blank
+% overflow. The pair remains on one pixel grid; only uniform page padding
+% moves. Require the complete recomposite to pass the existing RGB criterion.
+if modernPair && isstruct(nativePlan) && isfield(nativePlan,'nativeSize') && ...
+        isfield(blackPlan,'nativeSize') && isequal(size(reference),size(black))
+    extra=nativePlan.nativeSize-nativePlan.size;
+    dimension=find(extra==1);
+    if numel(dimension)==1 && all(extra(setdiff(1:2,dimension))==0) && ...
+            blackPlan.nativeSize(dimension)==nativePlan.size(dimension) && ...
+            blackPlan.size(dimension)==nativePlan.size(dimension) && ...
+            all(blackPlan.nativeSize(setdiff(1:2,dimension))==blackPlan.size(setdiff(1:2,dimension))) && ...
+            all(blackPlan.size(setdiff(1:2,dimension))+2*blackPlan.offset(setdiff(1:2,dimension))==nativePlan.size(setdiff(1:2,dimension)))
+        candidateBlack=shiftMattePadding(black,dimension,1);
+        candidateWhite=shiftMattePadding(white,dimension,1);
+        if ~isempty(candidateBlack) && ~isempty(candidateWhite)
+            currentErrors=recompositeErrors(black,white,reference,low,high);
+            candidateErrors=recompositeErrors(candidateBlack,candidateWhite,reference,low,high);
+            if candidateErrors<currentErrors && candidateErrors<.001*size(reference,1)*size(reference,2)
+                black=candidateBlack;white=candidateWhite;
+                difference=white-black;canvasAlignment(dimension)=1;
+            end
+        end
+    end
+end
 alpha = min(1,max(0,1-max(difference,[],3)/(high-low)));
 rgb = uint8(255*min(1,max(0,(black-low*(1-alpha))./max(alpha,1/255))));
 alpha = uint8(round(255*alpha));
@@ -647,6 +706,16 @@ else
         'XResolution',options.Resolution,'YResolution',options.Resolution);
     setTag(output,tags); write(output,cat(3,rgb,alpha));
 end
+end
+
+function count=recompositeErrors(black,white,reference,low,high)
+alpha=min(1,max(0,1-max(white-black,[],3)/(high-low)));
+rgb=double(uint8(255*min(1,max(0,(black-low*(1-alpha))./max(alpha,1/255)))));
+alpha=double(uint8(round(255*alpha)))/255;
+background=double(reference(1,1,:));
+composite=rgb.*alpha+background.*(1-alpha);
+delta=max(abs(composite-double(reference)),[],3);
+count=nnz(delta>3);
 end
 
 function plan = exportWithExactRasterSize(target, path, nameValues, options, isRaster, prepareAnnotations, sharedPlan)
@@ -676,9 +745,18 @@ switch options.Units
 end
 expected = max(1,round([options.Width options.Height] * pixelsPerUnit));
 info = imfinfo(path);
+nativeSize=[info.Width info.Height];
+if ~legacyOptions && any([info.Width info.Height]>expected)
+    % Native bounds can append one empty row/column to an exact-size PNG.
+    % Remove only verified uniform trailing padding before considering a
+    % smaller render; changing the render size also changes anatomy scale.
+    trimTrailingBlankPixel(path,expected,options.Resolution);
+    info = imfinfo(path);
+end
 if isempty(sharedPlan)
     if isequal([info.Width info.Height],expected)
         plan = rasterPlan(nameValues,[info.Width info.Height],[0 0],legacyOptions);
+        plan.nativeSize=nativeSize;
         return;
     end
     if all([info.Width info.Height] <= expected)
@@ -747,6 +825,7 @@ else
     end
     plan = sharedPlan; plan.size=actual; plan.offset=offset;
 end
+plan.nativeSize=nativeSize;
 [pixels,map,alpha] = imread(rasterPath);
 if ~isempty(map), pixels = uint8(255*ind2rgb(pixels,map)); end
 if size(pixels,3)==1, pixels = repmat(pixels,1,1,3); end
@@ -786,6 +865,25 @@ switch lower(extension)
     otherwise
         imwrite(canvas,path);
 end
+end
+
+function trimTrailingBlankPixel(path,expected,resolution)
+[~,~,extension]=fileparts(path);
+if ~strcmpi(extension,'.png'),return;end
+[pixels,map,alpha]=imread(path);
+actual=[size(pixels,2) size(pixels,1)];excess=actual-expected;
+if ~isempty(map)||any(excess>1)||~any(excess>0),return;end
+background=pixels(1,1,:);
+if excess(1)>0 && ~all(pixels(:,end,:)==background,'all'),return;end
+if excess(2)>0 && ~all(pixels(end,:,:)==background,'all'),return;end
+if ~isempty(alpha)
+    if excess(1)>0 && ~all(alpha(:,end)==alpha(1,1),'all'),return;end
+    if excess(2)>0 && ~all(alpha(end,:)==alpha(1,1),'all'),return;end
+end
+rows=1:min(actual(2),expected(2));columns=1:min(actual(1),expected(1));
+parameters={'ResolutionUnit','meter','XResolution',resolution/0.0254,'YResolution',resolution/0.0254};
+if ~isempty(alpha),parameters=[parameters,{'Alpha',alpha(rows,columns)}];end
+imwrite(pixels(rows,columns,:),path,parameters{:});
 end
 
 
