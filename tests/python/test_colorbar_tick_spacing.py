@@ -10,9 +10,6 @@ from unittest.mock import patch
 
 import numpy as np
 from PIL import Image
-from PySide6 import QtCore, QtWidgets as W
-from pyvistaqt import QtInteractor
-from vtkmodules.vtkRenderingFreeType import vtkFreeTypeTools
 from brainnet_viewer.rendering import SceneRenderer, prepare
 from brainnet_viewer.settings import DEFAULTS
 
@@ -22,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[2]
 @unittest.skipUnless(sys.platform == 'darwin', 'Actual macOS Qt capture required')
 class MacScalarTickSpacingTests(unittest.TestCase):
     def test_small_and_normal_exports_keep_labels_separate_and_restore(self):
+        from PySide6 import QtCore, QtWidgets as W
+        from pyvistaqt import QtInteractor
+        from vtkmodules.vtkRenderingFreeType import vtkFreeTypeTools
         qt = W.QApplication.instance() or W.QApplication([])
         window = W.QWidget(); layout = W.QVBoxLayout(window)
         plot = QtInteractor(window); layout.addWidget(plot)
