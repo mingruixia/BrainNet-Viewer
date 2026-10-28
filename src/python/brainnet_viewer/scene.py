@@ -72,6 +72,13 @@ def validate_document(document):
     for role, reference in inputs.items():
         if not isinstance(reference, dict) or reference.get("role") != role:
             raise ValueError("Scene input role mismatch.")
+        if "local_path" in reference:
+            raise ValueError(
+                "This Scene uses MATLAB local-file references, which Python Desktop "
+                "and Docker/Web cannot read. Open it in MATLAB where the original "
+                "files are available, or select the data again in this edition "
+                "and save a new Scene."
+            )
         validate_asset_path(reference.get("relative_path"))
         digest = reference.get("sha256", "")
         if not isinstance(digest, str) or (digest and (len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest))):
