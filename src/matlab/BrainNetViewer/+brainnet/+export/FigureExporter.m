@@ -230,7 +230,7 @@ classdef FigureExporter
             record.generated_at = char(datetime('now', 'TimeZone', 'local', ...
                 'Format', 'yyyy-MM-dd''T''HH:mm:ssXXX'));
             record.matlab_release = version('-release');
-            record.scene = scene.toStruct();
+            record.scene = brainnet.io.internal.sceneForProvenance(scene);
             record.prepared_scene = prepared.summary();
             record.renderer = renderMetrics;
             record.export = struct( ...

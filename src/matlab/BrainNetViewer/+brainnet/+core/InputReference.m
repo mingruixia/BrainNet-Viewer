@@ -4,6 +4,7 @@ classdef InputReference
     properties (SetAccess = private)
         Role (1, 1) string = "surface"
         RelativePath (1, 1) string = ""
+        LocalPath (1, 1) string = ""
         Sha256 (1, 1) string = ""
         CoordinateSpace (1, 1) string = "unknown"
         SourceUri (1, 1) string = ""
@@ -17,6 +18,7 @@ classdef InputReference
                 role (1, 1) string
                 relativePath (1, 1) string
                 options.Sha256 (1, 1) string = ""
+                options.LocalPath (1, 1) string = ""
                 options.CoordinateSpace (1, 1) string = "unknown"
                 options.SourceUri (1, 1) string = ""
                 options.RedistributionStatus (1, 1) string = "not-cleared"
@@ -42,6 +44,10 @@ classdef InputReference
                 error('BNV:Core:InvalidSha256', 'SHA-256 must contain exactly 64 hexadecimal characters.');
             end
 
+            if strlength(options.LocalPath)>0 && ~brainnet.core.InputReference.isAbsolute(options.LocalPath)
+                error('BNV:Core:InvalidLocalPath','A local file reference must use an absolute filesystem path.');
+            end
+            obj.LocalPath=options.LocalPath;
             obj.Role = role;
             obj.RelativePath = normalizedPath;
             obj.Sha256 = lower(options.Sha256);
@@ -56,7 +62,11 @@ classdef InputReference
                 obj (1, 1) brainnet.core.InputReference
                 rootPath (1, 1) string
             end
-            absolutePath = string(fullfile(rootPath, replace(obj.RelativePath, "/", filesep)));
+            if strlength(obj.LocalPath)>0
+                absolutePath=obj.LocalPath;
+            else
+                absolutePath = string(fullfile(rootPath, replace(obj.RelativePath, "/", filesep)));
+            end
         end
 
         function value = toStruct(obj)
@@ -68,6 +78,7 @@ classdef InputReference
             value.source_uri = char(obj.SourceUri);
             value.redistribution_status = char(obj.RedistributionStatus);
             value.metadata = obj.Metadata;
+            if strlength(obj.LocalPath)>0, value.local_path=char(obj.LocalPath); end
         end
     end
 
@@ -80,6 +91,7 @@ classdef InputReference
                 string(value.role), ...
                 string(value.relative_path), ...
                 Sha256=string(brainnet.core.InputReference.fieldOr(value, 'sha256', '')), ...
+                LocalPath=string(brainnet.core.InputReference.fieldOr(value, 'local_path', '')), ...
                 CoordinateSpace=string(brainnet.core.InputReference.fieldOr(value, 'coordinate_space', 'unknown')), ...
                 SourceUri=string(brainnet.core.InputReference.fieldOr(value, 'source_uri', '')), ...
                 RedistributionStatus=string(brainnet.core.InputReference.fieldOr(value, 'redistribution_status', 'not-cleared')), ...

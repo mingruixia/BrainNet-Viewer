@@ -267,7 +267,7 @@ classdef BrainNetApp < matlab.apps.AppBase
                 pathValue (1, 1) string
             end
             if ~isfile(pathValue)
-                error('BNV:App:SceneFileNotFound', 'Scene JSON does not exist: %s', pathValue);
+                error('BNV:App:SceneFileNotFound', 'Scene file does not exist: %s', pathValue);
             end
             try
                 scene = brainnet.io.readScene(pathValue);
@@ -290,8 +290,13 @@ classdef BrainNetApp < matlab.apps.AppBase
             if isempty(app.Session.Scene)
                 error('BNV:App:SceneRequired', 'Select input files before saving a Scene.');
             end
-            saved = brainnet.io.writeScene(app.sceneWithSessionState(), pathValue, ...
-                app.Session.RootPath, Overwrite=options.Overwrite);
+            if endsWith(lower(pathValue),".zip")
+                saved=brainnet.io.writePortableScene(app.sceneWithSessionState(),pathValue, ...
+                    app.Session.RootPath,Overwrite=options.Overwrite);
+            else
+                saved = brainnet.io.writeScene(app.sceneWithSessionState(), pathValue, ...
+                    app.Session.RootPath, Overwrite=options.Overwrite);
+            end
             % Saving must not discard an existing rendered canvas.
             app.SceneFilePath = pathValue;
             app.refreshView();
@@ -625,7 +630,7 @@ classdef BrainNetApp < matlab.apps.AppBase
                 if role == "auto"
                     role = app.classifyPath(pathValue);
                 end
-                [relative, inputPath, importMetadata] = app.makeRelative(pathValue, ...
+                [relative, inputPath, importMetadata, localPath] = app.makeRelative(pathValue, ...
                     ExternalImportApproved=options.ExternalImportApproved);
                 app.validateRoleExtension(role, relative);
                 hash = brainnet.io.internal.sha256File(inputPath);
@@ -636,7 +641,7 @@ classdef BrainNetApp < matlab.apps.AppBase
                 reference = brainnet.core.InputReference(role, relative, Sha256=hash, ...
                     CoordinateSpace=string(curated.coordinate_space), ...
                     RedistributionStatus=string(curated.redistribution_status), ...
-                    Metadata=importMetadata);
+                    Metadata=importMetadata, LocalPath=localPath);
                 if role == "surface" && endsWith(lower(relative), ".pial")
                     % Validate the new mesh before replacing current inputs.
                     [~, information] = brainnet.io.readFreeSurferSurface(reference, app.Session.RootPath);
@@ -644,35 +649,35 @@ classdef BrainNetApp < matlab.apps.AppBase
                     reference = brainnet.core.InputReference(role, relative, Sha256=hash, ...
                         CoordinateSpace="FreeSurfer as-stored; registration unverified", ...
                         RedistributionStatus="user-provided-not-for-redistribution", ...
-                        Metadata=importMetadata);
+                        Metadata=importMetadata, LocalPath=localPath);
                 elseif role == "surface" && endsWith(lower(relative), ".mesh")
                     [~, information] = brainnet.io.readBrainVisaMesh(reference, app.Session.RootPath);
                     importMetadata.brainvisa=information;
                     reference = brainnet.core.InputReference(role, relative, Sha256=hash, ...
                         CoordinateSpace="BrainVISA as-stored; registration unverified; no legacy XYZ inversion", ...
                         RedistributionStatus="user-provided-not-for-redistribution", ...
-                        Metadata=importMetadata);
+                        Metadata=importMetadata, LocalPath=localPath);
                 elseif role == "surface" && endsWith(lower(relative), ".g")
                     [~, information] = brainnet.io.readByuSurface(reference, app.Session.RootPath);
                     importMetadata.byu=information;
                     reference = brainnet.core.InputReference(role, relative, Sha256=hash, ...
                         CoordinateSpace="BYU as-stored; registration and units unverified", ...
                         RedistributionStatus="user-provided-not-for-redistribution", ...
-                        Metadata=importMetadata);
+                        Metadata=importMetadata, LocalPath=localPath);
                 elseif role == "surface" && endsWith(lower(relative), ".obj")
                     [~, information] = brainnet.io.readMniObjSurface(reference, app.Session.RootPath);
                     importMetadata.mni_bic=information;
                     reference = brainnet.core.InputReference(role, relative, Sha256=hash, ...
                         CoordinateSpace="MNI/BIC as-stored; registration and units unverified", ...
                         RedistributionStatus="user-provided-not-for-redistribution", ...
-                        Metadata=importMetadata);
+                        Metadata=importMetadata, LocalPath=localPath);
                 elseif role == "surface" && any(endsWith(lower(relative), [".mz3", ".mz3.gz"]))
                     [~, information] = brainnet.io.readMz3Surface(reference, app.Session.RootPath);
                     importMetadata.mz3=information;
                     reference = brainnet.core.InputReference(role, relative, Sha256=hash, ...
                         CoordinateSpace="MZ3 as-stored; registration and units unverified", ...
                         RedistributionStatus="user-provided-not-for-redistribution", ...
-                        Metadata=importMetadata);
+                        Metadata=importMetadata, LocalPath=localPath);
                 end
                 roles = string(cellfun(@(item) char(item.Role), app.DraftInputs, 'UniformOutput', false));
                 remove = roles == role;
@@ -1254,7 +1259,7 @@ classdef BrainNetApp < matlab.apps.AppBase
             catalog=brainnet.app.HelpDocuments.catalog(app.Session.RootPath);
             value = [ ...
                 "Workflow"; ...
-                "1. Select input files or open a Scene JSON."; ...
+                "1. Select input files or open a Scene JSON or ZIP."; ...
                 "2. Validate and load the scene."; ...
                 "3. Configure visualization settings and Apply."; ...
                 "4. Render and interact with the figure."; ...
@@ -1622,6 +1627,8 @@ classdef BrainNetApp < matlab.apps.AppBase
             app.SceneActionGrid.ColumnSpacing = 5;
             app.SaveSceneButton = uibutton(app.SceneActionGrid, 'push', ...
                 'Text', 'Save Scene', 'Tag', 'SaveScene', ...
+                'Tooltip', ['JSON saves file paths on this computer without copying data. ' ...
+                    'To move or share the data, choose Portable Scene with data (*.zip).'], ...
                 'ButtonPushedFcn', @(~, ~) app.onSaveScene());
             app.SaveSceneButton.FontWeight = 'bold';
             app.ImportSettingsButton = uibutton(app.SceneActionGrid, 'push', ...
@@ -2010,7 +2017,7 @@ classdef BrainNetApp < matlab.apps.AppBase
             tipGrid = uigridlayout(app.TipPanel, [1 1]);
             tipGrid.Padding = [10 8 10 8];
             app.TipLabel = uilabel(tipGrid);
-            app.TipLabel.Text = 'Select input files or open a Scene JSON.';
+            app.TipLabel.Text = 'Select input files or open a Scene JSON or ZIP.';
             app.TipLabel.WordWrap = 'on';
             app.TipLabel.HorizontalAlignment = 'center';
         end
@@ -2124,7 +2131,7 @@ classdef BrainNetApp < matlab.apps.AppBase
             app.SelectInputButton.Layout.Column = 2;
 
             app.OpenSceneButton = uibutton(app.MainGrid, 'push');
-            app.OpenSceneButton.Text = 'Open Scene JSON';
+            app.OpenSceneButton.Text = 'Open Scene';
             app.OpenSceneButton.ButtonPushedFcn = @(source, event) app.onOpenScene(source, event);
             app.OpenSceneButton.Layout.Row = 2;
             app.OpenSceneButton.Layout.Column = 3;
@@ -2321,98 +2328,26 @@ classdef BrainNetApp < matlab.apps.AppBase
                 struct('surface', struct('opacity', opacity)));
         end
 
-        function [relative, effectivePath, metadata] = makeRelative(app, pathValue, options)
+        function [relative, effectivePath, metadata, localPath] = makeRelative(app, pathValue, options)
             arguments
                 app
                 pathValue (1, 1) string
                 options.ExternalImportApproved (1, 1) logical = false
             end
+            % ExternalImportApproved remains accepted for older scripts; no copy is made.
             if ~isfile(pathValue)
-                error('BNV:App:InputNotFound', 'Selected input does not exist: %s', pathValue);
+                error('BNV:App:InputNotFound','Selected input does not exist: %s',pathValue);
             end
-            absolute = string(char(java.io.File(char(pathValue)).getCanonicalPath()));
-            effectivePath=absolute; metadata=struct();
-            prefix = app.Session.RootPath + string(filesep);
-            if ispc
-                inside = startsWith(lower(absolute), lower(prefix));
+            effectivePath=string(char(java.io.File(char(pathValue)).getCanonicalPath()));
+            prefix=app.Session.RootPath+string(filesep);
+            if ispc, inside=startsWith(lower(effectivePath),lower(prefix));
+            else, inside=startsWith(effectivePath,prefix); end
+            metadata=struct();localPath="";
+            if inside
+                relative=replace(extractAfter(effectivePath,strlength(prefix)),"\","/");
             else
-                inside = startsWith(absolute, prefix);
-            end
-            if ~inside
-                if ~options.ExternalImportApproved
-                    error('BNV:App:ExternalInputRequiresImport', ...
-                        ['Confirm staging to add an external input. The original file is not modified; ' ...
-                        'a verified copy is placed in the project import area for the portable Scene.']);
-                end
-                [effectivePath,relative,metadata]=app.stageExternalInput(absolute);
-                return;
-            end
-            relative = replace(extractAfter(absolute, strlength(prefix)), "\", "/");
-        end
-
-        function [stagedPath,relative,metadata]=stageExternalInput(app,sourcePath)
-            sourceHash=brainnet.io.internal.sha256File(sourcePath);
-            stageKey=extractBefore(sourceHash,17);
-            [~,name,extension]=fileparts(sourcePath);
-            fileName=regexprep(string(name)+string(extension),'[^A-Za-z0-9._-]','_');
-            if strlength(fileName)==0
-                error('BNV:App:ExternalImportName','The external input file name is not usable for staging.');
-            end
-            stageFolder=fullfile(app.Session.RootPath,'user-data','imports',stageKey);
-            stagedPath=fullfile(stageFolder,fileName);
-            app.copyExternalFile(sourcePath,stagedPath,sourceHash);
-            companions=app.externalCompanions(sourcePath);
-            for item=companions
-                app.copyExternalFile(item.source,fullfile(stageFolder,item.relative), ...
-                    brainnet.io.internal.sha256File(item.source));
-            end
-            relative=replace(fullfile('user-data','imports',stageKey,fileName),'\','/');
-            metadata=struct('external_import',struct('mode','user-confirmed-stage', ...
-                'original_basename',char(string(name)+string(extension)), ...
-                'original_sha256',char(sourceHash),'staged_relative_path',char(relative), ...
-                'dependency_count',numel(companions)));
-        end
-
-        function copyExternalFile(~,sourcePath,destination,expectedHash)
-            folder=fileparts(destination);
-            if ~isfolder(folder), mkdir(folder); end
-            if isfile(destination)
-                if brainnet.io.internal.sha256File(destination)~=expectedHash
-                    error('BNV:App:ExternalImportCollision','A staged input has the same destination name but a different hash.');
-                end
-                return;
-            end
-            [ok,message]=copyfile(sourcePath,destination);
-            if ~ok, error('BNV:App:ExternalImportCopy','Could not stage external input: %s',message); end
-            if brainnet.io.internal.sha256File(destination)~=expectedHash
-                error('BNV:App:ExternalImportHash','The staged input hash does not match the selected file.');
-            end
-        end
-
-        function companions=externalCompanions(~,sourcePath)
-            companions=struct('source',{},'relative',{});
-            lowerPath=lower(sourcePath); sourceFolder=fileparts(sourcePath);
-            if endsWith(lowerPath,'.hdr') || endsWith(lowerPath,'.img')
-                stem=extractBefore(sourcePath,strlength(sourcePath)-3);
-                if endsWith(lowerPath,'.hdr'), other=stem+".img"; else, other=stem+".hdr"; end
-                if isfile(other), companions(end+1)=struct('source',other,'relative',string(extractAfter(other,sourceFolder+filesep))); end
-            elseif endsWith(lowerPath,'.hdr.gz') || endsWith(lowerPath,'.img.gz')
-                stem=extractBefore(sourcePath,strlength(sourcePath)-6);
-                if endsWith(lowerPath,'.hdr.gz'), other=stem+".img.gz"; else, other=stem+".hdr.gz"; end
-                if isfile(other), companions(end+1)=struct('source',other,'relative',string(extractAfter(other,sourceFolder+filesep))); end
-            elseif endsWith(lowerPath,'.gii') || endsWith(lowerPath,'.gii.gz')
-                if endsWith(lowerPath,'.gii.gz')
-                    error('BNV:App:ExternalGiftiGzip','Stage an uncompressed GIfTI when it uses ExternalFileBinary arrays.');
-                end
-                text=fileread(sourcePath);
-                names=regexp(text,'ExternalFileName\s*=\s*["'']([^"'']+)["'']','tokens');
-                for index=1:numel(names)
-                    relativeName=string(names{index}{1});
-                    safe=brainnet.core.InputReference('surface',relativeName);
-                    companion=string(fullfile(sourceFolder,replace(safe.RelativePath,'/',filesep)));
-                    if ~isfile(companion), error('BNV:App:ExternalGiftiDependency','GIfTI dependency is missing: %s',relativeName); end
-                    companions(end+1)=struct('source',companion,'relative',safe.RelativePath); %#ok<AGROW>
-                end
+                [~,name,ext]=fileparts(effectivePath);
+                relative=string(name)+string(ext);localPath=effectivePath;
             end
         end
 
@@ -2467,7 +2402,7 @@ classdef BrainNetApp < matlab.apps.AppBase
                 app.RoleDetailLabels.scene.Tooltip = char(app.SceneFilePath);
             else
                 app.RoleDetailLabels.scene.Text = 'Open or drop JSON';
-                app.RoleDetailLabels.scene.Tooltip = 'Open a versioned Scene JSON file.';
+                app.RoleDetailLabels.scene.Tooltip = 'Open Scene JSON references or a portable Scene ZIP.';
             end
             for index = 1:numel(app.DraftInputs)
                 input = app.DraftInputs{index};
@@ -2541,7 +2476,7 @@ classdef BrainNetApp < matlab.apps.AppBase
             if app.DropSupported
                 app.DropHintLabel.Text = 'Drop supported files here or use Add Files.';
             else
-                app.DropHintLabel.Text = 'Use Add Files or open a Scene JSON.';
+                app.DropHintLabel.Text = 'Use Add Files or open a Scene JSON or ZIP.';
             end
             [app.SceneSummaryText, app.SceneSummaryRows] = ...
                 app.sceneSummaryLines(summary, roles);
@@ -2826,14 +2761,14 @@ classdef BrainNetApp < matlab.apps.AppBase
             [name, folder] = uigetfile(varargin{:});
         end
 
-        function [name, folder] = saveFileDialog(app, varargin)
+        function [name, folder, filterIndex] = saveFileDialog(app, varargin)
             wasVisible = isgraphics(app.UIFigure) && strcmp(app.UIFigure.Visible, 'on');
             restore = onCleanup(@() app.restoreAfterFileDialog(wasVisible));
             if ismac && verLessThan('matlab', '25.1') && wasVisible
                 app.UIFigure.Visible = 'off';
                 drawnow;
             end
-            [name, folder] = uiputfile(varargin{:});
+            [name, folder, filterIndex] = uiputfile(varargin{:});
         end
 
         function restoreAfterFileDialog(app, wasVisible)
@@ -2870,7 +2805,7 @@ classdef BrainNetApp < matlab.apps.AppBase
         end
 
         function onOpenScene(app, ~, ~)
-            [name, folder] = app.openFileDialog({'*.json', 'Scene JSON (*.json)'}, ...
+            [name, folder] = app.openFileDialog({'*.json;*.zip', 'Scene JSON or ZIP (*.json, *.zip)'}, ...
                 'Open BrainNet Scene', char(app.Session.RootPath));
             if isequal(name, 0)
                 return;
@@ -2881,9 +2816,16 @@ classdef BrainNetApp < matlab.apps.AppBase
         function onSaveScene(app)
             suggested = app.SceneFilePath;
             if suggested == "", suggested = fullfile(pwd, 'scene.json'); end
-            [name, folder] = app.saveFileDialog({'*.json', 'Scene JSON (*.json)'}, ...
+            if endsWith(lower(suggested),".zip")
+                [folderPart,stem]=fileparts(suggested);suggested=fullfile(folderPart,stem+".json");
+            end
+            [name, folder, filterIndex] = app.saveFileDialog({'*.json','Scene references (local file paths) (*.json)'; ...
+                '*.zip','Portable Scene with data (*.zip)'}, ...
                 'Save BrainNet Scene', char(suggested));
             if isequal(name, 0), return; end
+            if filterIndex==2 && ~endsWith(lower(string(name)),".zip")
+                [~,stem]=fileparts(string(name));name=stem+".zip";
+            end
             app.runUiAction(@() app.saveSceneFile( ...
                 string(fullfile(folder, name)), Overwrite=true));
         end
@@ -3815,21 +3757,7 @@ classdef BrainNetApp < matlab.apps.AppBase
         end
 
         function addSelectedInput(app,role,pathValue)
-            approved=false;
-            absolute=string(char(java.io.File(char(pathValue)).getCanonicalPath()));
-            prefix=app.Session.RootPath+string(filesep);
-            if ispc, inside=startsWith(lower(absolute),lower(prefix)); else, inside=startsWith(absolute,prefix); end
-            if ~inside
-                answer=uiconfirm(app.UIFigure, ...
-                    ['To keep a portable Scene, BrainNet Viewer will copy this external file and any required ' ...
-                    'local companion files into its project import area. The original files will not be changed.'], ...
-                    'Stage External Input','Options',{'Stage and Add','Cancel'}, ...
-                    'DefaultOption',2,'CancelOption',2);
-                approved=strcmp(answer,'Stage and Add');
-                if ~approved, return; end
-            end
-            app.runUiAction(@() app.selectInputPath(role,pathValue, ...
-                ExternalImportApproved=approved));
+            app.runUiAction(@() app.selectInputPath(role,pathValue));
         end
 
         function presentError(app, exception)

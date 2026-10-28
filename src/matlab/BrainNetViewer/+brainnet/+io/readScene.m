@@ -3,6 +3,9 @@ function scene = readScene(path)
 arguments
     path (1, 1) string
 end
+if endsWith(lower(path),".zip")
+    scene=brainnet.io.readPortableScene(path);return;
+end
 file = fopen(path, 'r', 'n', 'UTF-8');
 if file < 0
     error('BNV:IO:SceneOpenFailed', 'Cannot open Scene JSON: %s', path);
@@ -33,4 +36,34 @@ if ~isempty(missing)
 end
 scene = brainnet.core.Scene.fromStruct(document);
 scene = brainnet.core.SessionState.normalizeScene(scene);
+if isfield(scene.Metadata,'input_base')
+    if ~strcmp(scene.Metadata.input_base,'scene-directory')
+        error('BNV:IO:SceneInputBase','Unsupported Scene input base.');
+    end
+    state=brainnet.core.SessionState.fromScene(scene);
+    restore=~isempty(state)&&strcmp(state.scene_signature,brainnet.core.SessionState.signature(scene));
+    value=scene.toStruct();folder=string(char(java.io.File(char(fileparts(path))).getCanonicalPath()));
+    roles=fieldnames(value.inputs);
+    for k=1:numel(roles)
+        item=value.inputs.(roles{k});
+        if isfield(item,'local_path')&&strlength(string(item.local_path))>0
+            error('BNV:IO:PortableLocalPath','A portable Scene cannot contain local paths.');
+        end
+        item.local_path=char(brainnet.io.internal.sceneRelativeFile(folder,string(item.relative_path)));
+        ref=brainnet.core.InputReference.fromStruct(item);
+        brainnet.io.internal.resolveAndVerify(ref,folder,ref.Role);
+        value.inputs.(roles{k})=item;
+    end
+    if isfield(value.metadata,'packaged_files')
+        for item=reshape(value.metadata.packaged_files,1,[])
+            filePath=brainnet.io.internal.sceneRelativeFile(folder,string(item.relative_path));
+            ref=brainnet.core.InputReference('surface',string(item.relative_path), ...
+                LocalPath=filePath,Sha256=string(item.sha256));
+            brainnet.io.internal.resolveAndVerify(ref,folder,'surface');
+        end
+    end
+    value.metadata=rmfield(value.metadata,'input_base');
+    scene=brainnet.core.Scene.fromStruct(value);
+    if restore,scene=brainnet.core.SessionState.attach(scene,state.camera,state.export);end
+end
 end
