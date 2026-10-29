@@ -52,7 +52,7 @@ class MacCanvasToolbar(W.QWidget):
 
 
 def build_shell(app,library):
-    app.setWindowTitle(f"BrainNet Viewer {__version__} — Python development")
+    app.setWindowTitle(f"BrainNet Viewer {__version__} — Python Desktop")
     central=W.QWidget(); central.setObjectName("Workspace"); root=W.QVBoxLayout(central)
     root.setContentsMargins(8,6,8,0); root.setSpacing(8)
     banner=W.QFrame(); banner.setObjectName("Banner"); banner.setFixedHeight(86)
