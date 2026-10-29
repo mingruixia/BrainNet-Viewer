@@ -2773,12 +2773,15 @@ classdef BrainNetApp < matlab.apps.AppBase
 
         function restoreAfterFileDialog(app, wasVisible)
             if ~wasVisible || ~isgraphics(app.UIFigure) || ...
-                    ~(ismac || verLessThan('matlab','25.1'))
+                    ~(isunix || verLessThan('matlab','25.1'))
                 return;
             end
             app.UIFigure.Visible = 'on';
             drawnow;
             figure(app.UIFigure);
+            % Linux desktop choosers may activate MATLAB after returning.
+            % Repeat once after their close event; never focus a closed app.
+            if isunix && ~ismac, app.scheduleLegacyUiMainFocus(); end
         end
 
         function clearInputRole(app, role)
@@ -3822,6 +3825,16 @@ if ismac
     cpu = hardware.cpu;
     memoryText = hardware.memory;
     gpuText = hardware.gpu;
+elseif isunix
+    hardware=brainnet.app.internal.linuxHardwareProfile();
+    cpu=hardware.cpu;
+    memoryText=hardware.memory;
+    capabilities=brainnet.render.internal.accelerationCapabilities();
+    if capabilities.available_gpu_count>0
+        gpuText=gpuResourceText(capabilities.available_gpu_count);
+    else
+        gpuText='Not available';
+    end
 else
     capabilities = brainnet.render.internal.accelerationCapabilities();
     processorName = processorModel();

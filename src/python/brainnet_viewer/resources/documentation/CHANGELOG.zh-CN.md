@@ -2,6 +2,10 @@
 
 ## 2.0.0（尚未发行）
 
+- MATLAB透明PNG导出复用尺寸校准，减少重复底图绘制，保留输出尺寸、透明度、注释及当前画布状态；底图重放统一尺寸单位，保留英寸、厘米等物理尺寸。
+- Linux读取实际CPU拓扑和系统物理内存；MATLAB文件对话框关闭后恢复应用窗口焦点。
+- Linux Python工作区适应可用屏幕范围，必要时提供滚动，并由Qt管理原生窗口层级。
+
 - MATLAB补齐Figure Annotations的Show Colorbars、Colorbar Location、Colorbar Label和Figure Title；节点/连边色条与分类图例使用所选外侧位置，曲面色条保持独立开关，Apply、预设和导出保留相应设置。
 
 - MATLAB左侧信息框利用Save Scene下方的空余空间，缩小窗口时也保留更多可读内容。

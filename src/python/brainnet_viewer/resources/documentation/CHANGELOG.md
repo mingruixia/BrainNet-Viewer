@@ -2,6 +2,10 @@
 
 ## 2.0.0 — Unreleased
 
+- Reduce MATLAB transparent PNG export time by reusing size calibration and removing redundant matte renders. Preserve output dimensions, transparency, annotations, and the displayed canvas. Keep physical-size units consistent during matte replay.
+- Read CPU topology and physical system memory on Linux. Restore the MATLAB application window after file dialogs close.
+- Keep the Linux Python workspace within the available screen area, with scrolling when needed, and let Qt manage its native window hierarchy.
+
 - Complete MATLAB Figure Annotations with Show Colorbars, Colorbar Location, Colorbar Label, and Figure Title. Node/Edge scales and category legends use the selected outside position; Surface retains its independent colorbar switch. Apply, presets, and exports preserve these settings.
 
 - Expand the MATLAB scene summary into the unused space below Save Scene, including in smaller windows.

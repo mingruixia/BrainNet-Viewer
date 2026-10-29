@@ -552,16 +552,34 @@ if modernPair
     % exports even when the requested output dimensions are identical.
     nameValues{ri}=options.Resolution;
 end
-nameValues{backgroundIndex} = repmat(low,1,3);
-blackPlan = exportWithExactRasterSize(target,blackPath,nameValues,options,true,prepareAnnotations);
-nameValues{backgroundIndex} = repmat(high,1,3);
-whitePlan = exportWithExactRasterSize(target,whitePath,nameValues,options,true,prepareAnnotations);
+blackPlan=[]; whitePlan=[];
+if modernPair
+    % The exact-size reference already established the export resolution.
+    % Modern mattes always use the common inset replay below. Rendering two
+    % provisional mattes first only produces images that are discarded.
+    plan=nativePlan;
+else
+    % Reuse this export's size calibration, not a cached result from a prior
+    % canvas. Older MATLAB otherwise renders an oversized figure and repeats
+    % its resolution search independently for all three backgrounds.
+    if isstruct(nativePlan) && isfield(nativePlan,'values')
+        nameValues=nativePlan.values;
+    end
+    nameValues{backgroundIndex} = repmat(low,1,3);
+    blackPlan = exportWithExactRasterSize(target,blackPath,nameValues,options,true,prepareAnnotations);
+    if isstruct(blackPlan) && isfield(blackPlan,'values'),nameValues=blackPlan.values;end
+    nameValues{backgroundIndex} = repmat(high,1,3);
+    whitePlan = exportWithExactRasterSize(target,whitePath,nameValues,options,true,prepareAnnotations);
+    plan=blackPlan;
+    if ~isempty(blackPlan) && ~isempty(whitePlan) && whitePlan.scale<blackPlan.scale,plan=whitePlan;end
+end
 % Matte colors can change the native bounds by a pixel. Independent exact-
 % size retries must not give the two renders different scales or origins.
-if ~isempty(blackPlan) && ~isempty(whitePlan) && (modernPair || ~isequaln(blackPlan.geometry,whitePlan.geometry))
-    plan = blackPlan;
-    if whitePlan.scale < blackPlan.scale, plan = whitePlan; end
+if modernPair || (~isempty(blackPlan) && ~isempty(whitePlan) && ~isequaln(blackPlan.geometry,whitePlan.geometry))
     baseValues = plan.values;
+    % nativePlan retains the caller units; modern matte dimensions above
+    % are already pixels. Replay one consistent value/unit pair.
+    if modernPair, baseValues=nameValues; end
     for attempt=1:3
         inset=[.25 .5 .75]; inset=inset(attempt);
         values = baseValues;

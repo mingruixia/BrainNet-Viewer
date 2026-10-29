@@ -199,10 +199,25 @@ def build_shell(app,library):
         if mode is None: app.boundary_export_button=control; control.setEnabled(False)
     settings_layout.addWidget(tools); app.columns.addWidget(app.right)
     app.columns.setStretchFactor(0,0); app.columns.setStretchFactor(1,1); app.columns.setStretchFactor(2,0)
-    app.columns.setSizes([270,920,330]); app.setCentralWidget(central)
+    app.columns.setSizes([270,920,330])
+    if sys.platform.startswith("linux"):
+        # Respect the desktop work area even when font metrics or scaling make
+        # the three-column workspace taller than the screen. Keep all controls
+        # reachable instead of allowing the minimum layout to cover the footer.
+        app.workspace_scroll=W.QScrollArea()
+        app.workspace_scroll.setWidgetResizable(True)
+        app.workspace_scroll.setFrameShape(W.QFrame.NoFrame)
+        app.workspace_scroll.setWidget(central)
+        app.setCentralWidget(app.workspace_scroll)
+    else:
+        app.setCentralWidget(central)
     # VTK calls winId on its first widget. Promote the host before showing the
     # main window so Qt need not hide/recreate visible native ancestors later.
-    app.canvas_host.winId()
+    # Linux compositors should manage the Qt widget hierarchy. Forcing native
+    # ancestor windows before layout can detach painting from input geometry.
+    # Retain the existing promotion on the two previously verified platforms.
+    if not sys.platform.startswith("linux"):
+        app.canvas_host.winId()
     app.setStatusBar(StatusStrip())
     app.resource_label=W.QLabel(); app.resource_label.setObjectName("Muted"); app.resource_label.setSizePolicy(W.QSizePolicy.Ignored,W.QSizePolicy.Preferred); app.statusBar().addWidget(app.resource_label,3)
     app.statusBar().showMessage("Select input files or open a Scene JSON.",5000)

@@ -18,7 +18,7 @@ from .rendering import hemispheres
 from .export_size import figure_size, unit_scale
 from .session import KEY, signature, content_hashes, validate_session
 from .palettes import palette
-from .hardware import mac_hardware
+from .hardware import mac_hardware, linux_hardware
 from .help_ui import HelpDialog
 from .desktop_style import Accordion, FitImage, SettingsChoice, CompactNumber, card, stylesheet, section_label, GROUPS, field_label, choice_label
 
@@ -627,6 +627,16 @@ class BrainNetWindow(W.QMainWindow):
             except OSError: pass
         name=re.sub(r"\s+(\d+-Core Processor|Processor|CPU|@.*)$","",name).strip()
         memory="Memory: —"
+        cores=f"{os.cpu_count()} logical cores"
+        if sys.platform.startswith("linux"):
+            brand,logical,physical,total,available=linux_hardware()
+            if brand: name=brand
+            if logical: cores=f"{logical} logical cores"
+            if physical: cores=f"{physical} cores / {logical} logical processors"
+            if total is not None:
+                memory=f"Memory: {total/2**30:.1f} GiB total"
+                if available is not None:
+                    memory=f"Memory: {available/2**30:.1f} / {total/2**30:.1f} GiB available"
         if sys.platform=="darwin" and mac_memory is not None:
             memory=f"Memory: {mac_memory/2**30:g} GiB total"
         if os.name=="nt":
@@ -640,7 +650,7 @@ class BrainNetWindow(W.QMainWindow):
             report=self.plotter.render_window.ReportCapabilities()
             match=re.search(r"OpenGL renderer string:\s*([^\n]+)",report)
             if match: gpu="GPU: "+match.group(1).strip()
-        text=f"CPU: {name} · {os.cpu_count()} logical cores   |   {memory}   |   {gpu}"
+        text=f"CPU: {name} · {cores}   |   {memory}   |   {gpu}"
         self.resource_label.setText(text); self.resource_label.setToolTip(text)
 
     def install_settings(self, preserve_export=False):
