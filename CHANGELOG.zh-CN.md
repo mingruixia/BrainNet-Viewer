@@ -2,6 +2,8 @@
 
 ## 2.0.0（尚未发行）
 
+- MATLAB主窗口新增Global / Figure Annotations / Figure Title；Apply更新标题，Revert及预设使用相同的标题设置。
+
 - MATLAB左侧信息框利用Save Scene下方的空余空间，缩小窗口时也保留更多可读内容。
 
 ### 本机文件与Scene

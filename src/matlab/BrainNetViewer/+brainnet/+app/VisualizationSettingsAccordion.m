@@ -31,7 +31,7 @@ classdef VisualizationSettingsAccordion < handle
             ["Layout", "Global", "Surface", "Nodes", "Edges", "Volume / ROI"]
         HeaderButtons (1, :) cell = {}
         ContentPanels (1, :) cell = {}
-        ContentHeights (1, :) double = [180 438 518 801 999 1023]
+        ContentHeights (1, :) double = [180 405 518 801 999 1023]
         LayoutPresetDropDown = []
         ViewDirectionDropDown = []
         AzimuthField = []
@@ -41,6 +41,7 @@ classdef VisualizationSettingsAccordion < handle
         LightingDropDown = []
         LightDirectionDropDown = []
         OrientationLabelsCheckBox = []
+        ImageTitleField = []
         RenderDetailDropDown = []
         MaterialProfileDropDown = []
         MaterialAmbientField = []
@@ -279,7 +280,8 @@ classdef VisualizationSettingsAccordion < handle
                 "Custom Elevation", "Background Color", "Surface Shading", ...
                 "Lighting Model", "Light Direction", "Surface Material", ...
                 "Ambient Strength", "Diffuse Strength", "Specular Strength", ...
-                "Show Orientation Labels", "Surface Color Mode", ...
+                "Show Orientation Labels", "Figure Annotations", ...
+                "Figure Title", "Surface Color Mode", ...
                 "Surface Opacity", "Surface Colormap", "Surface Color Limits", ...
                 "Show Surface Colorbar", "Surface Boundary", ...
                 "Node Selection", "Node Labels", "Node Size", "Node Color", ...
@@ -440,8 +442,8 @@ classdef VisualizationSettingsAccordion < handle
         end
 
         function createGlobalPage(obj, parent)
-            grid = uigridlayout(parent, [10 2]);
-            grid.RowHeight = repmat({28},1,10);
+            grid = uigridlayout(parent, [12 2]);
+            grid.RowHeight = repmat({28},1,12);
             grid.ColumnWidth = {112, '1x'};
             grid.Padding = [8 7 8 7];
             grid.RowSpacing = 5;
@@ -500,6 +502,11 @@ classdef VisualizationSettingsAccordion < handle
             obj.OrientationLabelsCheckBox.Tooltip = ...
                 'Shows coordinate half-space labels unless anatomical X direction and the X=0 midline are explicitly confirmed in the Scene. Labels identify panes, not screen-edge directions.';
             obj.OrientationLabelsCheckBox.Layout.Column = [1 2];
+            obj.addSectionLabel(grid, 'Figure Annotations', 11);
+            obj.addLabel(grid, 'Figure Title', 12);
+            obj.ImageTitleField = obj.textField(grid, 12);
+            obj.ImageTitleField.Tag = 'ImageTitle';
+            obj.ImageTitleField.Tooltip = 'Leave empty to hide the figure title.';
         end
 
         function createSurfacePage(obj, parent)
@@ -1198,6 +1205,7 @@ classdef VisualizationSettingsAccordion < handle
         function writeControls(obj)
             layout = obj.Settings.section("layout");
             globalSettings = obj.Settings.section("global");
+            image = obj.Settings.section("image");
             surface = obj.Settings.section("surface");
             node = obj.Settings.section("node");
             edge = obj.Settings.section("edge");
@@ -1222,6 +1230,7 @@ classdef VisualizationSettingsAccordion < handle
             obj.MaterialDiffuseField.Value=globalSettings.material_coefficients(2);
             obj.MaterialSpecularField.Value=globalSettings.material_coefficients(3);
             obj.OrientationLabelsCheckBox.Value = globalSettings.show_orientation_labels;
+            obj.ImageTitleField.Value = char(image.title);
             surfaceColorMode = string(surface.color_mode);
             obj.SurfaceColorModeDropDown.Value = char(surfaceColorMode);
             obj.SurfaceColorButton.BackgroundColor = surface.color;
@@ -1370,6 +1379,8 @@ classdef VisualizationSettingsAccordion < handle
                     'material_coefficients', [obj.MaterialAmbientField.Value obj.MaterialDiffuseField.Value obj.MaterialSpecularField.Value], ...
                     'show_orientation_labels', ...
                     logical(obj.OrientationLabelsCheckBox.Value)), ...
+                'image', struct( ...
+                    'title', obj.ImageTitleField.Value), ...
                 'surface', struct( ...
                     'vertex_colors',obj.BoundaryDraft.vertex_colors, ...
                     'vertex_colors_mesh_sha256',obj.BoundaryDraft.vertex_colors_mesh_sha256, ...

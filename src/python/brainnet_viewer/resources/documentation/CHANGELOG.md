@@ -2,6 +2,8 @@
 
 ## 2.0.0 — Unreleased
 
+- Add Figure Title under Global / Figure Annotations in the MATLAB main window. Apply updates the title; Revert and presets retain the same title setting.
+
 - Expand the MATLAB scene summary into the unused space below Save Scene, including in smaller windows.
 
 ### Local files and Scenes
