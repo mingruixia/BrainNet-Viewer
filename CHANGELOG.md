@@ -2,6 +2,8 @@
 
 ## 2.0.0 — Unreleased
 
+- Expand the MATLAB scene summary into the unused space below Save Scene, including in smaller windows.
+
 ### Local files and Scenes
 
 - Python Desktop and Docker/Web clearly reject MATLAB Scenes that reference local file paths, without replacing the current Scene.

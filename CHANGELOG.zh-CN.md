@@ -2,6 +2,8 @@
 
 ## 2.0.0（尚未发行）
 
+- MATLAB左侧信息框利用Save Scene下方的空余空间，缩小窗口时也保留更多可读内容。
+
 ### 本机文件与Scene
 
 - Python桌面版和Docker/Web读取包含MATLAB本机路径引用的Scene时给出明确说明，并保留当前Scene。

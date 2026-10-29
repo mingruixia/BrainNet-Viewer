@@ -1555,7 +1555,7 @@ classdef BrainNetApp < matlab.apps.AppBase
             app.DataPanel.Layout.Row = 1;
             app.DataPanel.Layout.Column = 1;
             app.DataGrid = uigridlayout(app.DataPanel, [5 1]);
-            app.DataGrid.RowHeight = {34, 36, 288, '1x', 154};
+            app.DataGrid.RowHeight = {34, 36, 248, '1x', 154};
             app.DataGrid.ColumnWidth = {'1x'};
             app.DataGrid.Padding = [8 6 8 6];
             app.DataGrid.RowSpacing = 5;
@@ -3342,9 +3342,9 @@ classdef BrainNetApp < matlab.apps.AppBase
             app.WorkGrid.ColumnWidth = {dataWidth, '1x', settingsWidth};
             if app.RootPanel.InnerPosition(4)<760
                 % Keep Scene Summary usable in the scrollable data column.
-                app.DataGrid.RowHeight={34,36,288,150,154};
+                app.DataGrid.RowHeight={34,36,248,190,154};
             else
-                app.DataGrid.RowHeight={34,36,288,'1x',154};
+                app.DataGrid.RowHeight={34,36,248,'1x',154};
             end
             if app.LayoutDensity=="minimum-safe"
                 app.LoadButton.Text='Load Data';
