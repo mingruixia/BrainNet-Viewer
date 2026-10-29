@@ -2,7 +2,7 @@
 
 ## 2.0.0 — Unreleased
 
-- Add Figure Title under Global / Figure Annotations in the MATLAB main window. Apply updates the title; Revert and presets retain the same title setting.
+- Complete MATLAB Figure Annotations with Show Colorbars, Colorbar Location, Colorbar Label, and Figure Title. Node/Edge scales and category legends use the selected outside position; Surface retains its independent colorbar switch. Apply, presets, and exports preserve these settings.
 
 - Expand the MATLAB scene summary into the unused space below Save Scene, including in smaller windows.
 

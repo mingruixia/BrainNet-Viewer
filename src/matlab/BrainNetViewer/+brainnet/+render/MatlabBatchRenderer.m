@@ -20,6 +20,7 @@ classdef MatlabBatchRenderer < handle
         InspectCallback = []
         InspectInteractions cell = {}
         TitleAxes = []
+        AnnotationAxes = gobjects(0)
     end
 
     methods
@@ -208,6 +209,7 @@ classdef MatlabBatchRenderer < handle
                     colorHandle.FontName = 'Arial';
                     colorHandle.FontSize = 8;
                     colorHandle.Color = obj.contrastColor(backgroundColor);
+                    colorHandle.Tag = 'brainnet-surface-colorbar';
                 end
             end
             if ~isempty(boundary)
@@ -296,6 +298,7 @@ classdef MatlabBatchRenderer < handle
                 packingLayout=2;
             end
             brainnet.render.internal.packLegacyMontage(axesHandles,packingLayout);
+            obj.drawFigureAnnotations(target,axesHandles,prepared,renderOptions,backgroundColor,embedded);
             obj.drawTitle(target,axesHandles,renderOptions.section("image"),backgroundColor,embedded);
             drawnow;
             % Equal pixels per data unit, including panes of different heights.
@@ -303,27 +306,6 @@ classdef MatlabBatchRenderer < handle
             % Freeze initial limits; resize must not reset a user's camera.
             brainnet.render.CameraState.apply(axesHandles, ...
                 brainnet.render.CameraState.capture(axesHandles,renderOptions.Layout));
-            roiSettings=renderOptions.section("roi");
-            if roiSettings.show_legend && ~isempty(prepared.RoiMeshes)
-                entries=prepared.RoiMeshes;
-                count=min(16,numel(entries));
-                keys=gobjects(1,count);
-                labels=cell(1,count);
-                for roiIndex=1:count
-                    keys(roiIndex)=patch(axesHandles(1),'XData',NaN,'YData',NaN, ...
-                        'FaceColor',entries(roiIndex).color,'EdgeColor','none', ...
-                        'Tag','brainnet-roi-legend-key', ...
-                        'HitTest','off','PickableParts','none');
-                    labels{roiIndex}=sprintf('ROI %g',entries(roiIndex).label);
-                end
-                if numel(entries)>count
-                    labels{end}=sprintf('%s (+%d more)',labels{end},numel(entries)-count);
-                end
-                legendHandle=legend(axesHandles(1),keys,labels, ...
-                    'Location','northeast','Interpreter','none','FontSize',8);
-                legendHandle.Tag='brainnet-roi-legend';
-                legendHandle.AutoUpdate='off';
-            end
             drawSeconds = toc(drawTimer);
             metrics = struct( ...
                 'renderer_version', 'matlab-batch-0.2', ...
@@ -562,6 +544,8 @@ classdef MatlabBatchRenderer < handle
             obj.CameraListeners = {};
             if isgraphics(obj.TitleAxes), delete(obj.TitleAxes); end
             obj.TitleAxes = [];
+            delete(obj.AnnotationAxes(isgraphics(obj.AnnotationAxes)));
+            obj.AnnotationAxes = gobjects(0);
             if ~isempty(obj.ActiveFigure) && isgraphics(obj.ActiveFigure)
                 close(obj.ActiveFigure);
             end
@@ -582,6 +566,114 @@ classdef MatlabBatchRenderer < handle
     end
 
     methods (Access = private)
+        function drawFigureAnnotations(obj,target,axesHandles,prepared,options,background,embedded)
+            settings=options.section('image');
+            entries=brainnet.render.internal.figureAnnotationEntries(prepared,options);
+            foreground=obj.contrastColor(background);
+            surfaceBars=findall(target,'Tag','brainnet-surface-colorbar');
+            for bar=reshape(surfaceBars,1,[])
+                label=settings.colorbar_label;if isempty(label),label='Surface';end
+                bar.Label.String=label;bar.Label.Interpreter='none';
+            end
+            if isempty(entries), return; end
+            location=string(settings.colorbar_location);
+            categorical=any(arrayfun(@(entry)~isempty(entry.labels),entries));
+            if categorical,reserve=.25;else,reserve=.16;end
+            x0=0;y0=0;sx=1;sy=1;
+            switch location
+                case 'eastoutside',sx=1-reserve;
+                case 'westoutside',x0=reserve;sx=1-reserve;
+                case 'southoutside',y0=reserve;sy=1-reserve;
+                case 'northoutside',sy=1-reserve;
+            end
+            for ax=reshape(axesHandles,1,[])
+                p=ax.Position;ax.Position=[x0+p(1)*sx y0+p(2)*sy p(3)*sx p(4)*sy];
+            end
+            % The Surface strip stays horizontal, independent of Node/Edge location.
+            for bar=reshape(surfaceBars,1,[])
+                p=bar.Position;p(1)=x0+.38*sx;p(3)=.24*sx;
+                if location=="southoutside",p(2)=y0+p(2)*sy;end
+                bar.Position=p;
+            end
+            count=numel(entries);
+            for index=1:count
+                entry=entries(index);
+                ax=obj.annotationAxes(target,embedded);
+                ax.Tag='brainnet-annotation-axes';
+                if ~isempty(entry.labels)
+                    ax.Tag='brainnet-annotation-legend';
+                    if ismember(location,["eastoutside","westoutside"])
+                        h=.84/count;x=.015;if location=="eastoutside",x=1-reserve+.015;end
+                        rectangle=[x .08+(index-1)*h reserve-.025 h-.04];
+                    else
+                        w=.84/count;y=.015;if location=="northoutside",y=.755;end
+                        rectangle=[.08+(index-1)*w y w-.025 .22];
+                    end
+                    ax.Position=rectangle;
+                    shown=min(20,numel(entry.labels));labels=entry.labels(1:shown);
+                    colors=entry.map(1:shown,:);
+                    if numel(entry.labels)>shown
+                        labels(end+1)=sprintf('+%d more',numel(entry.labels)-shown);colors(end+1,:)=[.5 .5 .5];
+                    end
+                    if strcmp(entry.name,'ROI')
+                        keys=gobjects(numel(labels),1);
+                        for row=1:numel(labels)
+                            keys(row)=patch(ax,'XData',NaN,'YData',NaN,'FaceColor',colors(row,:), ...
+                                'EdgeColor','none','HitTest','off','PickableParts','none');
+                        end
+                        key=legend(ax,keys,cellstr(labels),'Interpreter','none','FontSize',8, ...
+                            'Color','none','Box','off','TextColor',foreground);
+                        key.Units='normalized';key.Position=rectangle;
+                        key.Tag='brainnet-roi-legend';key.AutoUpdate='off';
+                        continue;
+                    end
+                    pixels=getpixelposition(ax);rows=max(1,min(numel(labels),floor(pixels(4)/18)));
+                    columns=ceil(numel(labels)/rows);slot=1/columns;
+                    for row=1:numel(labels)
+                        column=floor((row-1)/rows);line=mod(row-1,rows);x=column*slot;
+                        y=1-(line+.5)/rows;
+                        patch(ax,x+[.01 .06 .06 .01]*slot,[y-.015 y-.015 y+.015 y+.015],colors(row,:), ...
+                            'EdgeColor','none','HitTest','off','PickableParts','none');
+                        text(ax,x+.09*slot,y,entry.name+": "+labels(row),'Interpreter','none', ...
+                            'FontSize',8,'Color',foreground,'VerticalAlignment','middle', ...
+                            'HitTest','off','PickableParts','none','Tag','brainnet-annotation-legend-text');
+                    end
+                    ax.UserData=struct('role',entry.name,'labels',entry.labels,'colors',entry.map);
+                    continue;
+                end
+                colormap(ax,entry.map);ax.CLim=entry.limits;
+                bar=colorbar(ax,char(location));bar.Units='normalized';
+                if ismember(location,["eastoutside","westoutside"])
+                    h=.84/count;x=.88;if location=="westoutside",x=.10;end
+                    rectangle=[x .10+(index-1)*h .018 min(.30,h-.04)];
+                else
+                    slot=.84/count;w=min(.30,slot-.10);y=.075;
+                    if location=="northoutside",y=.91;end
+                    rectangle=[.08+(index-1)*slot+(slot-w)/2 y w .018];
+                end
+                bar.Position=rectangle;bar.FontName='Arial';bar.FontSize=8;
+                if ismember(location,["southoutside","northoutside"]),bar.AxisLocation='in';end
+                bar.Color=foreground;bar.TickLabelInterpreter='none';
+                label=settings.colorbar_label;if isempty(label),label=entry.name;end
+                bar.Label.String=label;bar.Label.Interpreter='none';
+                bar.Tag=['brainnet-' lower(entry.name) '-colorbar'];
+                bar.UserData=struct('role',entry.name,'limits',entry.limits,'location',char(location));
+                ax.Visible='off';
+            end
+        end
+
+        function ax=annotationAxes(obj,target,embedded)
+            if embedded
+                ax=uiaxes('Parent',target,'Toolbar',[]);ax.Interactions=[];
+            else
+                ax=axes('Parent',target);
+            end
+            set(ax,'Units','normalized','Position',[.001 .001 .001 .001], ...
+                'Visible','off','Color','none','XLim',[0 1],'YLim',[0 1], ...
+                'HitTest','off','PickableParts','none','NextPlot','add');
+            obj.AnnotationAxes(end+1)=ax;
+        end
+
         function drawTitle(obj,target,axesHandles,settings,background,embedded)
             if strlength(string(settings.title))==0, return; end
             % Reserve one shared title strip, independent of scientific axes.
@@ -593,6 +685,12 @@ classdef MatlabBatchRenderer < handle
             for bar=reshape(findall(target,'Type','ColorBar'),1,[])
                 position=bar.Position; position([2 4])=position([2 4])*.925;
                 bar.Position=position;
+            end
+            for ax=reshape(findall(target,'Tag','brainnet-annotation-legend'),1,[])
+                position=ax.Position;position([2 4])=position([2 4])*.925;ax.Position=position;
+            end
+            for key=reshape(findall(target,'Tag','brainnet-roi-legend'),1,[])
+                position=key.Position;position([2 4])=position([2 4])*.925;key.Position=position;
             end
             if embedded
                 titleAxes=uiaxes('Parent',target,'Toolbar',[]);

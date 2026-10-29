@@ -314,14 +314,16 @@ cleanup = []; prepare = []; record = @() struct('sizing','unchanged');
 if ~any(format == ["png","pdf"]), return; end
 titles = findall(target,'Tag','brainnet-image-title');
 bars = findall(target,'Type','ColorBar');
-if isempty(titles) && isempty(bars), return; end
+legendText = findall(target,'Tag','brainnet-annotation-legend-text');
+if isempty(titles) && isempty(bars) && isempty(legendText), return; end
+oldLegendFonts=arrayfun(@(t)t.FontSize,legendText);
 oldTitles = cell(numel(titles),2); oldBars = cell(numel(bars),1);
 for k=1:numel(titles)
     oldTitles(k,:) = {titles(k).FontUnits,titles(k).FontSize};
 end
 for k=1:numel(bars), oldBars{k} = bars(k).FontSize; end
 layout = captureAnnotationLayout(target,titles,bars);
-cleanup = onCleanup(@() restoreAnnotations(titles,bars,oldTitles,oldBars,layout));
+cleanup = onCleanup(@() restoreAnnotations(titles,bars,oldTitles,oldBars,layout,legendText,oldLegendFonts));
 ppi = get(groot,'ScreenPixelsPerInch');
 position = getpixelposition(target); canvasInches = position(3:4)/ppi;
 isImage = format == "png" || contentType == "image";
@@ -360,6 +362,9 @@ prepare = @apply; record = @metadata;
         for j=1:numel(bars)
             bars(j).FontSize = scalarPoints/lastScale*(1+1e-10);
         end
+        for j=1:numel(legendText)
+            legendText(j).FontSize=scalarPoints/lastScale*(1+1e-10);
+        end
         for j=1:numel(titles)
             t = titles(j); t.FontUnits = 'points';
             for attempt=1:4
@@ -393,7 +398,7 @@ prepare = @apply; record = @metadata;
     end
 end
 
-function restoreAnnotations(titles,bars,oldTitles,oldBars,layout)
+function restoreAnnotations(titles,bars,oldTitles,oldBars,layout,legendText,oldLegendFonts)
 restoreAnnotationLayout(layout);
 for j=1:numel(titles)
     if isgraphics(titles(j))
@@ -402,6 +407,9 @@ for j=1:numel(titles)
 end
 for j=1:numel(bars)
     if isgraphics(bars(j)), bars(j).FontSize = oldBars{j}; end
+end
+for j=1:numel(legendText)
+    if isgraphics(legendText(j)),legendText(j).FontSize=oldLegendFonts(j);end
 end
 end
 
@@ -412,6 +420,7 @@ for t=reshape(titles,1,[]), parents(end+1)=t.Parent; end
 allAxes = findall(target,'Type','axes');
 for a=reshape(allAxes,1,[])
     if ~isequal(a.Parent,target), continue; end
+    if startsWith(string(a.Tag),"brainnet-annotation-"), continue; end
     state = struct('handle',a,'units',a.Units,'position',a.Position, ...
         'normalized',hgconvertunits(ancestor(a,'figure'),a.Position,a.Units,'normalized',a.Parent), ...
         'cameraModes',{{a.CameraPositionMode,a.CameraTargetMode,a.CameraUpVectorMode,a.CameraViewAngleMode}});
@@ -453,7 +462,13 @@ for t=reshape(titles,1,[])
 end
 for k=1:numel(bars)
     pos=layout.bars(k).normalized; em=bars(k).FontSize*ppi/72/height;
-    need=need || pos(2)<1.25*em;
+    if pos(3)<pos(4),continue;end % Side bars do not consume a bottom gutter.
+    if pos(2)<.5
+        lines=1.25;if strlength(string(bars(k).Label.String))>0,lines=2.25;end
+        need=need || pos(2)<lines*em;
+    else
+        need=need || pos(2)+pos(4)+2.25*em>1-padding;
+    end
 end
 adjusted=need;
 if ~need, return; end
@@ -469,9 +484,16 @@ for s=layout.titleAxes
 end
 for k=1:numel(bars)
     pos=layout.bars(k).normalized; em=bars(k).FontSize*ppi/72/height;
-    pos(2)=max(pos(2),1.5*em+padding);
+    if pos(3)<pos(4),continue;end
+    if pos(2)<.5
+        lines=1.5;if strlength(string(bars(k).Label.String))>0,lines=2.5;end
+        pos(2)=max(pos(2),lines*em+padding);
+        bottom=max(bottom,pos(2)+pos(4)+padding);
+    else
+        pos(2)=min(pos(2),1-pos(4)-2.5*em-padding);
+        top=min(top,pos(2)-padding);
+    end
     if ~strcmp(bars(k).Units,'normalized')||~isequal(bars(k).Position,pos),set(bars(k),'Units','normalized','Position',pos);end
-    bottom=max(bottom,pos(2)+pos(4)+padding);
 end
 if top-bottom<=0
     error('BNV:Export:AnnotationSpaceUnavailable','The canvas cannot hold physical annotation gutters (top=%g bottom=%g padding=%g height=%g scale=%g).',top,bottom,padding,height,scale);

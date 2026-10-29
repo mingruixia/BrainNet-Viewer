@@ -2,7 +2,7 @@
 
 ## 2.0.0（尚未发行）
 
-- MATLAB主窗口新增Global / Figure Annotations / Figure Title；Apply更新标题，Revert及预设使用相同的标题设置。
+- MATLAB补齐Figure Annotations的Show Colorbars、Colorbar Location、Colorbar Label和Figure Title；节点/连边色条与分类图例使用所选外侧位置，曲面色条保持独立开关，Apply、预设和导出保留相应设置。
 
 - MATLAB左侧信息框利用Save Scene下方的空余空间，缩小窗口时也保留更多可读内容。
 
