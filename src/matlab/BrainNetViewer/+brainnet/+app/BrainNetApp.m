@@ -1728,8 +1728,8 @@ classdef BrainNetApp < matlab.apps.AppBase
             end
             startupVersion = ['Version ' app.ProductInfo.version ' · ' ...
                 app.ProductInfo.release_status];
-            if ~isempty(app.ProductInfo.build_date)
-                startupVersion = [startupVersion ' · ' app.ProductInfo.build_date];
+            if ~isempty(app.ProductInfo.release_date)
+                startupVersion = [startupVersion ' · Release: ' app.ProductInfo.release_date];
             end
             app.StartupInfoArea = uilabel(app.StartupGrid, ...
                 'Text', [startupVersion ...
