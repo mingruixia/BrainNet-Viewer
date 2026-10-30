@@ -2,6 +2,8 @@
 
 ## 2.0.0 — Unreleased
 
+- Keep MATLAB edge colorbars consistent with the displayed colors when all mapped edge weights are equal.
+
 - Reduce MATLAB transparent PNG export time by reusing size calibration and removing redundant matte renders. Preserve output dimensions, transparency, annotations, and the displayed canvas. Keep physical-size units consistent during matte replay.
 - Read CPU topology and physical system memory on Linux. Restore the MATLAB application window after file dialogs close.
 - Keep the Linux Python workspace within the available screen area, with scrolling when needed, and let Qt manage its native window hierarchy.

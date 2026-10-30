@@ -21,8 +21,8 @@ switch string(edge.color_mode)
     case "mapped"
         values=prepared.EdgeValues;
         if string(edge.mapped_value_mode)=="absolute", values=abs(values); end
-        add('Edge',brainnet.core.Colormap.sample(edge.colormap,64), ...
-            range(values,edge.color_limits),strings(0,1));
+        [map,limits]=edgeRange(values,edge);
+        add('Edge',map,limits,strings(0,1));
     case "threshold"
         basis='Value';if string(edge.threshold_value_mode)=="absolute",basis='Absolute value';end
         add('Edge',[edge.color_low;edge.color_high],[0 1], ...
@@ -49,6 +49,24 @@ end
     function add(name,map,limits,labels)
         entries(end+1)=struct('name',name,'map',map,'limits',limits,'labels',{string(labels(:))});
     end
+end
+
+function [map,limits]=edgeRange(values,settings)
+map=brainnet.core.Colormap.sample(settings.colormap,64);
+limits=settings.color_limits;
+if isempty(limits),limits=[min(values) max(values)];end
+if limits(1)==limits(2)
+    % mappedEdgeColors assigns a degenerate domain to LUT entry 64.
+    % Keep the value at the high endpoint; do not change Node's low-end rule.
+    value=limits(1);step=max(1,eps(value));lower=value-step;
+    if isfinite(lower)&&lower<value
+        limits=[lower value];
+    else
+        % At -realmax no lower finite endpoint exists. A single-color scale
+        % preserves the actual mapped color without an infinite axis range.
+        limits=[value value+step];map=repmat(map(end,:),64,1);
+    end
+end
 end
 
 function limits=range(values,requested)

@@ -64,4 +64,4 @@ jobs:
           release: R2025a
       - uses: matlab-actions/run-command@37b454c384483087929a3d652be474ba585a9659 # v2
         with:
-          command: addpath('tests/matlab'); runReviewNodeComments(pwd,fullfile(tempdir,'bnv-node-reader.json')); runLocalSceneContractCI(pwd,fullfile(tempdir,'bnv-local-scene-contracts'))
+          command: addpath('tests/matlab'); runReviewNodeComments(pwd,fullfile(tempdir,'bnv-node-reader.json')); runLocalSceneContractCI(pwd,fullfile(tempdir,'bnv-local-scene-contracts')); r=runtests({'TestConstantEdgeLegend','TestFigureAnnotationEntries'}); assert(all([r.Passed]) && ~any([r.Incomplete]))
