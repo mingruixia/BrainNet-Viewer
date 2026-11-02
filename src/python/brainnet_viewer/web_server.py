@@ -29,6 +29,22 @@ def loopback(value):
         return False
 
 
+def private_address(value):
+    """Literal LAN addresses only; do not accept arbitrary DNS or reserved IPs."""
+    try:
+        address = ipaddress.ip_address(value)
+        if address.is_unspecified or address.is_multicast or '%' in value:
+            return False
+        if address.version == 6 and address.ipv4_mapped:
+            address = address.ipv4_mapped
+        return address.is_loopback or any(address in network for network in (
+            ipaddress.ip_network('10.0.0.0/8'), ipaddress.ip_network('172.16.0.0/12'),
+            ipaddress.ip_network('192.168.0.0/16'), ipaddress.ip_network('fc00::/7'))
+            if address.version == network.version)
+    except ValueError:
+        return False
+
+
 def parse_origin(value):
     parsed = urlsplit(value)
     if (parsed.scheme not in ('http', 'https') or not parsed.hostname or
@@ -51,11 +67,30 @@ class ServerConfig:
     threads: int = 2
     login_attempts: int = 10
     login_window: int = 60
+    trusted_lan: bool = False
+    anonymous: bool = False
 
     def __post_init__(self):
-        scheme, host, _ = parse_origin(self.origin)
-        if scheme == 'http' and not loopback(host):
+        if type(self.trusted_lan) is not bool or type(self.anonymous) is not bool:
+            raise ValueError('LAN and anonymous options must be boolean.')
+        if self.anonymous and not self.trusted_lan:
+            raise ValueError('Anonymous sessions require explicit trusted-LAN mode.')
+        if self.origin == 'auto':
+            if not self.trusted_lan:
+                raise ValueError('Automatic origin requires explicit trusted-LAN mode.')
+            scheme, host = 'http', None
+        else:
+            scheme, host, _ = parse_origin(self.origin)
+        if scheme == 'http' and host and not loopback(host) and not self.trusted_lan:
             raise ValueError('LAN server access requires HTTPS.')
+        if scheme == 'http' and host and self.trusted_lan:
+            try:
+                ipaddress.ip_address(host)
+            except ValueError:
+                pass  # An explicitly configured DNS origin remains exact-match.
+            else:
+                if not private_address(host):
+                    raise ValueError('Trusted-LAN HTTP requires a private or loopback address.')
         for value, low, high in ((self.maximum, 1, 32), (self.idle_seconds, 30, 86400),
                                  (self.startup_seconds, 5, 300), (self.threads, 1, 64),
                                  (self.login_attempts, 1, 100), (self.login_window, 10, 3600)):
@@ -63,12 +98,22 @@ class ServerConfig:
                 raise ValueError('Server resource settings are outside supported bounds.')
 
 
+def request_origin(request, config):
+    actual = parse_origin(f'{request.scheme}://{request.host}')
+    if config.origin == 'auto':
+        if actual[0] != 'http' or not private_address(actual[1]):
+            raise ValueError('Automatic LAN origin requires a literal private address.')
+        return actual
+    expected = parse_origin(config.origin)
+    if actual != expected:
+        raise ValueError('Server address does not match the configured origin.')
+    return expected
+
+
 def allowed_request(request, config):
     """Validate the actual connection. Forwarded headers never grant access."""
     try:
-        expected = parse_origin(config.origin)
-        if parse_origin(f'{request.scheme}://{request.host}') != expected:
-            return False
+        expected = request_origin(request, config)
         sensitive = (request.method not in ('GET', 'HEAD') or
                      request.headers.get('Upgrade', '').lower() == 'websocket')
         origin = request.headers.get('Origin')
@@ -146,11 +191,13 @@ button{{background:#075fe4;color:white;border:0;border-radius:4px}}p{{line-heigh
         content_type='text/html')
 
 
-def create_server(config, password, *, launcher=None):
-    if (not isinstance(password, str) or not 16 <= len(password.encode('utf-8')) <= 256
+def create_server(config, password=None, *, launcher=None):
+    if config.anonymous and password is not None:
+        raise ValueError('Anonymous mode must not silently ignore a supplied password.')
+    if not config.anonymous and (not isinstance(password, str) or not 16 <= len(password.encode('utf-8')) <= 256
             or any(character in password for character in ('\r', '\n', '\0'))):
         raise ValueError('The server password must contain 16 to 256 UTF-8 bytes.')
-    digest = hashlib.sha256(password.encode('utf-8')).digest()
+    digest = hashlib.sha256(password.encode('utf-8')).digest() if password is not None else None
     limiter = LoginLimiter(config.login_attempts, config.login_window)
     pool = None
     client = None
@@ -174,7 +221,9 @@ def create_server(config, password, *, launcher=None):
             # strict origin guard must reject. Keep origins for same-origin forms.
             headers['Referrer-Policy'] = 'same-origin'
             headers['Content-Security-Policy'] = "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
-        if config.origin.startswith('https://'):
+            if config.anonymous:
+                headers['Content-Security-Policy'] += "; script-src 'self'; connect-src 'self'"
+        if request.scheme == 'https':
             headers['Strict-Transport-Security'] = 'max-age=31536000'
         return headers
 
@@ -224,7 +273,59 @@ def create_server(config, password, *, launcher=None):
     def current(request):
         return pool.find(request.cookies.get(COOKIE, ''))
 
+    def session_response(request, item):
+        response = web.HTTPSeeOther(location='/index.html')
+        response.set_cookie(COOKIE, item.key, httponly=True,
+                            secure=request.scheme == 'https', samesite='Strict', path='/')
+        return response
+
+    async def start_session(request):
+        if not config.anonymous:
+            raise web.HTTPNotFound()
+        if await request.read():
+            raise web.HTTPBadRequest(text='No session-start payload is required.')
+        item = current(request)
+        if item is None:
+            if not limiter.accept(request.remote or ''):
+                raise web.HTTPTooManyRequests(text='Too many session starts. Try again in a minute.',
+                                             headers={'Retry-After': str(config.login_window)})
+            try:
+                item = pool.allocate()
+            except RuntimeError as error:
+                raise web.HTTPServiceUnavailable(text=str(error), headers={'Retry-After': '30'})
+        item.activity = time.monotonic()
+        raise session_response(request, item)
+
+    async def start_script(_request):
+        if not config.anonymous:
+            raise web.HTTPNotFound()
+        return web.Response(text='''(() => {
+  const button = document.getElementById('start');
+  const message = document.getElementById('message');
+  async function start() {
+    button.disabled = true;
+    try {
+      const response = await fetch('/_bnv/start', {method:'POST', credentials:'same-origin', redirect:'manual'});
+      if (response.type === 'opaqueredirect' || response.status === 303) location.replace('/index.html');
+      else { message.textContent = await response.text(); button.disabled = false; }
+    } catch (_) { message.textContent = 'Connection unavailable. Try again.'; button.disabled = false; }
+  }
+  button.addEventListener('click', start);
+  if (button.dataset.auto === 'yes') start();
+})();''', content_type='application/javascript')
+
     async def login(request):
+        if config.anonymous:
+            if request.method != 'GET':
+                raise web.HTTPNotFound()
+            if current(request) is not None:
+                raise web.HTTPSeeOther(location='/index.html')
+            auto = 'no' if request.query.get('ended') == '1' else 'yes'
+            return web.Response(text=f'''<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>BrainNet Viewer</title><script src="/_bnv/start.js" defer></script></head><body>
+<h1>BrainNet Viewer</h1><p id="message">{'Session ended.' if auto == 'no' else 'Opening your browser session…'}</p>
+<button id="start" data-auto="{auto}">Start new session</button>
+<noscript>Enable JavaScript to open BrainNet Viewer.</noscript></body></html>''', content_type='text/html')
         if request.method == 'GET':
             return login_page()
         existing = current(request)
@@ -257,7 +358,7 @@ def create_server(config, password, *, launcher=None):
         response = web.HTTPSeeOther(location='/index.html')
         LOG.info('login ok peer=%s audit=%s', request.remote or 'unknown', item.audit_id)
         response.set_cookie(COOKIE, item.key, httponly=True,
-                            secure=config.origin.startswith('https://'), samesite='Strict', path='/')
+                            secure=request.scheme == 'https', samesite='Strict', path='/')
         raise response
 
     async def activity(request):
@@ -279,7 +380,7 @@ def create_server(config, password, *, launcher=None):
             raise web.HTTPSeeOther(location='/_bnv/login')
         if request.method == 'POST':
             await pool.remove(item)
-            response = web.HTTPSeeOther(location='/_bnv/login')
+            response = web.HTTPSeeOther(location='/_bnv/login?ended=1' if config.anonymous else '/_bnv/login')
             response.del_cookie(COOKIE, path='/')
             raise response
         return web.Response(text='''<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -382,9 +483,9 @@ def create_server(config, password, *, launcher=None):
                     if upstream.status != 200:
                         raise web.HTTPBadGateway(text='Session bootstrap failed.')
                     value = await upstream.json()
-                    protocol = 'wss' if config.origin.startswith('https://') else 'ws'
+                    protocol = 'wss' if request.scheme == 'https' else 'ws'
                     # Browser-visible address must never expose a worker port.
-                    value['sessionURL'] = protocol + '://' + urlsplit(config.origin).netloc + '/ws'
+                    value['sessionURL'] = protocol + '://' + request.host + '/ws'
                     return web.json_response(value)
                 if upstream.status == 200 and request.path in ('/', '/index.html'):
                     # read(n) may return only the first network chunk. Wait for
@@ -421,8 +522,13 @@ def create_server(config, password, *, launcher=None):
 
     app.router.add_get('/_bnv/health', health)
     async def client_script(_request):
-        return web.Response(text=Path(__file__).with_name('web_session_client.js').read_text(encoding='utf-8'),
+        script = Path(__file__).with_name('web_session_client.js').read_text(encoding='utf-8')
+        if config.anonymous:
+            script = script.replace("expired ? 'Sign in'", "expired ? 'Start new session'")
+        return web.Response(text=script,
                             content_type='application/javascript')
+    app.router.add_post('/_bnv/start', start_session)
+    app.router.add_get('/_bnv/start.js', start_script)
     app.router.add_get('/_bnv/activity.js', client_script)
     app.router.add_post('/_bnv/activity', activity)
     app.router.add_get('/_bnv/status', activity)
@@ -440,8 +546,10 @@ def arguments(argv=None):
     parser = argparse.ArgumentParser(description='BrainNet Viewer Linux browser-session server.')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=1031)
-    parser.add_argument('--public-origin', required=True)
-    parser.add_argument('--password-file', type=Path, required=True)
+    parser.add_argument('--public-origin')
+    parser.add_argument('--password-file', type=Path)
+    parser.add_argument('--trusted-lan', action='store_true',
+                        help='Explicit trusted-LAN mode: private HTTP origin discovery and optional password.')
     parser.add_argument('--cert', type=Path)
     parser.add_argument('--key', type=Path)
     parser.add_argument('--allow-local-http', action='store_true',
@@ -455,15 +563,19 @@ def arguments(argv=None):
     parser.add_argument('--log-level', choices=('INFO', 'WARNING', 'ERROR'), default='INFO')
     args = parser.parse_args(argv)
     try:
+        args.public_origin = args.public_origin or ('auto' if args.trusted_lan else '')
+        if not args.password_file and not args.trusted_lan:
+            raise ValueError('Provide --password-file, or explicitly select --trusted-lan.')
         config = ServerConfig(args.public_origin, args.max_sessions, args.idle_seconds,
                               args.startup_seconds, args.worker_threads,
-                              args.login_attempts, args.login_window)
-        scheme, host, _ = parse_origin(args.public_origin)
+                              args.login_attempts, args.login_window,
+                              args.trusted_lan, args.trusted_lan and args.password_file is None)
+        scheme, host = ('http', None) if args.public_origin == 'auto' else parse_origin(args.public_origin)[:2]
         if not 1 <= args.port <= 65535:
             raise ValueError('Listening port must be between 1 and 65535.')
         local_host, local_bind = loopback(host), loopback(args.host)
         if scheme == 'http':
-            if not (args.allow_local_http and local_host and local_bind) or args.cert or args.key:
+            if not (args.trusted_lan or args.allow_local_http and local_host and local_bind) or args.cert or args.key:
                 raise ValueError('LAN server access requires HTTPS and a certificate/key pair.')
         elif not args.cert or not args.key:
             raise ValueError('HTTPS requires both --cert and --key.')
@@ -479,10 +591,12 @@ def main(argv=None):
     logging.basicConfig(level=args.log_level, format='%(asctime)s %(levelname)s %(name)s %(message)s')
     context = None
     try:
-        if args.password_file.stat().st_size > 258:
-            raise ValueError('Server password file is too large.')
-        password = args.password_file.read_text(encoding='utf-8').rstrip('\r\n')
-        if len(set(password)) < 5 or password.isdecimal():
+        password = None
+        if args.password_file:
+            if args.password_file.stat().st_size > 258:
+                raise ValueError('Server password file is too large.')
+            password = args.password_file.read_text(encoding='utf-8').rstrip('\r\n')
+        if password is not None and (len(set(password)) < 5 or password.isdecimal()):
             LOG.warning('Server password appears weak. Generate a random team access password.')
         if args.cert:
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)

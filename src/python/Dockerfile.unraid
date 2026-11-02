@@ -1,0 +1,15 @@
+# Published 2.0.0 is immutable. This small derivative changes the LAN gateway only.
+FROM mingruixia/brainnet-viewer@sha256:221195f71d9ad1ab2f936e29d1416542aa7c758e42a1aa5dfc0b7cd946726e84
+ARG BNV_REVISION=unknown
+ARG BNV_CREATED=unknown
+LABEL org.opencontainers.image.title="BrainNet Viewer LAN for Unraid" \
+      org.opencontainers.image.version="2.0.0-unraid.1" \
+      org.opencontainers.image.revision=$BNV_REVISION \
+      org.opencontainers.image.created=$BNV_CREATED \
+      org.opencontainers.image.source="https://github.com/mingruixia/BrainNet-Viewer" \
+      org.opencontainers.image.description="Trusted-LAN HTTP with anonymous browser sessions; optional HTTPS and password."
+COPY brainnet_viewer/web_server.py brainnet_viewer/web_unraid.py /usr/local/lib/python3.12/site-packages/brainnet_viewer/
+ENV BNV_SCHEME=http BNV_PASSWORD_AUTH=off
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 CMD python -c "from brainnet_viewer.web_unraid import healthcheck; healthcheck()"
+ENTRYPOINT ["python", "-m", "brainnet_viewer.web_unraid"]
+CMD []
