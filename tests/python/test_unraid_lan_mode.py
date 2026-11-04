@@ -40,7 +40,7 @@ class ModeTests(unittest.TestCase):
             self.assertTrue(private_address(host),host)
         for host in ['0.0.0.0','::','8.8.8.8','192.0.2.7','169.254.1.1','evil.example','224.0.0.1']:
             self.assertFalse(private_address(host),host)
-        request=SimpleNamespace(scheme='http',host='192.168.2.7:1045',method='POST',headers={'Origin':'http://192.168.2.7:1045'})
+        request=SimpleNamespace(scheme='http',host='192.168.2.7:1045',method='POST',headers={'Origin':'http://192.168.2.7:1045'},remote='192.168.2.8')
         self.assertTrue(allowed_request(request,config))
         for headers in ({},{'Origin':'null'},{'Origin':'http://evil.invalid'},
                         {'Origin':'http://192.168.2.7:1031'},

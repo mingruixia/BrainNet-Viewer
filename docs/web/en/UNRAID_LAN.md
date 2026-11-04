@@ -49,3 +49,35 @@ Source for this variant is on branch `maintenance/unraid-easy-lan-20261102`.
 The image is built with `src/python/Dockerfile.unraid`, from the pinned 2.0.0
 multi-architecture index. Docker/Linux HTTP and optional TLS checks are separate
 from native Unraid installation, GPU passthrough and native ARM64 rendering.
+
+## Unreleased anonymous network guard
+
+The following changes are in the local maintenance source and are not included
+in the published `2.0.0-unraid.1` image. The Community Applications template
+continues to use that published image.
+
+The guard admits anonymous requests from the actual socket peer only when it is
+a private or loopback address. It normalizes IPv4-mapped IPv6 addresses. It does
+not use `Forwarded`, `X-Forwarded-For` or `X-Real-IP` to grant access. Existing
+Host, Origin and same-origin WebSocket checks remain in force; rejected requests
+do not allocate a session. Password-enabled access keeps its existing rules.
+
+Docker bridge addresses remain supported. For a VPN that routes private LAN
+addresses, no additional network setting is needed. For direct VPN peers in a
+different range, the source launcher accepts `BNV_ANONYMOUS_NETWORKS`, a
+comma-separated list of canonical CIDRs, for example `100.101.102.0/24`. Allow
+only the client range you intend to use. This does not change server-address
+validation: automatic origin discovery still requires a private/loopback server
+IP. Use a DNS name with an explicit matching `BNV_SERVER_ORIGIN` when needed.
+
+A reverse proxy is the socket peer seen by the gateway. If that proxy has a
+private address, its clients must be restricted by the proxy or upstream
+firewall. The application cannot recover the original client boundary from
+untrusted forwarding headers. A same-origin HTTP proxy must preserve Host and
+Origin and support WebSocket upgrade. TLS termination in front of an HTTP
+gateway is not covered by these checks; configure and validate the HTTPS path
+separately rather than disabling origin validation.
+
+The association checks cover a Docker bridge, an HTTP proxy and simulated CGNAT
+VPN addresses in Docker network namespaces. They do not constitute physical VPN,
+native Unraid or GPU passthrough acceptance.

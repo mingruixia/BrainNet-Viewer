@@ -18,3 +18,15 @@ HTTP通信不加密，能访问该端口的设备可以进入应用，默认模�
 上述私有文件及目录须可由UID10001读取，文件保持私有，以只读方式挂载；默认模式不要求创建这些文件或挂载目录。切换模式或更新容器前保存Scene，重启会结束未保存会话。Scene保存仍为可迁移ZIP，图片和JSON仍分别下载。
 
 普通brainnet-server入口仍要求明确的安全配置；新增免密码/HTTP行为只有显式trusted-LAN模式或Unraid启动器启用。源码位于maintenance/unraid-easy-lan-20261102分支，构建使用src/python/Dockerfile.unraid和不可变2.0.0双架构基础索引。容器/API程序检查不代替原生Unraid安装、GPU透传或原生ARM64图形验收。
+
+## 尚未发行的匿名访问网段防护
+
+以下修改仅在本地独立维护源码中，已公开的`2.0.0-unraid.1`镜像尚不包含；Community Applications模板继续指向该已发行镜像。
+
+匿名请求按实际连接到网关的地址判断，默认接收私有网段与回环地址，并兼容IPv4映射的IPv6地址。不以`Forwarded`、`X-Forwarded-For`或`X-Real-IP`作为放行依据。原有Host、Origin及WebSocket同源检查保留，拒绝请求不创建会话。启用密码时沿用原有认证规则。
+
+Docker桥接地址可直接使用。VPN若通过路由访问私有局域网地址，无需增加网段设置；若客户端直接使用其他地址段，可在源码启动器中设置`BNV_ANONYMOUS_NETWORKS`，用逗号分隔规范CIDR，例如`100.101.102.0/24`，只允许实际需要的客户端范围。该选项不放宽服务器地址校验：自动origin仍只识别私有或回环服务器IP；需要时使用域名并明确填写匹配的`BNV_SERVER_ORIGIN`。
+
+使用反向代理时，网关看到的是代理地址。若代理位于私有网段，应由代理或上游防火墙限制客户端，不能依赖转发头恢复原始访问边界。同源HTTP代理须保留Host和Origin并支持WebSocket升级。本轮未验证“前端HTTPS终止、后端HTTP”部署，应另行配置和核验HTTPS链路，不应关闭同源检查来绕过。
+
+本轮关联检查覆盖Docker桥接、HTTP代理以及Docker网络命名空间中的CGNAT地址模拟，不等同于真实VPN、原生Unraid或GPU透传验收。

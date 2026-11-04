@@ -45,6 +45,22 @@ def private_address(value):
         return False
 
 
+def anonymous_peer_allowed(peer, extra_networks=()):
+    """Use the socket peer only; forwarding headers cannot grant admission."""
+    if not isinstance(peer, str) or '%' in peer:
+        return False
+    try:
+        address = ipaddress.ip_address(peer)
+    except ValueError:
+        return False
+    if address.version == 6 and address.ipv4_mapped:
+        address = address.ipv4_mapped
+    if private_address(str(address)):
+        return True
+    return any(address.version == network.version and address in network
+               for network in extra_networks)
+
+
 def parse_origin(value):
     parsed = urlsplit(value)
     if (parsed.scheme not in ('http', 'https') or not parsed.hostname or
@@ -69,10 +85,25 @@ class ServerConfig:
     login_window: int = 60
     trusted_lan: bool = False
     anonymous: bool = False
+    anonymous_networks: tuple = ()
 
     def __post_init__(self):
         if type(self.trusted_lan) is not bool or type(self.anonymous) is not bool:
             raise ValueError('LAN and anonymous options must be boolean.')
+        if not isinstance(self.anonymous_networks, tuple) or len(self.anonymous_networks) > 32:
+            raise ValueError('Provide at most 32 additional anonymous peer networks.')
+        networks = []
+        for value in self.anonymous_networks:
+            try:
+                network = ipaddress.ip_network(value, strict=True)
+            except (ValueError, TypeError) as error:
+                raise ValueError('Anonymous peer networks require canonical IP CIDRs.') from error
+            if network.prefixlen == 0 or network.is_multicast or network.is_unspecified:
+                raise ValueError('Anonymous peer networks must be specific unicast CIDRs.')
+            if network.version == 6 and network.network_address.ipv4_mapped:
+                raise ValueError('Use IPv4 CIDRs for IPv4-mapped anonymous peers.')
+            networks.append(network)
+        object.__setattr__(self, 'anonymous_networks', tuple(networks))
         if self.anonymous and not self.trusted_lan:
             raise ValueError('Anonymous sessions require explicit trusted-LAN mode.')
         if self.origin == 'auto':
@@ -114,6 +145,9 @@ def allowed_request(request, config):
     """Validate the actual connection. Forwarded headers never grant access."""
     try:
         expected = request_origin(request, config)
+        if config.anonymous and not anonymous_peer_allowed(
+                getattr(request, 'remote', None), config.anonymous_networks):
+            return False
         sensitive = (request.method not in ('GET', 'HEAD') or
                      request.headers.get('Upgrade', '').lower() == 'websocket')
         origin = request.headers.get('Origin')
@@ -230,7 +264,7 @@ def create_server(config, password=None, *, launcher=None):
     @web.middleware
     async def security(request, handler):
         if not allowed_request(request, config):
-            raise web.HTTPForbidden(text='Use the configured server address and same-origin requests.')
+            raise web.HTTPForbidden(text='Use the configured server address, an allowed client network and same-origin requests.')
         try:
             response = await handler(request)
         except web.HTTPException as error:
@@ -550,6 +584,8 @@ def arguments(argv=None):
     parser.add_argument('--password-file', type=Path)
     parser.add_argument('--trusted-lan', action='store_true',
                         help='Explicit trusted-LAN mode: private HTTP origin discovery and optional password.')
+    parser.add_argument('--anonymous-network', action='append', default=[], metavar='CIDR',
+                        help='Additional socket-peer CIDR for anonymous access, e.g. a VPN subnet. Repeat as needed.')
     parser.add_argument('--cert', type=Path)
     parser.add_argument('--key', type=Path)
     parser.add_argument('--allow-local-http', action='store_true',
@@ -569,7 +605,8 @@ def arguments(argv=None):
         config = ServerConfig(args.public_origin, args.max_sessions, args.idle_seconds,
                               args.startup_seconds, args.worker_threads,
                               args.login_attempts, args.login_window,
-                              args.trusted_lan, args.trusted_lan and args.password_file is None)
+                              args.trusted_lan, args.trusted_lan and args.password_file is None,
+                              tuple(args.anonymous_network))
         scheme, host = ('http', None) if args.public_origin == 'auto' else parse_origin(args.public_origin)[:2]
         if not 1 <= args.port <= 65535:
             raise ValueError('Listening port must be between 1 and 65535.')

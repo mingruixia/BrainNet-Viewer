@@ -16,6 +16,12 @@ def command(environ=None):
             '--max-sessions', env.get('BNV_MAX_SESSIONS', '4'),
             '--idle-seconds', env.get('BNV_IDLE_SECONDS', '1800'),
             '--worker-threads', env.get('BNV_WORKER_THREADS', '2')]
+    networks = env.get('BNV_ANONYMOUS_NETWORKS', '').strip()
+    if networks:
+        if len(networks) > 4096:
+            raise ValueError('BNV_ANONYMOUS_NETWORKS is too long.')
+        for network in networks.split(','):
+            args += ['--anonymous-network', network.strip()]
     origin = env.get('BNV_SERVER_ORIGIN', '').strip()
     if origin:
         if not origin.startswith(scheme + '://'):
