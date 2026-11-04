@@ -5,6 +5,7 @@ application. It leaves the `2.0.0` and `latest` images unchanged. The applicatio
 and each browser worker retain the 2.0.0 renderer and resources.
 
 The Unraid Community Applications template starts with HTTP and no password.
+These defaults are also set by the image entry point when run outside Unraid.
 Install it from **Apps**, then open **WebUI** at `http://UNRAID_IP:1031`.
 No certificate, password file or public-origin setting is needed for this mode.
 The default address discovery accepts literal private/loopback IP addresses.
