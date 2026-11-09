@@ -82,3 +82,13 @@ separately rather than disabling origin validation.
 The association checks cover a Docker bridge, an HTTP proxy and simulated CGNAT
 VPN addresses in Docker network namespaces. They do not constitute physical VPN,
 native Unraid or GPU passthrough acceptance.
+
+## Anonymous source guard (source maintenance update)
+
+This section describes the source guard on this maintenance branch. The published 2.0.0-unraid.1 image retains its original gateway. A later release receipt will identify any new image and installation target.
+
+Anonymous requests are checked against the actual connection peer. Defaults allow RFC1918 private networks, loopback and IPv6 ULA. BNV_ANONYMOUS_NETWORKS adds explicit canonical CIDRs for controlled VPN or other client networks. BNV_SERVER_ORIGIN identifies the application address; it is independent of client source admission. Forwarded headers grant no access. HTTPS and password authentication remain optional.
+
+A proxy, docker-proxy or SNAT can give several clients the same allowed private peer. Apply access controls upstream where real clients are distinguishable. The application can check only its actual connection peer. Record observed peers, response codes and refusal before session allocation. Windows Docker Desktop host-port checks are distinct from native Unraid, physical VPN and IPv6 deployment validation.
+
+With password authentication enabled, failed attempts from clients sharing a proxy peer count towards the same limit. Once exhausted, other users' new sign-ins can temporarily return HTTP 429. Existing sessions and successful sign-ins retain their existing handling. Check concurrent sign-in availability alongside upstream access and rate limits.
