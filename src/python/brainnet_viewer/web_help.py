@@ -10,9 +10,13 @@ def render_page(text,source,root):
         image,label,target=match.groups(); parts=urlsplit(target)
         if parts.scheme:
             url=target if parts.scheme in ('http','https','mailto') else ''
+        elif parts.netloc:
+            url=''
+        elif not parts.path:
+            url='#'+quote(parts.fragment) if parts.fragment and not image else ''
         else:
             path=(source.parent/unquote(parts.path)).resolve()
-            if not path.is_relative_to(root): url=''
+            if not path.is_relative_to(root) or path==root or path.is_dir(): url=''
             else:
                 suffix='.html' if path.suffix=='.md' else path.suffix
                 relative=path.relative_to(root).with_suffix(suffix).as_posix()
@@ -38,6 +42,10 @@ def render_page(text,source,root):
         if line.startswith('```'):
             rows.append('</pre>' if code else '<pre>'); code=not code; continue
         if code: rows.append(escape(line)+'\n'); continue
+        anchor_tag=re.fullmatch(r'<a id="([A-Za-z][A-Za-z0-9_-]*)"></a>',line.strip())
+        if anchor_tag:
+            rows.append(f'<a id="{anchor_tag[1]}"></a>')
+            continue
         heading=re.match(r'^(#{1,6})\s+(.+)',line)
         if heading:
             level=len(heading[1]); anchor=re.sub(r'[^\w -]','',heading[2].lower()).replace(' ','-')
