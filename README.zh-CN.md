@@ -43,7 +43,7 @@ AAL/Brodmann；使用个人数据前确认配准与坐标对应。界面为英�
 使用对应2.0.0镜像或源码构建；既有公测镜像不包含服务器模式。
 
 本地服务会检查浏览器请求，但不提供操作系统用户认证。本机进程可以伪造请求头，
-因此不能直接作为多用户共享主机或公网部署配置。参见[安全说明](SECURITY.md)。
+因此不能直接作为多用户共享主机或公网部署配置。参见[安全说明](README.md#security)。
 
 ## 源码构建
 
@@ -62,3 +62,9 @@ https://doi.org/10.1371/journal.pone.0068910
 
 联系人Mingrui Xia：mxia@bnu.edu.cn；mingruixia@gmail.com。
 代码使用[GPL-3.0-or-later](LICENSE)，请保留代码及资源说明。
+
+## 贡献、问题反馈与安全部署
+
+报告问题时提供版本或提交、操作系统、运行环境、复现步骤和完整错误信息。贡献要求与测试入口见[贡献说明](README.md#contributing)。安全问题请通过README中的联系人私下反馈，详情见[安全与部署说明](README.md#security)。
+
+代码遵循[GPL-3.0-or-later](LICENSE)。图谱、曲面、示例、字体及色图的来源与适用条款统一见[第三方声明](THIRD_PARTY_NOTICES.md)。[机器可读引用](docs/citation/CITATION.cff)保留原作者和论文信息。

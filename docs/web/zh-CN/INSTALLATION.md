@@ -158,7 +158,7 @@ Origin，通过同源请求获取每次启动的新key。它不提供用户登�
 
 仅支持一名受信任用户的私有本机。本机进程可伪造Origin取得key，这不是操作系统
 用户认证；不要用于多用户共享主机、JupyterHub或不可信共享网络命名空间。参见
-[安全说明](../../../SECURITY.md)。Compose支持`BNV_PORT`（默认1031）、`BNV_CPUS`（1）
+[安全说明](../../../README.md#security)。Compose支持`BNV_PORT`（默认1031）、`BNV_CPUS`（1）
 及`BNV_MEM`（8g）。WSL容器环境可用`MESA_D3D12_DEFAULT_ADAPTER_NAME`选择显卡，
 默认不强制厂商。不要设置内部`BNV_WEB_BOOTSTRAPPED`；启动允许90秒完成图形探测和服务初始化，请根据报告的后端区分硬件与软件绘图。
 

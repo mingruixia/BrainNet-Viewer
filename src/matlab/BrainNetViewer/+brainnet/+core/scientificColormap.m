@@ -2,7 +2,7 @@ function colors = scientificColormap(name)
 %SCIENTIFICCOLORMAP Fixed 256-row scientific palettes from Matplotlib 3.10.0.
 % Source: https://github.com/matplotlib/matplotlib/blob/v3.10.0/lib/matplotlib/_cm_listed.py
 % Copyright (c) 2012- Matplotlib Development Team; All Rights Reserved.
-% See LICENSE_MATPLOTLIB_COLORMAPS.txt for the source license.
+% See THIRD_PARTY_NOTICES.md (Matplotlib colormaps) for the source license.
 switch char(string(name))
     case 'viridis'
         colors = [ ...

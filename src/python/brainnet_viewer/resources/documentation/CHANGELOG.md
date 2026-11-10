@@ -1,6 +1,10 @@
 # Changes in BrainNet Viewer
 
-## 2.0.0 — Unreleased
+## Unreleased
+
+- Upgrade pypdf to 6.21.4 to fix excessive memory use when parsing crafted PDF page trees (CVE-2026-119204).
+
+## 2.0.0 — 2026-10-31
 
 - Keep MATLAB edge colorbars consistent with the displayed colors when all mapped edge weights are equal.
 

@@ -192,7 +192,7 @@ embed it in another site's iframe without a separately designed deployment.
 
 Only one trusted local user is supported. Local processes can forge Origin and
 obtain a key; this is not OS-user authentication. Do not use shared-user hosts,
-JupyterHub or untrusted shared network namespaces. See [security guidance](../../../SECURITY.md).
+JupyterHub or untrusted shared network namespaces. See [security guidance](../../../README.md#security).
 Compose accepts `BNV_PORT` (default 1031), `BNV_CPUS` (1) and `BNV_MEM` (8g).
 On WSL, `MESA_D3D12_DEFAULT_ADAPTER_NAME` optionally chooses an adapter when supplied
 to the container environment; no vendor is forced by default. Do not set internal

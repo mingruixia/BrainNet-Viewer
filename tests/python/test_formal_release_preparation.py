@@ -26,6 +26,8 @@ class FormalPreparationTests(unittest.TestCase):
             ".server-secrets/server.key","docs/web/secret.pem","tests/python/test.py"}
         matlab=TOOL.archive_inputs(files,"MATLAB")
         self.assertIn("BrainNetViewer.m",matlab)
+        self.assertIn("THIRD_PARTY_NOTICES.md",matlab)
+        self.assertNotIn("NOTICE_CODE.md",matlab)
         self.assertIn("resources/atlases/AAL90/aal.nii",matlab)
         for key in ("legacy/old.m","research/fiber.py","docs/internal/private.md",
                     "docs/manual/en/Old.docx","tmp/secret.txt",".server-secrets/server.key","docs/web/secret.pem"):

@@ -12,12 +12,10 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 ROOT_FILES = {
     "README.md", "README.zh-CN.md", "CHANGELOG.md", "CHANGELOG.zh-CN.md",
-    "CITATION.cff", "LICENSE", "LICENSE_MATPLOTLIB_COLORMAPS.txt",
-    "NOTICE_ATLAS_NETWORK_EXAMPLES.md", "NOTICE_CODE.md", "NOTICE_INSPECT_ATLASES.md",
-    "NOTICE_NETWORK_EXAMPLES.md", "NOTICE_SURFACE_TEMPLATES.md", "NOTICE_TUTORIAL_ASSETS.md",
-    "SECURITY.md",
+    "LICENSE", "THIRD_PARTY_NOTICES.md",
 }
-DOC_PREFIXES = ("docs/manual/", "docs/tutorials/", "docs/documentation/",
+
+DOC_PREFIXES = ("docs/citation/", "docs/manual/", "docs/tutorials/", "docs/documentation/",
                 "docs/python/", "docs/web/", "docs/compatibility/Surface_Format_Support.md")
 FORBIDDEN = {"research", "legacy", "archives", "releases", "tmp", ".git", ".server-secrets",
              "__pycache__", "internal", "architecture"}

@@ -2,7 +2,7 @@
 
 **Colors...** 编辑器只有四个独立目标：Surface、Nodes、Edges、Volume。Volume用**一张**带符号色图；Positive & Negative显示模式从中点分成正负两侧，不再存两张。ROI Label Index的类别色板及可选ROI ID图例在Volume设置中选择，不是编辑器目标。
 
-新增Viridis、Plasma、Inferno、Magma、Cividis，采用Matplotlib固定256色参考表；Surface、Nodes、Edges、Volume及ROI Palette下拉框均可选择。Fiber设置数据模型也接受这些名称，但当前尚不提供纤维绘制。顺序色图适合有序数值，相邻ROI类别却可能难以区分；带正负号体数据会从色图中点分割，零点具有实际含义时宜选Blue-White-Red等发散色图。来源署名及许可见`NOTICE_CODE.md`与`LICENSE_MATPLOTLIB_COLORMAPS.txt`。
+新增Viridis、Plasma、Inferno、Magma、Cividis，采用Matplotlib固定256色参考表；Surface、Nodes、Edges、Volume及ROI Palette下拉框均可选择。Fiber设置数据模型也接受这些名称，但当前尚不提供纤维绘制。顺序色图适合有序数值，相邻ROI类别却可能难以区分；带正负号体数据会从色图中点分割，零点具有实际含义时宜选Blue-White-Red等发散色图。来源署名及许可见`THIRD_PARTY_NOTICES.md`（代码署名及完整Matplotlib许可证）。
 
 选择内置名称与 **Count**（2–4096）后点Generate，或导入TXT/JSON RGB表。Red/Green/Blue通道为[0,1]内有限数值。**Resample** 在RGB空间插值，**Reverse** 倒序，**Export...** 仅写出当前目标的表。**Use in Settings** 暂存四个目标并关闭编辑器；面板底部唯一的 **Apply** 提交**并渲染**，**Revert** 放弃待提交设置；Cancel/关闭编辑器放弃编辑器内的修改。
 

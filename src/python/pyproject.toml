@@ -52,7 +52,7 @@ brainnet_viewer = [
     "data/*.npz", "data/*.json",
     "resources/Help.en.md", "resources/*.mat",
     "resources/Tutorials.en.md",
-    "resources/documentation/docs/*.md",
+    "resources/documentation/docs/*.md", "resources/documentation/docs/citation/*.cff",
     "resources/documentation/docs/compatibility/*.md",
     "resources/documentation/docs/documentation/*.md",
     "resources/documentation/docs/manual/en/*.docx",
